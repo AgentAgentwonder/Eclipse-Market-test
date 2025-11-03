@@ -50,7 +50,7 @@ pub struct HealthCheckRecord {
     pub service_name: String,
     pub timestamp: DateTime<Utc>,
     pub success: bool,
-    pub latency_ms: u128,
+    pub latency_ms: i64,
     pub status_code: Option<u16>,
     pub error: Option<String>,
 }
@@ -152,7 +152,7 @@ impl ApiHealthMonitor {
         .bind(&record.service_name)
         .bind(record.timestamp.to_rfc3339())
         .bind(if record.success { 1 } else { 0 })
-        .bind(record.latency_ms as i64)
+        .bind(record.latency_ms.max(0))
         .bind(record.status_code.map(|c| c as i64))
         .bind(&record.error)
         .execute(&self.pool)
@@ -199,20 +199,20 @@ impl ApiHealthMonitor {
         let total = rows.len() as i64;
         let mut successful = 0i64;
         let mut failed = 0i64;
-        let mut total_latency = 0u128;
+        let mut total_latency: i128 = 0;
         let mut last_success: Option<DateTime<Utc>> = None;
         let mut last_failure: Option<DateTime<Utc>> = None;
         let mut last_error: Option<String> = None;
 
         for row in &rows {
             let success: i64 = row.try_get("success")?;
-            let latency: i64 = row.try_get("latency_ms")?;
+            let latency: i64 = row.try_get("latency_ms")?.max(0);
             let timestamp_str: String = row.try_get("timestamp")?;
             let timestamp = DateTime::parse_from_rfc3339(&timestamp_str)
                 .map_err(|e| HealthMonitorError::Internal(format!("Invalid timestamp: {}", e)))?
                 .with_timezone(&Utc);
 
-            total_latency += latency as u128;
+            total_latency += latency as i128;
 
             if success == 1 {
                 successful += 1;

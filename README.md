@@ -34,9 +34,13 @@ A Vite-powered React 18 + TypeScript desktop application with Tauri backend for 
    npm install
    ```
 
-3. Configure environment variables (optional):
-   Create a `.env` file in the project root:
+3. Configure environment variables:
+   Create a `.env` file in the project root (use `.env.example` as a template):
    ```env
+   # Required for Rust backend (sqlx compile-time checking)
+   DATABASE_URL=sqlite:./database.db
+
+   # Optional: Solana configuration
    VITE_SOLANA_NETWORK=mainnet-beta
    VITE_SOLANA_RPC_ENDPOINT=https://api.mainnet-beta.solana.com
    SOLANA_RPC_ENDPOINT=https://api.mainnet-beta.solana.com
