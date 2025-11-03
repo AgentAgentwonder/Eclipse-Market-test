@@ -26,6 +26,12 @@ interface VoiceState {
   mfaChallenge: VoiceMFAChallenge | null;
   pendingNotifications: Array<{ id: string; message: string; priority: number; timestamp: number }>;
 
+  settings: VoiceSettings;
+  isListening: boolean;
+  isProcessing: boolean;
+  lastTranscript: string | null;
+  errorMessage: string | null;
+
   setEnabled: (enabled: boolean) => void;
   setListening: (listening: boolean) => void;
   startSession: (locale?: VoiceLocale, drivingMode?: boolean) => void;
@@ -54,6 +60,18 @@ interface VoiceState {
   queueNotification: (message: string, priority?: number) => void;
   dequeueNotification: (id: string) => void;
   clearNotifications: () => void;
+
+  updateWakeWordConfig: (config: Partial<WakeWordConfig>) => void;
+  updateSTTConfig: (config: Partial<SpeechToTextConfig>) => void;
+  updateTTSConfig: (config: Partial<TextToSpeechConfig>) => void;
+  setIsListening: (listening: boolean) => void;
+  setIsProcessing: (processing: boolean) => void;
+  setLastTranscript: (transcript: string | null) => void;
+  setErrorMessage: (error: string | null) => void;
+  setConfirmationPrompts: (enabled: boolean) => void;
+  setPrivacyMode: (enabled: boolean) => void;
+  setAutoActivation: (enabled: boolean) => void;
+  resetSettings: () => void;
 }
 
 const generateId = () => `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -116,27 +134,7 @@ export interface VoiceSettings {
   autoActivation: boolean;
 }
 
-interface VoiceState {
-  settings: VoiceSettings;
-  isListening: boolean;
-  isProcessing: boolean;
-  lastTranscript: string | null;
-  errorMessage: string | null;
-
-  updateWakeWordConfig: (config: Partial<WakeWordConfig>) => void;
-  updateSTTConfig: (config: Partial<SpeechToTextConfig>) => void;
-  updateTTSConfig: (config: Partial<TextToSpeechConfig>) => void;
-  setIsListening: (listening: boolean) => void;
-  setIsProcessing: (processing: boolean) => void;
-  setLastTranscript: (transcript: string | null) => void;
-  setErrorMessage: (error: string | null) => void;
-  setConfirmationPrompts: (enabled: boolean) => void;
-  setPrivacyMode: (enabled: boolean) => void;
-  setAutoActivation: (enabled: boolean) => void;
-  resetSettings: () => void;
-}
-
-const DEFAULT_SETTINGS: VoiceSettings = {
+const createDefaultSettings = (): VoiceSettings => ({
   wakeWord: {
     enabled: true,
     wakeWord: 'Hey Eclipse',
@@ -161,7 +159,16 @@ const DEFAULT_SETTINGS: VoiceSettings = {
   confirmationPrompts: true,
   privacyMode: false,
   autoActivation: false,
-};
+});
+
+const DEFAULT_SETTINGS = createDefaultSettings();
+
+const cloneSettings = (settings: VoiceSettings): VoiceSettings => ({
+  ...settings,
+  wakeWord: { ...settings.wakeWord },
+  stt: { ...settings.stt },
+  tts: { ...settings.tts },
+});
 
 export const useVoiceStore = create<VoiceState>()(
   persist(
@@ -177,6 +184,11 @@ export const useVoiceStore = create<VoiceState>()(
       availableVoices: [],
       mfaChallenge: null,
       pendingNotifications: [],
+      settings: cloneSettings(DEFAULT_SETTINGS),
+      isListening: false,
+      isProcessing: false,
+      lastTranscript: null,
+      errorMessage: null,
 
       setEnabled: enabled => {
         set({ enabled });
@@ -405,6 +417,89 @@ export const useVoiceStore = create<VoiceState>()(
       clearNotifications: () => {
         set({ pendingNotifications: [] });
       },
+
+      updateWakeWordConfig: config => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            wakeWord: {
+              ...state.settings.wakeWord,
+              ...config,
+            },
+          },
+        }));
+      },
+
+      updateSTTConfig: config => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            stt: {
+              ...state.settings.stt,
+              ...config,
+            },
+          },
+        }));
+      },
+
+      updateTTSConfig: config => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            tts: {
+              ...state.settings.tts,
+              ...config,
+            },
+          },
+        }));
+      },
+
+      setIsListening: listening => {
+        set({ isListening: listening });
+      },
+
+      setIsProcessing: processing => {
+        set({ isProcessing: processing });
+      },
+
+      setLastTranscript: transcript => {
+        set({ lastTranscript: transcript });
+      },
+
+      setErrorMessage: error => {
+        set({ errorMessage: error });
+      },
+
+      setConfirmationPrompts: enabled => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            confirmationPrompts: enabled,
+          },
+        }));
+      },
+
+      setPrivacyMode: enabled => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            privacyMode: enabled,
+          },
+        }));
+      },
+
+      setAutoActivation: enabled => {
+        set(state => ({
+          settings: {
+            ...state.settings,
+            autoActivation: enabled,
+          },
+        }));
+      },
+
+      resetSettings: () => {
+        set({ settings: cloneSettings(DEFAULT_SETTINGS) });
+      },
     }),
     {
       name: 'voice-store',
@@ -415,6 +510,7 @@ export const useVoiceStore = create<VoiceState>()(
         speechConfig: state.speechConfig,
         recognitionConfig: state.recognitionConfig,
         commandHistory: state.commandHistory.slice(0, 20),
+        settings: state.settings,
       }),
     }
   )
