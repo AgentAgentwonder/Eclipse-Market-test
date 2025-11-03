@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bot,
@@ -7,8 +7,6 @@ import {
   Trash2,
   ThumbsUp,
   ThumbsDown,
-  MessageSquare,
-  Settings,
   Download,
   Zap,
   AlertTriangle,
@@ -34,19 +32,12 @@ export function AIAnalysis() {
     quickActions,
     latestOptimization,
     patternWarnings,
-    loading,
     error,
     createConversation,
-    switchConversation,
-    deleteConversation,
-    sendMessage,
     streamMessage,
     addFeedback,
-    addQuickAction,
     toggleQuickAction,
     deleteQuickAction,
-    executeQuickAction,
-    requestPortfolioOptimization,
     fetchPatternWarnings,
     dismissPatternWarning,
     getActiveConversation,
@@ -59,7 +50,6 @@ export function AIAnalysis() {
   const [showQuickActions, setShowQuickActions] = useState(true);
   const [showPatternWarnings, setShowPatternWarnings] = useState(true);
   const [showOptimization, setShowOptimization] = useState(true);
-  const [newQuickActionOpen, setNewQuickActionOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -70,7 +60,7 @@ export function AIAnalysis() {
     if (!activeConversationId && conversations.length === 0) {
       createConversation('AI Trading Assistant');
     }
-  }, []);
+  }, [activeConversationId, conversations.length, createConversation]);
 
   useEffect(() => {
     fetchPatternWarnings();
