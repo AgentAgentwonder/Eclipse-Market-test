@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tokio::sync::RwLock;
 
 const SCHEDULER_CONFIG_FILE: &str = "backup_schedule.json";
@@ -109,7 +109,7 @@ impl BackupScheduler {
     fn config_path(&self) -> Result<PathBuf, SchedulerError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| {
                 std::io::Error::new(std::io::ErrorKind::NotFound, "App data directory not found")

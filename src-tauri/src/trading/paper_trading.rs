@@ -5,7 +5,7 @@ use sqlx::{FromRow, Pool, Sqlite, SqlitePool};
 use std::collections::{HashMap, VecDeque};
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tokio::sync::{OnceCell, RwLock};
 use uuid::Uuid;
 
@@ -1005,7 +1005,7 @@ pub async fn init_paper_trading(app_handle: &AppHandle) -> Result<(), String> {
     }
 
     let app_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| "Failed to resolve app data directory".to_string())?;
 

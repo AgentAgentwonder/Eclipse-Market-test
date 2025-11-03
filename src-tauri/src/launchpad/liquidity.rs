@@ -6,7 +6,7 @@ use rand::RngCore;
 use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
 use std::sync::Mutex;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
 pub struct LiquidityLocker {

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tokio::sync::RwLock;
 
 use crate::security::keystore::Keystore;
@@ -24,7 +24,7 @@ impl SocialDataService {
         let reddit_client = RedditClient::new().map_err(SocialError::from)?;
         let twitter_client = TwitterClient::new().map_err(SocialError::from)?;
 
-        let mut data_dir = app.path_resolver().app_data_dir().ok_or_else(|| {
+        let mut data_dir = app.path().app_data_dir().ok_or_else(|| {
             SocialError::Internal("Failed to resolve app data directory".to_string())
         })?;
 

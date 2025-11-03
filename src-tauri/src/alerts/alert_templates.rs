@@ -475,7 +475,7 @@ impl AlertTemplateManager {
 
 fn alert_templates_db_path(app: &AppHandle) -> Result<PathBuf, AlertError> {
     let app_data_dir = app
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| AlertError::Internal("Unable to resolve app data directory".to_string()))?;
 

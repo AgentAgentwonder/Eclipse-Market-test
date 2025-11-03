@@ -1,11 +1,4 @@
-use chrono::Utc;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-
 use chrono::{Duration as ChronoDuration, Utc};
-#[derive(Debug, Clone, Serialize, Deserialize)]
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::path::PathBuf;
@@ -444,7 +437,7 @@ pub fn start_new_coins_scanner(scanner: SharedNewCoinsScanner) {
 }
 
 fn get_new_coins_db_path(app: &AppHandle) -> Result<PathBuf, NewCoinsScannerError> {
-    let mut path = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let mut path = app.path().app_data_dir().ok_or_else(|| {
         NewCoinsScannerError::Internal("Unable to resolve app data directory".to_string())
     })?;
 

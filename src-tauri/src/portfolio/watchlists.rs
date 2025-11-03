@@ -491,7 +491,7 @@ impl WatchlistManager {
 }
 
 fn watchlist_db_path(app: &AppHandle) -> Result<PathBuf, WatchlistError> {
-    let app_data_dir = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let app_data_dir = app.path().app_data_dir().ok_or_else(|| {
         WatchlistError::Internal("Unable to resolve app data directory".to_string())
     })?;
 

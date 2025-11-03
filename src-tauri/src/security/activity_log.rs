@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, RwLock};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 const ACTIVITY_DB_FILE: &str = "activity_logs.db";
 const ACTIVITY_CONFIG_FILE: &str = "activity_log_config.json";
@@ -689,7 +689,7 @@ fn bind_values<'q>(
 }
 
 fn activity_log_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
-    let mut path = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let mut path = app.path().app_data_dir().ok_or_else(|| {
         ActivityLogError::Internal("Unable to resolve app data directory".to_string())
     })?;
     if !path.exists() {
@@ -700,7 +700,7 @@ fn activity_log_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
 }
 
 fn activity_config_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
-    let mut path = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let mut path = app.path().app_data_dir().ok_or_else(|| {
         ActivityLogError::Internal("Unable to resolve app data directory".to_string())
     })?;
     if !path.exists() {

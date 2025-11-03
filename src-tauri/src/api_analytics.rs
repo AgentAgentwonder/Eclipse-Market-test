@@ -407,7 +407,7 @@ pub async fn get_fair_use_status(
 
 pub fn initialize_usage_tracker(app: &AppHandle) -> Result<Arc<Mutex<ApiUsageTracker>>, String> {
     let mut data_path = app
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
 

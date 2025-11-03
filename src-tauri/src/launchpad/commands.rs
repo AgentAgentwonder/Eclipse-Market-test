@@ -8,7 +8,7 @@ use super::vesting::VestingManager;
 use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
 pub type SharedLaunchpadState = Arc<RwLock<LaunchpadState>>;

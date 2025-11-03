@@ -781,7 +781,7 @@ impl TwitterManager {
 }
 
 fn twitter_db_path(app: &AppHandle) -> Result<PathBuf, TwitterError> {
-    let app_dir = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let app_dir = app.path().app_data_dir().ok_or_else(|| {
         TwitterError::Internal("Unable to resolve app data directory".to_string())
     })?;
 

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tokio::sync::RwLock;
 
 pub type SharedSettingsManager = Arc<RwLock<SettingsManager>>;
@@ -91,7 +91,7 @@ impl SettingsManager {
     fn settings_path(&self) -> Result<PathBuf, SettingsError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| {
                 SettingsError::Io(std::io::Error::new(
@@ -111,7 +111,7 @@ impl SettingsManager {
     fn profiles_path(&self) -> Result<PathBuf, SettingsError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| {
                 SettingsError::Io(std::io::Error::new(

@@ -87,7 +87,7 @@ impl CloudProviderManager {
     fn storage_base(&self) -> Result<PathBuf, CloudProviderError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "app data dir"))?;
         path.push(STORAGE_DIR);
