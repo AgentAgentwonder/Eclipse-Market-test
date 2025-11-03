@@ -19,7 +19,7 @@ pub async fn init_trading(app_handle: &AppHandle) -> Result<(), String> {
     }
 
     let app_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| "Failed to resolve app data directory".to_string())?;
 

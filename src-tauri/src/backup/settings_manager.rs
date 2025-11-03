@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 const SETTINGS_VERSION: u32 = 1;
 
@@ -107,7 +107,7 @@ impl SettingsManager {
     fn settings_path(&self) -> Result<PathBuf, SettingsError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or(SettingsError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,

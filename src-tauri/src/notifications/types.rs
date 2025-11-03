@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 pub const NOTIFICATIONS_DB_FILE: &str = "chat_integrations.db";
 
@@ -170,7 +170,7 @@ pub enum NotificationError {
 }
 
 pub fn notifications_db_path(app: &AppHandle) -> Result<PathBuf, NotificationError> {
-    let mut path = app.path_resolver().app_data_dir().ok_or_else(|| {
+    let mut path = app.path().app_data_dir().ok_or_else(|| {
         NotificationError::Internal("Unable to resolve app data directory".to_string())
     })?;
 

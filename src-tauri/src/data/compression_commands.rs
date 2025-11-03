@@ -1,5 +1,5 @@
 use crate::data::database::{CompressionConfig, CompressionStats, SharedCompressionManager};
-use tauri::State;
+use tauri::{Manager, State};
 
 #[tauri::command]
 pub async fn get_compression_stats(
@@ -68,7 +68,7 @@ pub async fn get_database_size(app_handle: tauri::AppHandle) -> Result<DatabaseS
     use std::fs;
 
     let mut data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
 

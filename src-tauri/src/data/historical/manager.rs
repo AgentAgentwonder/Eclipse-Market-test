@@ -32,7 +32,7 @@ impl HistoricalReplayManager {
         api_key: Option<String>,
     ) -> Result<Self, String> {
         let mut db_path = app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
 

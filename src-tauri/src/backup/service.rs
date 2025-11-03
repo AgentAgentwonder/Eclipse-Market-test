@@ -195,7 +195,7 @@ impl BackupService {
     fn config_path(&self) -> Result<PathBuf, BackupError> {
         let mut path = self
             .app_handle
-            .path_resolver()
+            .path()
             .app_data_dir()
             .ok_or_else(|| {
                 std::io::Error::new(std::io::ErrorKind::NotFound, "App data directory not found")

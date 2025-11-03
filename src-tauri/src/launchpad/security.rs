@@ -5,7 +5,7 @@ use rand_core::RngCore;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Mutex;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 use zeroize::Zeroizing;
 

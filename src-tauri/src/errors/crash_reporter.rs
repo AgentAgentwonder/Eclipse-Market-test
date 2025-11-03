@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,7 +33,7 @@ pub struct CrashReporter {
 
 impl CrashReporter {
     pub fn new(app: &AppHandle, logger: SharedLogger) -> Result<Self, std::io::Error> {
-        let mut report_dir = app.path_resolver().app_data_dir().ok_or_else(|| {
+        let mut report_dir = app.path().app_data_dir().ok_or_else(|| {
             std::io::Error::new(std::io::ErrorKind::NotFound, "App data dir not found")
         })?;
 

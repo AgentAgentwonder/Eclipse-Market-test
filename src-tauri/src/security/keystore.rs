@@ -16,7 +16,7 @@ use chrono::{DateTime, Utc};
 use keyring::Entry;
 use rand_core::RngCore;
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use zeroize::{Zeroize, Zeroizing};
 
 const KEYRING_SERVICE: &str = "EclipseMarketPro";
@@ -354,7 +354,7 @@ fn persist_document(path: &PathBuf, document: &KeystoreDocument) -> Result<(), K
 
 fn keystore_path(app: &AppHandle) -> Result<PathBuf, KeystoreError> {
     let mut path = app
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or(KeystoreError::Internal)?;
     if !path.exists() {

@@ -485,7 +485,7 @@ pub async fn init_wallet_monitor(app_handle: &AppHandle) -> Result<(), String> {
     }
 
     let app_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
     std::fs::create_dir_all(&app_dir)

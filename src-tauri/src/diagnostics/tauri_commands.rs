@@ -95,7 +95,7 @@ pub async fn get_diagnostics_settings(
     app_handle: tauri::AppHandle,
 ) -> Result<DiagnosticsSettings, String> {
     let app_data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or("Failed to resolve app data directory")?;
 
@@ -116,7 +116,7 @@ pub async fn save_diagnostics_settings(
     app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
     let app_data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or("Failed to resolve app data directory")?;
 
@@ -137,7 +137,7 @@ pub async fn save_diagnostics_settings(
 #[tauri::command]
 pub async fn backup_before_repair(app_handle: tauri::AppHandle) -> Result<String, String> {
     let app_data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or("Failed to resolve app data directory")?;
 
@@ -172,7 +172,7 @@ pub async fn export_diagnostics_report(
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
     let app_data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or("Failed to resolve app data directory")?;
 
@@ -196,7 +196,7 @@ pub fn initialize_diagnostics_engine(
     app_handle: &tauri::AppHandle,
 ) -> Result<SharedDiagnosticsEngine, String> {
     let app_data_dir = app_handle
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or("Failed to resolve app data directory")?;
 

@@ -553,7 +553,7 @@ impl EmailManager {
 
 fn email_db_path(app: &AppHandle) -> Result<PathBuf, EmailError> {
     let app_dir = app
-        .path_resolver()
+        .path()
         .app_data_dir()
         .ok_or_else(|| EmailError::Internal("Unable to resolve app data directory".to_string()))?;
 
