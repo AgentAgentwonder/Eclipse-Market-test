@@ -199,7 +199,7 @@ impl ApiHealthMonitor {
         let total = rows.len() as i64;
         let mut successful = 0i64;
         let mut failed = 0i64;
-        let mut total_latency: i128 = 0;
+        let mut total_latency: i64 = 0;
         let mut last_success: Option<DateTime<Utc>> = None;
         let mut last_failure: Option<DateTime<Utc>> = None;
         let mut last_error: Option<String> = None;
@@ -212,7 +212,7 @@ impl ApiHealthMonitor {
                 .map_err(|e| HealthMonitorError::Internal(format!("Invalid timestamp: {}", e)))?
                 .with_timezone(&Utc);
 
-            total_latency += latency as i128;
+            total_latency = total_latency.saturating_add(latency);
 
             if success == 1 {
                 successful += 1;
