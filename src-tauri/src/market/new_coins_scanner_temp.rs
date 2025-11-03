@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::RwLock;
 
 const NEW_COINS_DB_FILE: &str = "new_coins.db";
