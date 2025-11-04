@@ -11,9 +11,8 @@ import {
   PlayCircle,
   ArrowUpDown,
   Star,
-  Sparkline,
 } from 'lucide-react';
-import { QuickTradeButton } from '../trading/QuickTradeButton';
+import { QuickTradeButton } from '../../components/trading/QuickTradeButton';
 
 interface TrendingCoin {
   address: string;
@@ -689,13 +688,9 @@ export function TrendingCoinsExplorer({ searchQuery, onSelectCoin }: TrendingCoi
               </div>
 
               <div className="mb-4">
-                <Sparkline
-                  data={sparklineMap[coin.address] ?? generateSparklineData(coin.price_change_24h)}
-                  color={coin.price_change_24h >= 0 ? '#4ade80' : '#f87171'}
-                  width={250}
-                  height={50}
-                />
-              </div>
+                <div className="text-center text-gray-500 text-sm">
+                  Chart visualization coming soon
+                </div>
 
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
