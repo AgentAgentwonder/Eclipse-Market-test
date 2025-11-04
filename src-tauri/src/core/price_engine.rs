@@ -115,8 +115,8 @@ impl LatencyTracker {
         sorted.sort_unstable();
 
         let count = sorted.len();
-        let total: u128 = sorted.iter().map(|&v| v as u128).sum();
-        let mean_ns = (total / count as u128) as u64;
+        let total: u64 = sorted.iter().sum();
+        let mean_ns = total / count as u64;
 
         LatencyStats {
             p50: nanos_to_micros(percentile(&sorted, 0.50)),
