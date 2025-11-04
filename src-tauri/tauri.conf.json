@@ -1,28 +1,31 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "Eclipse Market Pro",
-  "version": "1.0.0",
-  "identifier": "com.eclipse.market.pro",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "devUrl": "http://localhost:1420",
+    "distDir": "../dist"
   },
-  "bundle": {
-    "active": true,
-    "category": "Finance",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
-    "targets": [
-      "all"
-    ]
+  "package": {
+    "productName": "Eclipse Market Pro",
+    "version": "1.0.0"
   },
-  "app": {
+  "tauri": {
+    "identifier": "com.eclipse.market.pro",
+    "bundle": {
+      "active": true,
+      "category": "Finance",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "targets": [
+        "all"
+      ]
+    },
     "security": {
       "csp": null,
       "capabilities": [
@@ -30,7 +33,7 @@
         "shell:allow-open"
       ]
     },
-    "trayIcon": {
+    "systemTray": {
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true
     },
