@@ -46,13 +46,8 @@ impl HeliusStream {
         &self,
         ws_stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
     ) -> anyhow::Result<()> {
-        let (mut write, mut read) = ws_stream.split();
-        async fn handle_stream(
-            &self,
-            ws_stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
-        ) -> anyhow::Result<()> {
-            let (write, mut read) = ws_stream.split();
-            let write = Arc::new(Mutex::new(write));
+        let (write, mut read) = ws_stream.split();
+        let write = Arc::new(Mutex::new(write));
 
             let (cmd_tx, mut cmd_rx) = mpsc::unbounded_channel::<StreamCommand>();
             {
