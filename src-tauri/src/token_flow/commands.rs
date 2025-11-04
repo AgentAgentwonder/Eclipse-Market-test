@@ -1,3 +1,4 @@
+use base64::{Engine as _, engine::general_purpose};
 use crate::token_flow::clustering::{
     assess_cluster_risk, build_wallet_clusters, detect_cluster_performance,
     perform_louvain_clustering, LouvainConfig,
