@@ -182,8 +182,8 @@ async fn persist_snapshot(
 
 fn generate_snapshot_placeholder(format: FlowExportFormat) -> String {
     match format {
-        FlowExportFormat::Png => base64::encode("PNG_SNAPSHOT_PLACEHOLDER"),
-        FlowExportFormat::Svg => base64::encode("SVG_SNAPSHOT_PLACEHOLDER"),
+        FlowExportFormat::Png => general_purpose::STANDARD.encode("PNG_SNAPSHOT_PLACEHOLDER"),
+        FlowExportFormat::Svg => general_purpose::STANDARD.encode("SVG_SNAPSHOT_PLACEHOLDER"),
         _ => String::new(),
     }
 }
