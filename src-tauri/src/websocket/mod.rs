@@ -1,3 +1,6 @@
+use std::sync::Arc;
+use tauri::AppHandle;
+
 pub mod birdeye;
 pub mod helius;
 pub mod reconnect;
@@ -10,11 +13,11 @@ pub use types::*;
 
 // WebSocket Manager for managing WebSocket connections
 pub struct WebSocketManager {
-    handle: tauri::AppHandle,
+    handle: AppHandle,
 }
 
 impl WebSocketManager {
-    pub fn new(handle: tauri::AppHandle) -> Self {
+    pub fn new(handle: AppHandle) -> Self {
         Self { handle }
     }
 }
