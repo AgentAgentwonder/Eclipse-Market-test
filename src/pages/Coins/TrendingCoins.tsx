@@ -688,7 +688,7 @@ export function TrendingCoinsExplorer({ searchQuery, onSelectCoin }: TrendingCoi
               </div>
 
               <div className="mb-4">
-                <Sparkline
+                <div
                   data={sparklineMap[coin.address] ?? generateSparklineData(coin.price_change_24h)}
                   color={coin.price_change_24h >= 0 ? '#4ade80' : '#f87171'}
                   width={250}
