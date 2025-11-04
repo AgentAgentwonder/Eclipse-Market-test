@@ -1,6 +1,7 @@
+use crate::trading::types::Order;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Pool, Sqlite, SqlitePool};
+use sqlx::{FromRow, Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -154,7 +155,7 @@ impl CompressionManager {
     }
 
     async fn load_config(&self) -> Result<(), sqlx::Error> {
-        let row = sqlx::query!(
+        let row = sqlx::query(
             r#"
             SELECT enabled, age_threshold_days, compression_level, auto_compress
             FROM compression_config
@@ -165,10 +166,10 @@ impl CompressionManager {
         .await?;
 
         let mut config = self.config.write().await;
-        config.enabled = row.enabled != 0;
-        config.age_threshold_days = row.age_threshold_days as i64;
-        config.compression_level = row.compression_level;
-        config.auto_compress = row.auto_compress != 0;
+        config.enabled = row.get::<i32, _>("enabled") != 0;
+        config.age_threshold_days = row.get::<i64, _>("age_threshold_days");
+        config.compression_level = row.get::<i32, _>("compression_level");
+        config.auto_compress = row.get::<i32, _>("auto_compress") != 0;
 
         Ok(())
     }
@@ -299,16 +300,16 @@ impl CompressionManager {
         let threshold_date = Utc::now() - Duration::days(config.age_threshold_days);
 
         // Get old events that aren't compressed yet
-        let old_events = sqlx::query!(
+        let old_events = sqlx::query(
             r#"
             SELECT id, event_data, timestamp
             FROM events
             WHERE timestamp < ?1
             AND id NOT IN (SELECT id FROM compressed_data WHERE record_type = 'event')
             LIMIT 1000
-            "#,
-            threshold_date.to_rfc3339()
+            "#
         )
+        .bind(threshold_date.to_rfc3339())
         .fetch_all(&self.pool)
         .await?;
 
@@ -316,23 +317,27 @@ impl CompressionManager {
         let mut space_saved = 0i64;
 
         for event in old_events {
-            let data = event.event_data.as_bytes();
+            let event_id: String = event.get("id");
+            let event_data: String = event.get("event_data");
+            let timestamp_str: String = event.get("timestamp");
+            
+            let data = event_data.as_bytes();
             let original_size = data.len() as i64;
 
-            let timestamp = DateTime::parse_from_rfc3339(&event.timestamp)?.with_timezone(&Utc);
+            let timestamp = DateTime::parse_from_rfc3339(&timestamp_str)?.with_timezone(&Utc);
 
-            self.compress_data(data, "event", &event.id, timestamp)
+            self.compress_data(data, "event", &event_id, timestamp)
                 .await?;
 
             // Get compressed size
-            let compressed = sqlx::query!(
-                "SELECT compressed_size FROM compressed_data WHERE id = ?1",
-                event.id
+            let compressed = sqlx::query(
+                "SELECT compressed_size FROM compressed_data WHERE id = ?1"
             )
+            .bind(&event_id)
             .fetch_one(&self.pool)
             .await?;
 
-            space_saved += original_size - compressed.compressed_size;
+            space_saved += original_size - compressed.get::<i64, _>("compressed_size");
             compressed_count += 1;
         }
 
@@ -368,7 +373,7 @@ impl CompressionManager {
         let threshold_date = Utc::now() - Duration::days(30); // Compress trades older than 30 days
 
         // Check if orders table exists
-        let table_exists = sqlx::query!(
+        let table_exists = sqlx::query(
             r#"
             SELECT name FROM sqlite_master 
             WHERE type='table' AND name='orders'
@@ -382,7 +387,7 @@ impl CompressionManager {
         }
 
         // Get old closed orders that aren't compressed yet
-        let old_orders = sqlx::query!(
+        let old_orders = sqlx::query(
             r#"
             SELECT id, created_at
             FROM orders
@@ -390,26 +395,30 @@ impl CompressionManager {
             AND created_at < ?1
             AND id NOT IN (SELECT id FROM compressed_data WHERE record_type = 'trade')
             LIMIT 1000
-            "#,
-            threshold_date.to_rfc3339()
+            "#
         )
+        .bind(threshold_date.to_rfc3339())
         .fetch_all(&self.pool)
         .await?;
 
         let mut compressed_count = 0;
 
         for order in old_orders {
+            let order_id: String = order.get("id");
+            let created_at: String = order.get("created_at");
+
             // Get full order data
-            let order_json = sqlx::query!("SELECT * FROM orders WHERE id = ?1", order.id)
+            let order_record = sqlx::query_as::<_, Order>("SELECT * FROM orders WHERE id = ?1")
+                .bind(&order_id)
                 .fetch_one(&self.pool)
                 .await?;
 
-            let order_data = serde_json::to_string(&order_json)?;
+            let order_data = serde_json::to_string(&order_record)?;
             let data = order_data.as_bytes();
 
-            let timestamp = DateTime::parse_from_rfc3339(&order.created_at)?.with_timezone(&Utc);
+            let timestamp = DateTime::parse_from_rfc3339(&created_at)?.with_timezone(&Utc);
 
-            self.compress_data(data, "trade", &order.id, timestamp)
+            self.compress_data(data, "trade", &order_id, timestamp)
                 .await?;
             compressed_count += 1;
         }
@@ -431,7 +440,7 @@ impl CompressionManager {
             }
         }
 
-        let totals = sqlx::query!(
+        let totals = sqlx::query(
             r#"
             SELECT 
                 COALESCE(SUM(original_size), 0) as total_original,
@@ -443,7 +452,7 @@ impl CompressionManager {
         .fetch_one(&self.pool)
         .await?;
 
-        let last_run = sqlx::query!(
+        let last_run = sqlx::query(
             r#"
             SELECT timestamp
             FROM compression_log
@@ -454,8 +463,10 @@ impl CompressionManager {
         .fetch_optional(&self.pool)
         .await?;
 
-        let total_uncompressed = totals.total_original;
-        let total_compressed = totals.total_compressed;
+        let total_uncompressed = totals.get::<i64, _>("total_original");
+        let total_compressed = totals.get::<i64, _>("total_compressed");
+        let num_records = totals.get::<i64, _>("num_records");
+        
         let compression_ratio = if total_uncompressed > 0 {
             ((total_uncompressed - total_compressed) as f64 / total_uncompressed as f64) * 100.0
         } else {
@@ -466,9 +477,9 @@ impl CompressionManager {
             total_uncompressed_bytes: total_uncompressed,
             total_compressed_bytes: total_compressed,
             compression_ratio,
-            num_compressed_records: totals.num_records,
+            num_compressed_records: num_records,
             space_saved_mb: (total_uncompressed - total_compressed) as f64 / 1024.0 / 1024.0,
-            last_compression_run: last_run.map(|r| r.timestamp),
+            last_compression_run: last_run.map(|r| r.get::<String, _>("timestamp")),
         };
 
         // Update cache
