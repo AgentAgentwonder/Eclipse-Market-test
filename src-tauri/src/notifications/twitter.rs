@@ -781,8 +781,8 @@ impl TwitterManager {
 }
 
 fn twitter_db_path(app: &AppHandle) -> Result<PathBuf, TwitterError> {
-    let app_dir = app.path().app_data_dir().ok_or_else(|| {
-        TwitterError::Internal("Unable to resolve app data directory".to_string())
+    let app_dir = app.path().app_data_dir().map_err(|err| {
+        TwitterError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 
     std::fs::create_dir_all(&app_dir).map_err(|e| {

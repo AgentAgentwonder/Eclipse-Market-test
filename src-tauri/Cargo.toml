@@ -35,7 +35,7 @@ sha2 = "0.10.8"
 
 # Database  
 # NOTE: Using 0.6 to avoid zeroize version conflicts with solana-client (0.7 pulls in mysql backend which needs zeroize 1.5+)
-sqlx = { version = "0.6", default-features = false, features = ["runtime-tokio-native-tls", "sqlite", "macros", "chrono", "uuid", "migrate"] }
+sqlx = { version = "0.6", default-features = false, features = ["runtime-tokio-native-tls", "sqlite", "macros", "chrono", "uuid", "migrate", "offline"] }
 
 # Security
 keyring = "2.0.0"

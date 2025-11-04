@@ -54,9 +54,15 @@ pub struct ComprehensiveLogger {
 
 impl ComprehensiveLogger {
     pub fn new(app: &AppHandle) -> Result<Self, std::io::Error> {
-        let mut log_dir = app.path().app_data_dir().ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, "App data dir not found")
-        })?;
+        let mut log_dir = app
+            .path()
+            .app_data_dir()
+            .map_err(|err| {
+                std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("App data dir not found: {err}"),
+                )
+            })?;
 
         log_dir.push("logs");
         std::fs::create_dir_all(&log_dir)?;

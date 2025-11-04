@@ -435,8 +435,8 @@ pub fn start_new_coins_scanner(scanner: SharedNewCoinsScanner) {
 }
 
 fn get_new_coins_db_path(app: &AppHandle) -> Result<PathBuf, NewCoinsScannerError> {
-    let mut path = app.path().app_data_dir().ok_or_else(|| {
-        NewCoinsScannerError::Internal("Unable to resolve app data directory".to_string())
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        NewCoinsScannerError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 
     std::fs::create_dir_all(&path)?;
