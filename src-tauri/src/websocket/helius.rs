@@ -45,7 +45,7 @@ impl HeliusStream {
 
     async fn handle_stream(
         &self,
-        ws_stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
+        ws_stream: WebSocketStream<MaybeTauriStream<TcpStream>>,
     ) -> anyhow::Result<()> {
         let write = Arc::new(Mutex::new(write));
             let (cmd_tx, mut cmd_rx) = mpsc::unbounded_channel::<StreamCommand>();
@@ -118,7 +118,7 @@ impl HeliusStream {
                 let mut writer = write.lock().await;
                 let msg = json!({
                     "jsonrpc": "2.0",
-                    "id": 1,
+                    "id": 1",
                     "method": "accountSubscribe",
                     "params": existing_addresses
                 });
