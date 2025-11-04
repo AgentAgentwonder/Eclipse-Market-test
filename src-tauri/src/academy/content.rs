@@ -168,12 +168,15 @@ pub struct ContentService {
 
 impl ContentService {
     pub async fn new(app_handle: &AppHandle) -> Result<Self, ContentError> {
-        let app_dir = app_handle.path().app_data_dir().ok_or_else(|| {
-            ContentError::Io(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                "Unable to resolve app data directory",
-            ))
-        })?;
+        let app_dir = app_handle
+            .path()
+            .app_data_dir()
+            .map_err(|err| {
+                ContentError::Io(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("Unable to resolve app data directory: {err}"),
+                ))
+            })?;
 
         std::fs::create_dir_all(&app_dir)?;
         let db_path = app_dir.join(ACADEMY_DB_FILE);

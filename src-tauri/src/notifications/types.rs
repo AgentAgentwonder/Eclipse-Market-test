@@ -170,8 +170,8 @@ pub enum NotificationError {
 }
 
 pub fn notifications_db_path(app: &AppHandle) -> Result<PathBuf, NotificationError> {
-    let mut path = app.path().app_data_dir().ok_or_else(|| {
-        NotificationError::Internal("Unable to resolve app data directory".to_string())
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        NotificationError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 
     std::fs::create_dir_all(&path).map_err(|e| NotificationError::Io(e))?;

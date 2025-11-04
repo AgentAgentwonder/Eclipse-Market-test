@@ -105,7 +105,7 @@ pub type SharedAIPortfolioAdvisor = Arc<RwLock<AIPortfolioAdvisor>>;
 
 impl AIPortfolioAdvisor {
     pub async fn new(app: &AppHandle) -> Result<Self, sqlx::Error> {
-        let mut db_path = app.path().app_data_dir().ok_or_else(|| {
+        let mut db_path = app.path().app_data_dir().map_err(|err| {
             sqlx::Error::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "App data dir not found",

@@ -110,12 +110,15 @@ pub struct RewardEngine {
 
 impl RewardEngine {
     pub async fn new(app_handle: &AppHandle) -> Result<Self, RewardError> {
-        let app_dir = app_handle.path().app_data_dir().ok_or_else(|| {
-            RewardError::Io(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                "Unable to resolve app data directory",
-            ))
-        })?;
+        let app_dir = app_handle
+            .path()
+            .app_data_dir()
+            .map_err(|err| {
+                RewardError::Io(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("Unable to resolve app data directory: {err}"),
+                ))
+            })?;
 
         std::fs::create_dir_all(&app_dir)?;
         let db_path = app_dir.join("academy.db");
