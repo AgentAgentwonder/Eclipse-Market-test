@@ -45,7 +45,7 @@ impl HeliusStream {
 
     async fn handle_stream(
         &self,
-        ws_stream: WebSocketStream<MaybeTauriStream<TcpStream>>,
+        ws_stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
     ) -> anyhow::Result<()> {
         let write = Arc::new(Mutex::new(write));
             let (cmd_tx, mut cmd_rx) = mpsc::unbounded_channel::<StreamCommand>();
