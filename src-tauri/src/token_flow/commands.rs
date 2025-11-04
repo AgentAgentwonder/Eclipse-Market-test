@@ -1,3 +1,4 @@
+use base64::{Engine as _, engine::general_purpose};
 use crate::token_flow::clustering::{
     assess_cluster_risk, build_wallet_clusters, detect_cluster_performance,
     perform_louvain_clustering, LouvainConfig,
@@ -181,8 +182,8 @@ async fn persist_snapshot(
 
 fn generate_snapshot_placeholder(format: FlowExportFormat) -> String {
     match format {
-        FlowExportFormat::Png => base64::encode("PNG_SNAPSHOT_PLACEHOLDER"),
-        FlowExportFormat::Svg => base64::encode("SVG_SNAPSHOT_PLACEHOLDER"),
+        FlowExportFormat::Png => general_purpose::STANDARD.encode("PNG_SNAPSHOT_PLACEHOLDER"),
+        FlowExportFormat::Svg => general_purpose::STANDARD.encode("SVG_SNAPSHOT_PLACEHOLDER"),
         _ => String::new(),
     }
 }

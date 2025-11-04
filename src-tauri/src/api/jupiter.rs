@@ -576,7 +576,7 @@ mod tests {
         let _mock = server.mock(|when, then| {
             when.method(POST).path("/swap");
             then.status(200).json_body(serde_json::json!({
-                "swapTransaction": base64::encode(bincode::serialize(&dummy_versioned_tx()).unwrap()),
+                "swapTransaction": general_purpose::STANDARD.encode(bincode::serialize(&dummy_versioned_tx()).unwrap()),
                 "lastValidBlockHeight": 1,
                 "simulationLogs": ["log1", "log2"],
                 "computeUnitsConsumed": 50000

@@ -115,8 +115,8 @@ impl LatencyTracker {
         sorted.sort_unstable();
 
         let count = sorted.len();
-        let total: u128 = sorted.iter().map(|&v| v as u128).sum();
-        let mean_ns = (total / count as u128) as u64;
+        let total: u64 = sorted.iter().sum();
+        let mean_ns = total / count as u64;
 
         LatencyStats {
             p50: nanos_to_micros(percentile(&sorted, 0.50)),
@@ -323,9 +323,9 @@ impl PriceEngine {
         let mut rng = rand::thread_rng();
         for i in 0..num_updates {
             let symbol = format!("SYM{}", i % 64);
-            let price = 100.0 + rng.random_range(-5.0..5.0);
-            let volume = rng.random_range(1_000.0..100_000.0);
-            let change_24h = rng.random_range(-10.0..10.0);
+            let price = 100.0 + rng.gen_range(-5.0..5.0);
+            let volume = rng.gen_range(1_000.0..100_000.0);
+            let change_24h = rng.gen_range(-10.0..10.0);
 
             let update = PriceUpdate::new(symbol, price, volume, change_24h);
             self.process_update(update);
