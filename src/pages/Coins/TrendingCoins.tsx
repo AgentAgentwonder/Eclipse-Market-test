@@ -13,7 +13,7 @@ import {
   Star,
   Sparkline,
 } from 'lucide-react';
-import { QuickTradeButton } from '../trading/QuickTradeButton';
+import { QuickTradeButton } from '../../components/trading/QuickTradeButton';
 
 interface TrendingCoin {
   address: string;
