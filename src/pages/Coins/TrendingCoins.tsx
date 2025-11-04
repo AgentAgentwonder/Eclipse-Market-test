@@ -11,7 +11,6 @@ import {
   PlayCircle,
   ArrowUpDown,
   Star,
-  Sparkline,
 } from 'lucide-react';
 import { QuickTradeButton } from '../../components/trading/QuickTradeButton';
 
