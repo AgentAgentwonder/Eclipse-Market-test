@@ -9,6 +9,7 @@ use tokio::net::TcpStream;
 use tokio::sync::{mpsc, Mutex};
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
+use url::Url;
 
 const HELIUS_WS_URL: &str = "wss://mainnet.helius-rpc.com/?api-key=YOUR_KEY";
 
