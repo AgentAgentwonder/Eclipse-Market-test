@@ -2,6 +2,7 @@
 // Best-execution swaps and limit orders
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct JupiterClient {
