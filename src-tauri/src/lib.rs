@@ -158,7 +158,7 @@ use std::sync::{Arc, Mutex};
 use stream_commands::*;
 use tauri::Manager;
 use tokio::sync::RwLock;
-use tray::{attach_window_listeners, handle_tray_event, SharedTrayManager, TrayManager};
+use tray::{attach_window_listeners, SharedTrayManager, TrayManager};
 use voice::commands::{SharedVoiceState, VoiceState};
 use wallet::hardware_wallet::HardwareWalletState;
 use wallet::ledger::LedgerState;

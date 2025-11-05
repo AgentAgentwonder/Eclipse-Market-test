@@ -4,9 +4,11 @@ use std::cmp::min;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::api::notification::Notification;
 use tauri::{
-AppHandle, Emitter, Manager, WindowEvent, tray::{TrayIcon, TrayIconBuilder, TrayIconEvent},
+    menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
+    notification::Notification,
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Emitter, Manager, WindowEvent,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,6 +88,7 @@ pub struct TrayManager {
     stats: RwLock<TrayStats>,
     shortcut: RwLock<Option<String>>,
     settings_path: RwLock<Option<PathBuf>>,
+    tray_handle: RwLock<Option<TrayIcon>>,
 }
 
 impl TrayManager {
@@ -95,22 +98,77 @@ impl TrayManager {
             stats: RwLock::new(TrayStats::default()),
             shortcut: RwLock::new(None),
             settings_path: RwLock::new(None),
+            tray_handle: RwLock::new(None),
         }
     }
 
-    pub fn create_tray() -> SystemTray {
-        let open = CustomMenuItem::new("open".to_string(), "Open");
-        let settings = CustomMenuItem::new("settings".to_string(), "Settings");
-        let quit = CustomMenuItem::new("quit".to_string(), "Exit");
+    fn create_tray(&self, app_handle: &AppHandle) -> Result<(), String> {
+        let menu = self.build_menu(app_handle)?;
 
-        let tray_menu = SystemTrayMenu::new()
-            .add_item(open)
-            .add_native_item(SystemTrayMenuItem::Separator)
-            .add_item(settings)
-            .add_native_item(SystemTrayMenuItem::Separator)
-            .add_item(quit);
+        let mut builder = TrayIconBuilder::new()
+            .menu(&menu)
+            .tooltip("Eclipse Market Pro")
+            .on_menu_event(|app, event| {
+                Self::handle_menu_event(app, event.id.as_ref());
+            })
+            .on_tray_icon_event(|tray, event| {
+                if let TrayIconEvent::Click {
+                    button: MouseButton::Left,
+                    button_state: MouseButtonState::Up,
+                    ..
+                } = event
+                {
+                    let app = tray.app_handle();
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.unminimize();
+                        let _ = window.set_focus();
+                    }
+                }
+            });
 
-        SystemTray::new().with_menu(tray_menu)
+        if let Some(icon) = app_handle.default_window_icon() {
+            builder = builder.icon(icon.clone());
+        }
+
+        let tray = builder
+            .build(app_handle)
+            .map_err(|e| format!("Failed to create tray icon: {e}"))?;
+
+        self.tray_handle.write().replace(tray);
+        Ok(())
+    }
+
+    fn handle_menu_event(app_handle: &AppHandle, menu_id: &str) {
+        match menu_id {
+            "open" => {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                }
+            }
+            "settings" => {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                    let _ = window.emit("navigate-to-settings", ());
+                }
+            }
+            "quit" => {
+                std::process::exit(0);
+            }
+            "alerts" => {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                    let _ = window.emit("show-alerts", ());
+                }
+            }
+            _ => {}
+        }
     }
 
     pub fn initialize(&self, app_handle: &AppHandle) {
@@ -133,6 +191,11 @@ impl TrayManager {
             Err(err) => {
                 eprintln!("Failed to resolve app data directory for tray: {err}");
             }
+        }
+
+        if let Err(err) = self.create_tray(app_handle) {
+            eprintln!("Failed to create tray icon: {err}");
+            return;
         }
 
         if let Err(err) = self.apply_icon_style(app_handle) {
@@ -205,7 +268,7 @@ impl TrayManager {
         }
     }
 
-    fn apply_icon_style(&self, app_handle: &AppHandle) -> Result<(), String> {
+    fn apply_icon_style(&self, _app_handle: &AppHandle) -> Result<(), String> {
         let settings = self.settings.read();
         let stats = self.stats.read();
 
@@ -214,75 +277,106 @@ impl TrayManager {
             title = format!("{} ({})", title, stats.alert_count);
         }
 
-        app_handle
-        .tray()
-        .set_title(Some(title))
-            .map_err(|e| format!("Failed to set tray title: {e}"))
+        let tray_guard = self.tray_handle.read();
+        if let Some(tray) = tray_guard.as_ref() {
+            tray.set_title(Some(&title))
+                .map_err(|e| format!("Failed to set tray title: {e}"))?;
+            tray.set_tooltip(Some(title))
+                .map_err(|e| format!("Failed to set tray tooltip: {e}"))?;
+        }
+
+        Ok(())
     }
 
-    fn build_menu(&self) -> SystemTrayMenu {
+    fn build_menu(&self, app_handle: &AppHandle) -> Result<Menu<tauri::Wry>, String> {
         let settings = self.settings.read().clone();
         let stats = self.stats.read().clone();
 
-        let mut menu = SystemTrayMenu::new();
-        menu = menu.add_item(CustomMenuItem::new("open".to_string(), "Open"));
+        let mut builder = MenuBuilder::new(app_handle);
+
+        let open = MenuItem::with_id(app_handle, "open", "Open", true, None::<&str>)
+            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+        builder = builder.item(&open);
 
         if settings.show_stats {
-            menu = menu.add_native_item(SystemTrayMenuItem::Separator);
-            menu = menu.add_item(
-                CustomMenuItem::new(
-                    "portfolio".to_string(),
-                    format!("Portfolio: ${:.2}", stats.portfolio_value),
-                )
-                .disabled(),
-            );
-            menu = menu.add_item(
-                CustomMenuItem::new(
-                    "pnl".to_string(),
-                    format!(
-                        "P&L: ${:.2} ({:.2}%)",
-                        stats.pnl_value, stats.pnl_percentage
-                    ),
-                )
-                .disabled(),
-            );
+            builder = builder.separator();
+            let portfolio = MenuItem::with_id(
+                app_handle,
+                "portfolio",
+                format!("Portfolio: ${:.2}", stats.portfolio_value),
+                false,
+                None::<&str>,
+            )
+            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+            builder = builder.item(&portfolio);
+
+            let pnl = MenuItem::with_id(
+                app_handle,
+                "pnl",
+                format!(
+                    "P&L: ${:.2} ({:.2}%)",
+                    stats.pnl_value, stats.pnl_percentage
+                ),
+                false,
+                None::<&str>,
+            )
+            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+            builder = builder.item(&pnl);
         }
 
         if settings.show_alerts && (!stats.recent_alerts.is_empty() || stats.alert_count > 0) {
-            menu = menu.add_native_item(SystemTrayMenuItem::Separator);
+            builder = builder.separator();
             if stats.alert_count > 0 {
-                menu = menu.add_item(CustomMenuItem::new(
-                    "alerts".to_string(),
+                let alerts = MenuItem::with_id(
+                    app_handle,
+                    "alerts",
                     format!("🔔 {} Alerts", stats.alert_count),
-                ));
+                    true,
+                    None::<&str>,
+                )
+                .map_err(|e| format!("Failed to create menu item: {e}"))?;
+                builder = builder.item(&alerts);
             }
 
             let limit = min(3, stats.recent_alerts.len());
             for preview in stats.recent_alerts.iter().take(limit) {
-                menu = menu.add_item(
-                    CustomMenuItem::new(
-                        format!("alert-preview-{}", preview.id),
-                        format!("{} — {}", preview.title, preview.summary),
-                    )
-                    .disabled(),
-                );
+                let preview_item = MenuItem::with_id(
+                    app_handle,
+                    format!("alert-preview-{}", preview.id),
+                    format!("{} — {}", preview.title, preview.summary),
+                    false,
+                    None::<&str>,
+                )
+                .map_err(|e| format!("Failed to create menu item: {e}"))?;
+                builder = builder.item(&preview_item);
             }
         }
 
-        menu = menu.add_native_item(SystemTrayMenuItem::Separator);
-        menu = menu.add_item(CustomMenuItem::new("settings".to_string(), "Settings"));
-        menu = menu.add_native_item(SystemTrayMenuItem::Separator);
-        menu = menu.add_item(CustomMenuItem::new("quit".to_string(), "Exit"));
+        builder = builder.separator();
+        let settings_item = MenuItem::with_id(app_handle, "settings", "Settings", true, None::<&str>)
+            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+        builder = builder.item(&settings_item);
 
-        menu
+        builder = builder.separator();
+        let quit = MenuItem::with_id(app_handle, "quit", "Exit", true, None::<&str>)
+            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+        builder = builder.item(&quit);
+
+        builder
+            .build()
+            .map_err(|e| format!("Failed to build menu: {e}"))
     }
 
     pub fn refresh_tray_menu(&self, app_handle: &AppHandle) -> Result<(), String> {
-        let menu = self.build_menu();
-        app_handle
-        .tray()
-        .set_menu(menu)
-            .map_err(|e| format!("Failed to update tray menu: {e}"))
+        let menu = self.build_menu(app_handle)?;
+        
+        let tray_guard = self.tray_handle.read();
+        if let Some(tray) = tray_guard.as_ref() {
+            tray.set_menu(Some(menu))
+                .map_err(|e| format!("Failed to update tray menu: {e}"))?;
+        }
+
+        Ok(())
     }
 
     pub fn get_settings(&self) -> TraySettings {
@@ -346,57 +440,14 @@ impl TrayManager {
             return;
         }
 
-        let identifier = app_handle.config().identifier.clone();
-        let _ = Notification::new(identifier)
+        let _ = Notification::new()
             .title("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
-            .show();
+            .show(app_handle);
     }
 }
 
 pub type SharedTrayManager = Arc<TrayManager>;
-
-pub fn handle_tray_event(app_handle: &AppHandle, event: SystemTrayEvent) {
-    match event {
-        SystemTrayEvent::LeftClick { .. } => {
-            if let Some(window) = app_handle.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.unminimize();
-                let _ = window.set_focus();
-            }
-        }
-        SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-            "open" => {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
-                }
-            }
-            "settings" => {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
-                    let _ = window.emit("navigate-to-settings", ());
-                }
-            }
-            "quit" => {
-                std::process::exit(0);
-            }
-            "alerts" => {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
-                    let _ = window.emit("show-alerts", ());
-                }
-            }
-            _ => {}
-        },
-        _ => {}
-    }
-}
 
 pub fn attach_window_listeners(window: &tauri::Window, tray_manager: SharedTrayManager) {
     let app_handle = window.app_handle();
@@ -416,7 +467,7 @@ pub fn attach_window_listeners(window: &tauri::Window, tray_manager: SharedTrayM
         WindowEvent::Destroyed => {
             if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
                 if let Err(err) = handle_clone
-                    .global_shortcut_manager()
+                    .global_shortcut()
                     .unregister(shortcut.as_str())
                 {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
