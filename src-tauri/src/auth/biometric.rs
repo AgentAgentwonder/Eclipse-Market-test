@@ -236,7 +236,7 @@ fn windows_available() -> Result<bool, BiometricError> {
     let future = UserConsentVerifier::CheckAvailabilityAsync()
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 
-    futures_util::future::block_on(async move {
+    tauri::async_runtime::block_on(async move {
         let availability = future
             .into_future()
             .await
