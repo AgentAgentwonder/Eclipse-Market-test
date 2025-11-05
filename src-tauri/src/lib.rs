@@ -1,5 +1,6 @@
 mod academy;
 mod ai;
+mod ai_legacy;
 mod ai_chat;
 mod alerts;
 mod anomalies;
@@ -61,6 +62,7 @@ pub use governance::*;
 pub use journal::*;
 mod p2p;
 pub use ai::*;
+pub use ai_legacy::*;
 pub use ai_chat::*;
 pub use alerts::*;
 pub use anomalies::*;
@@ -117,12 +119,12 @@ pub use wallet::multisig::*;
 pub use wallet::performance::*;
 pub use windowing::*;
 
-use ai::launch_predictor::{
+use ai_legacy::launch_predictor::{
     add_launch_training_data, extract_token_features, get_launch_bias_report,
     get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
     retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
 };
-use ai::SharedAIAssistant;
+use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
 use auth::session_manager::SessionManager;
@@ -737,14 +739,14 @@ pub fn run() {
             app.manage(stock_cache.clone());
             // Initialize risk analyzer
             let risk_analyzer = tauri::async_runtime::block_on(async {
-                ai::RiskAnalyzer::new(&app.handle()).await
+                ai_legacy::RiskAnalyzer::new(&app.handle()).await
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize risk analyzer: {e}");
                 Box::new(e) as Box<dyn Error>
             })?;
 
-            let shared_risk_analyzer: ai::SharedRiskAnalyzer = Arc::new(RwLock::new(risk_analyzer));
+            let shared_risk_analyzer: ai_legacy::SharedRiskAnalyzer = Arc::new(RwLock::new(risk_analyzer));
             app.manage(shared_risk_analyzer.clone());
 
             // Initialize AI portfolio advisor
@@ -761,14 +763,14 @@ pub fn run() {
 
             // Initialize AI Assistant
             let ai_assistant = tauri::async_runtime::block_on(async {
-                ai::AIAssistant::new(&app.handle(), &keystore).await
+                ai_legacy::AIAssistant::new(&app.handle(), &keystore).await
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize AI assistant: {e}");
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
 
-            let shared_ai_assistant: ai::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
+            let shared_ai_assistant: ai_legacy::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
             app.manage(shared_ai_assistant.clone());
 
             // Initialize launch predictor
@@ -1168,24 +1170,25 @@ pub fn run() {
             get_risk_history,
             get_latest_risk_score,
             // Social Data
-            social_fetch_reddit,
-            social_search_reddit_mentions,
-            social_fetch_twitter,
-            social_fetch_twitter_user,
-            social_get_cached_mentions,
-            social_get_mention_aggregates,
-            social_get_trend_snapshots,
-            social_create_trend_snapshot,
-            social_set_twitter_bearer_token,
-            social_cleanup_old_posts,
-            social_run_sentiment_analysis,
-            social_run_full_analysis_all,
-            social_get_sentiment_snapshot,
-            social_get_sentiment_snapshots,
-            social_get_trending_tokens,
-            social_get_token_trends,
-            social_get_influencer_scores,
-            social_get_fomo_fud,
+            // TODO: Re-enable when social commands are implemented
+            // social_fetch_reddit,
+            // social_search_reddit_mentions,
+            // social_fetch_twitter,
+            // social_fetch_twitter_user,
+            // social_get_cached_mentions,
+            // social_get_mention_aggregates,
+            // social_get_trend_snapshots,
+            // social_create_trend_snapshot,
+            // social_set_twitter_bearer_token,
+            // social_cleanup_old_posts,
+            // social_run_sentiment_analysis,
+            // social_run_full_analysis_all,
+            // social_get_sentiment_snapshot,
+            // social_get_sentiment_snapshots,
+            // social_get_trending_tokens,
+            // social_get_token_trends,
+            // social_get_influencer_scores,
+            // social_get_fomo_fud,
             // Launch Predictor
             extract_token_features,
             predict_launch_success,
