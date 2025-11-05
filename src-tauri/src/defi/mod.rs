@@ -25,4 +25,5 @@ pub use lp_analyzer::LpAnalyzer;
 pub use yield_farming::*;
 pub use position_manager::*;
 pub use auto_compound::*;
-pub use governance::*;
+// Explicit exports for governance to avoid naming conflict with standalone governance module
+pub use governance::{get_governance_proposals, vote_on_proposal, get_governance_participation};
