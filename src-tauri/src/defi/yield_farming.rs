@@ -112,7 +112,7 @@ impl YieldFarmingAdapter {
 
     fn generate_mock_positions(&self, _wallet: &str) -> Vec<DeFiPosition> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let timestamp = chrono::Utc::now().timestamp();
 
         vec![
