@@ -2,6 +2,7 @@
 // Ledger device integration
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct LedgerManager {
