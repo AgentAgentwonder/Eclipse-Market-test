@@ -20,3 +20,9 @@ pub use types::*;
 pub use jupiter::JupiterClient;
 pub use yield_tracker::YieldTracker;
 pub use lp_analyzer::LpAnalyzer;
+
+// Tauri command exports - wildcards ensure new commands are automatically available
+pub use yield_farming::*;
+pub use position_manager::*;
+pub use auto_compound::*;
+pub use governance::*;
