@@ -9,7 +9,7 @@ use std::sync::Arc;
 use tauri::State;
 use tokio::sync::RwLock;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Trade {
     pub id: String,
@@ -22,10 +22,31 @@ pub struct Trade {
     pub total_value: f64,
     pub fee: f64,
     pub tx_signature: String,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
     pub pnl: Option<f64>,
     pub hold_duration_seconds: Option<i64>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for Trade {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(Trade {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            token_mint: row.try_get("token_mint")?,
+            token_symbol: row.try_get("token_symbol")?,
+            side: row.try_get("side")?,
+            amount: row.try_get("amount")?,
+            price: row.try_get("price")?,
+            total_value: row.try_get("total_value")?,
+            fee: row.try_get("fee")?,
+            tx_signature: row.try_get("tx_signature")?,
+            timestamp: Rfc3339DateTime::try_from(row.try_get::<String, _>("timestamp")?)?.into(),
+            pnl: row.try_get("pnl")?,
+            hold_duration_seconds: row.try_get("hold_duration_seconds")?,
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
