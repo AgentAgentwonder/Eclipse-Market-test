@@ -17,6 +17,12 @@ pub mod governance;
 pub mod auto_compound;
 
 pub use types::*;
-pub use jupiter::JupiterClient;
 pub use yield_tracker::YieldTracker;
 pub use lp_analyzer::LpAnalyzer;
+
+// Tauri command exports - wildcards ensure new commands are automatically available
+pub use yield_farming::*;
+pub use position_manager::*;
+pub use auto_compound::*;
+// Explicit exports for governance to avoid naming conflict with standalone governance module
+pub use governance::{get_governance_proposals, vote_on_proposal, get_governance_participation};

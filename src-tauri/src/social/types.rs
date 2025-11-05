@@ -21,9 +21,21 @@ pub struct TraderProfile {
 pub enum SocialError {
     #[error("social error: {0}")]
     General(String),
-    
+
     #[error("database error: {0}")]
     Database(#[from] sqlx::Error),
+
+    #[error("reddit error: {0}")]
+    Reddit(#[from] crate::social::reddit::RedditError),
+
+    #[error("twitter error: {0}")]
+    Twitter(#[from] crate::social::twitter::TwitterError),
+
+    #[error("cache error: {0}")]
+    Cache(#[from] crate::social::cache::CacheError),
+
+    #[error("internal error: {0}")]
+    Internal(String),
 }
 
 pub type SocialResult<T> = Result<T, SocialError>;

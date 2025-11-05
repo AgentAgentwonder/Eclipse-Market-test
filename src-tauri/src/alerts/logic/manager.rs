@@ -24,6 +24,9 @@ pub enum SmartAlertError {
     #[error("serialization error: {0}")]
     Serialization(#[from] serde_json::Error),
 
+    #[error("rule serialization error: {0}")]
+    RuleSerialization(#[from] crate::alerts::logic::serialization::SerializationError),
+
     #[error("rule not found: {0}")]
     NotFound(String),
 

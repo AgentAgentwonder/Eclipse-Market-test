@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 pub type WebhookHeaders = HashMap<String, String>;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum WebhookMethod {
     Get,

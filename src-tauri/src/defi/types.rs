@@ -25,6 +25,8 @@ pub enum Protocol {
     Solend,
     MarginFi,
     Kamino,
+    Raydium,
+    Orca,
     Other(String),
 }
 
@@ -233,6 +235,7 @@ pub struct YieldFarm {
     pub deposit_fee: f64,
     pub withdrawal_fee: f64,
     pub lock_period: Option<u64>,
+    pub risk_score: u8,
 }
 
 // Staking pool structure

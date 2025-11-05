@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -313,7 +313,7 @@ impl LaunchPredictor {
         let liq_contrib = weights.get("liquidity_amount").unwrap_or(&0.0) * liquidity_score;
         score += liq_contrib;
         if features.liquidity_usd < 10000.0 {
-            let low_liq_contrib = weights.get("low_liquidity").unwrap_or(&0.0);
+            let low_liq_contrib = *weights.get("low_liquidity").unwrap_or(&0.0);
             score += low_liq_contrib;
             factor_contributions.push((
                 "Low Liquidity".to_string(),
@@ -330,7 +330,7 @@ impl LaunchPredictor {
 
         // Holder concentration
         if concentration > 0.7 {
-            let concentration_contrib = weights.get("holder_concentration").unwrap_or(&0.0);
+            let concentration_contrib = *weights.get("holder_concentration").unwrap_or(&0.0);
             score += concentration_contrib;
             factor_contributions.push((
                 "High Concentration".to_string(),
@@ -340,7 +340,7 @@ impl LaunchPredictor {
         }
 
         if features.holder_count < 100 {
-            let low_holders_contrib = weights.get("low_holders").unwrap_or(&0.0);
+            let low_holders_contrib = *weights.get("low_holders").unwrap_or(&0.0);
             score += low_holders_contrib;
             factor_contributions.push((
                 "Low Holder Count".to_string(),
@@ -435,7 +435,7 @@ impl LaunchPredictor {
 
         // Simple gradient descent for logistic regression
         // In a real implementation, this would be more sophisticated
-        let mut new_weights = Self::default_weights();
+        let new_weights = Self::default_weights();
         let new_intercept = 50.0;
 
         // Calculate accuracy on training set

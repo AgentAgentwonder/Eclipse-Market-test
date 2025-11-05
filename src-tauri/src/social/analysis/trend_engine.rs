@@ -52,7 +52,8 @@ impl TrendEngine {
             let mut posts_by_id: HashMap<String, SocialPost> = HashMap::new();
             for row in posts {
                 let data: String = row.try_get("post_data")?;
-                let post: SocialPost = serde_json::from_str(&data)?;
+                let post: SocialPost = serde_json::from_str(&data)
+                    .map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
                 engagement_total += post.engagement as i64;
                 mentions += 1;
                 posts_by_id.insert(post.id.clone(), post);

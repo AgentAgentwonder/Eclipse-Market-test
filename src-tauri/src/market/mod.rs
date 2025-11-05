@@ -9,7 +9,11 @@ pub mod top_coins;
 
 pub use drift_adapter::*;
 pub use holders::*;
-pub use new_coins_scanner_clean::*;
+// Exclude HolderInfo from new_coins_scanner_clean to avoid conflict with holders::HolderInfo
+pub use new_coins_scanner_clean::{
+    CreatorInfo, LiquidityInfo, NewCoin, NewCoinsScanner, NewCoinsScannerError, SafetyAnalysis,
+    SafetyChecks, SafetyReport, SharedNewCoinsScanner, start_new_coins_scanner,
+};
 pub use polymarket_adapter::*;
 pub use predictions::*;
 pub use top_coins::*;
