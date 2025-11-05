@@ -20,3 +20,19 @@ pub use types::*;
 pub use jupiter::JupiterClient;
 pub use yield_tracker::YieldTracker;
 pub use lp_analyzer::LpAnalyzer;
+
+// Re-export command functions
+pub use yield_farming::{get_farming_opportunities, get_farming_positions, get_yield_farms};
+pub use position_manager::{
+    get_auto_compound_recommendations, get_defi_portfolio_summary, get_defi_risk_metrics,
+    get_defi_snapshot,
+};
+pub use auto_compound::{
+    configure_auto_compound, estimate_compound_apy_boost, get_auto_compound_config,
+    get_compound_history,
+};
+pub use solend::{get_solend_pools, get_solend_positions, get_solend_reserves};
+pub use marginfi::{get_marginfi_banks, get_marginfi_positions};
+pub use kamino::{get_kamino_farms, get_kamino_positions, get_kamino_vaults};
+pub use staking::{get_staking_pools, get_staking_positions, get_staking_schedule};
+pub use governance::{get_governance_participation, get_governance_proposals, vote_on_proposal};

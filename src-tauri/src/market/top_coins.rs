@@ -38,17 +38,6 @@ pub struct TopCoin {
     pub circulating_supply: Option<f64>,
 }
 
-pub struct CacheEntry {
-    pub data: Vec<TopCoin>,
-    pub timestamp: SystemTime,
-}
-
-pub struct TopCoinsCache {
-    cache: RwLock<Option<CacheEntry>>,
-    ttl: Duration,
-    page_size: usize,
-}
-
 impl TopCoinsCache {
     pub fn new() -> Self {
         Self {

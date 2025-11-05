@@ -25,6 +25,8 @@ pub enum Protocol {
     Solend,
     MarginFi,
     Kamino,
+    Raydium,
+    Orca,
     Other(String),
 }
 
