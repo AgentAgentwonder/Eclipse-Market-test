@@ -127,8 +127,8 @@ use ai_legacy::launch_predictor::{
 use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
-use auth::session_manager::SessionManager;
-use auth::two_factor::TwoFactorManager;
+use auth::session_manager::{SessionManager, session_create, session_renew, session_end, session_status, session_verify, session_update_activity, session_configure_timeout};
+use auth::two_factor::{TwoFactorManager, two_factor_enroll, two_factor_verify, two_factor_disable, two_factor_status, two_factor_regenerate_backup_codes};
 use auto_start::{AutoStartManager, SharedAutoStartManager};
 use bridges::{BridgeManager, SharedBridgeManager};
 use chains::{ChainManager, SharedChainManager};
