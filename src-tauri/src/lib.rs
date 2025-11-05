@@ -1197,13 +1197,14 @@ pub fn run() {
             // social_get_influencer_scores,
             // social_get_fomo_fud,
             // Launch Predictor
-            extract_token_features,
-            predict_launch_success,
-            get_launch_prediction_history,
-            add_launch_training_data,
-            retrain_launch_model,
-            load_latest_launch_model,
-            get_launch_bias_report,
+            // TODO: Re-enable when launch_predictor module is implemented
+            // extract_token_features,
+            // predict_launch_success,
+            // get_launch_prediction_history,
+            // add_launch_training_data,
+            // retrain_launch_model,
+            // load_latest_launch_model,
+            // get_launch_bias_report,
             // AI Assistant
             ai_chat,
             ai_get_conversations,
