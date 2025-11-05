@@ -1,5 +1,8 @@
 use std::str;
 
+#[cfg(target_os = "windows")]
+use std::future::IntoFuture;
+
 use argon2::{
 password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
 Argon2,
@@ -146,7 +149,7 @@ fn read_entry(key: &str) -> Result<Option<String>, BiometricError> {
     let entry = keyring_entry(key)?;
     match entry.get_password() {
         Ok(value) => Ok(Some(value)),
-        Err(KeyringError::NoPasswordFound) => Ok(None),
+        Err(KeyringError::NoEntry) => Ok(None),
         Err(err) => Err(BiometricError::Storage(err.to_string())),
     }
 }
@@ -160,9 +163,9 @@ fn write_entry(key: &str, value: &str) -> Result<(), BiometricError> {
 
 fn delete_entry(key: &str) -> Result<(), BiometricError> {
     let entry = keyring_entry(key)?;
-    match entry.delete_credential() {
+    match entry.delete_password() {
         Ok(_) => Ok(()),
-        Err(KeyringError::NoPasswordFound) => Ok(()),
+        Err(KeyringError::NoEntry) => Ok(()),
         Err(err) => Err(BiometricError::Storage(err.to_string())),
     }
 }
@@ -235,6 +238,7 @@ fn windows_available() -> Result<bool, BiometricError> {
 
     futures_util::future::block_on(async move {
         let availability = future
+            .into_future()
             .await
             .map_err(|err| BiometricError::Failed(err.to_string()))?;
         Ok(matches!(
@@ -255,6 +259,7 @@ async fn windows_verify() -> Result<(), BiometricError> {
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 
     let result = future
+        .into_future()
         .await
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 

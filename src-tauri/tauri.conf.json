@@ -4,28 +4,24 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
     "devUrl": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "Eclipse Market Pro",
-    "version": "1.0.0"
+  "productName": "Eclipse Market Pro",
+  "version": "1.0.0",
+  "identifier": "com.eclipse.market.pro",
+  "bundle": {
+    "active": true,
+    "category": "Finance",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": "all"
   },
-  "tauri": {
-    "identifier": "com.eclipse.market.pro",
-    "bundle": {
-      "active": true,
-      "category": "Finance",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "targets": [
-        "all"
-      ]
-    },
+  "app": {
     "security": {
       "csp": null,
       "capabilities": [
@@ -33,7 +29,7 @@
         "shell:allow-open"
       ]
     },
-    "systemTray": {
+    "trayIcon": {
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true
     },

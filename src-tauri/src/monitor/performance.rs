@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use sysinfo::{CpuExt, NetworkExt, ProcessExt, System, SystemExt};
+use sysinfo::{CpuExt, DiskExt, NetworkExt, ProcessExt, System, SystemExt};
 use tokio::sync::broadcast;
 use tokio::time::{self, Duration};
 
@@ -74,23 +74,28 @@ impl PerformanceMonitor {
         let total_memory = system.total_memory() as f32 / 1024.0;
         let used_memory = system.used_memory() as f32 / 1024.0;
 
-        let disk_read = system.disks().iter().map(|d| d.read_bytes()).sum::<u64>() as f64 / 1024.0;
+        let disk_read = system
+            .disks()
+            .iter()
+            .map(|d| d.total_read_bytes())
+            .sum::<u64>() as f64
+            / 1024.0;
         let disk_write = system
             .disks()
             .iter()
-            .map(|d| d.written_bytes())
+            .map(|d| d.total_written_bytes())
             .sum::<u64>() as f64
             / 1024.0;
 
         let net_sent = system
             .networks()
-            .iter()
+            .into_iter()
             .map(|(_, data)| data.total_transmitted())
             .sum::<u64>() as f64
             / 1024.0;
         let net_recv = system
             .networks()
-            .iter()
+            .into_iter()
             .map(|(_, data)| data.total_received())
             .sum::<u64>() as f64
             / 1024.0;
