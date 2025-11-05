@@ -427,14 +427,14 @@ impl SentimentEngine {
             negative_mentions: negative_count,
             neutral_mentions: neutral_count,
             confidence,
-            dominant_label,
+            dominant_label: dominant_label.clone(),
             last_post_timestamp: last_timestamp,
             updated_at: now,
         };
 
         sqlx::query(
             r#"
-            INSERT OR REPLACE INTO sentiment_snapshots 
+            INSERT OR REPLACE INTO sentiment_snapshots
             (token, avg_score, momentum, mention_count, positive_mentions, negative_mentions,
              neutral_mentions, confidence, dominant_label, last_post_timestamp, updated_at)
             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
