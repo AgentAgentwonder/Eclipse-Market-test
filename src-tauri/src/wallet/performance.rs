@@ -49,7 +49,7 @@ impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for Trade {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PerformanceScore {
     pub id: i64,
@@ -70,8 +70,35 @@ pub struct PerformanceScore {
     pub avg_hold_duration_seconds: f64,
     pub best_trade_pnl: f64,
     pub worst_trade_pnl: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub calculated_at: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for PerformanceScore {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(PerformanceScore {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            score: row.try_get("score")?,
+            win_rate: row.try_get("win_rate")?,
+            total_trades: row.try_get("total_trades")?,
+            winning_trades: row.try_get("winning_trades")?,
+            losing_trades: row.try_get("losing_trades")?,
+            total_profit: row.try_get("total_profit")?,
+            total_loss: row.try_get("total_loss")?,
+            net_pnl: row.try_get("net_pnl")?,
+            avg_profit_per_trade: row.try_get("avg_profit_per_trade")?,
+            avg_loss_per_trade: row.try_get("avg_loss_per_trade")?,
+            profit_factor: row.try_get("profit_factor")?,
+            sharpe_ratio: row.try_get("sharpe_ratio")?,
+            consistency_score: row.try_get("consistency_score")?,
+            avg_hold_duration_seconds: row.try_get("avg_hold_duration_seconds")?,
+            best_trade_pnl: row.try_get("best_trade_pnl")?,
+            worst_trade_pnl: row.try_get("worst_trade_pnl")?,
+            calculated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("calculated_at")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
