@@ -218,11 +218,11 @@ impl SentimentAnalyzer {
 
         for source in sources {
             let id = Uuid::new_v4().to_string();
-            let sentiment_score = rng.gen_range(-1.0..1.0);
-            let confidence = rng.gen_range(0.5..0.95);
-            let positive = rng.gen_range(10..100);
-            let negative = rng.gen_range(5..50);
-            let neutral = rng.gen_range(20..80);
+            let sentiment_score = rng.random_range(-1.0..1.0);
+            let confidence = rng.random_range(0.5..0.95);
+            let positive = rng.random_range(10..100);
+            let negative = rng.random_range(5..50);
+            let neutral = rng.random_range(20..80);
             let timestamp = Utc::now();
 
             sqlx::query(
