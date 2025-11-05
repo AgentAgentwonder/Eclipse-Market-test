@@ -356,7 +356,7 @@ fn keystore_path(app: &AppHandle) -> Result<PathBuf, KeystoreError> {
     let mut path = app
         .path()
         .app_data_dir()
-        .ok_or(KeystoreError::Internal)?;
+        .map_err(|_| KeystoreError::Internal)?;
     if !path.exists() {
         fs::create_dir_all(&path)?;
     }

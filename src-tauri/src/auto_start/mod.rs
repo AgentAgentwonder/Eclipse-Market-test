@@ -52,7 +52,7 @@ impl AutoStartManager {
     }
 
     pub fn initialize(&self, app_handle: &AppHandle) {
-        if let Some(mut data_dir) = app_handle.path().app_data_dir() {
+        if let Ok(mut data_dir) = app_handle.path().app_data_dir() {
             if let Err(err) = fs::create_dir_all(&data_dir) {
                 eprintln!("Failed to ensure auto-start settings directory: {err}");
             } else {
