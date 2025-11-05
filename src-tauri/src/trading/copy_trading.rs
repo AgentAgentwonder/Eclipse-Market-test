@@ -59,7 +59,7 @@ impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for CopyTradeConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyTradeExecution {
     pub id: String,
     pub config_id: String,
@@ -73,10 +73,33 @@ pub struct CopyTradeExecution {
     pub output_symbol: String,
     pub price: f64,
     pub pnl: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub executed_at: DateTime<Utc>,
     pub status: String,
     pub error_message: Option<String>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for CopyTradeExecution {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(CopyTradeExecution {
+            id: row.try_get("id")?,
+            config_id: row.try_get("config_id")?,
+            source_tx_signature: row.try_get("source_tx_signature")?,
+            copied_tx_signature: row.try_get("copied_tx_signature")?,
+            source_amount: row.try_get("source_amount")?,
+            copied_amount: row.try_get("copied_amount")?,
+            input_mint: row.try_get("input_mint")?,
+            output_mint: row.try_get("output_mint")?,
+            input_symbol: row.try_get("input_symbol")?,
+            output_symbol: row.try_get("output_symbol")?,
+            price: row.try_get("price")?,
+            pnl: row.try_get("pnl")?,
+            executed_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("executed_at")?)?.into(),
+            status: row.try_get("status")?,
+            error_message: row.try_get("error_message")?,
+        })
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
