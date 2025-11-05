@@ -1,5 +1,6 @@
 mod academy;
 mod ai;
+mod ai_legacy;
 mod ai_chat;
 mod alerts;
 mod anomalies;
