@@ -68,7 +68,7 @@ impl std::fmt::Display for OrderStatus {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
     pub id: String,
     pub order_type: OrderType,
@@ -95,17 +95,47 @@ pub struct Order {
     pub slippage_bps: i32,
     pub priority_fee_micro_lamports: i32,
     pub wallet_address: String,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[sqlx(try_from = "crate::utils::OptionalRfc3339DateTime")]
     pub triggered_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tx_signature: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_message: Option<String>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for Order {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(Order {
+            id: row.try_get("id")?,
+            order_type: row.try_get("order_type")?,
+            side: row.try_get("side")?,
+            status: row.try_get("status")?,
+            input_mint: row.try_get("input_mint")?,
+            output_mint: row.try_get("output_mint")?,
+            input_symbol: row.try_get("input_symbol")?,
+            output_symbol: row.try_get("output_symbol")?,
+            amount: row.try_get("amount")?,
+            filled_amount: row.try_get("filled_amount")?,
+            limit_price: row.try_get("limit_price")?,
+            stop_price: row.try_get("stop_price")?,
+            trailing_percent: row.try_get("trailing_percent")?,
+            highest_price: row.try_get("highest_price")?,
+            lowest_price: row.try_get("lowest_price")?,
+            linked_order_id: row.try_get("linked_order_id")?,
+            slippage_bps: row.try_get("slippage_bps")?,
+            priority_fee_micro_lamports: row.try_get("priority_fee_micro_lamports")?,
+            wallet_address: row.try_get("wallet_address")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+            triggered_at: OptionalRfc3339DateTime::try_from(row.try_get::<Option<String>, _>("triggered_at")?)?.into(),
+            tx_signature: row.try_get("tx_signature")?,
+            error_message: row.try_get("error_message")?,
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
