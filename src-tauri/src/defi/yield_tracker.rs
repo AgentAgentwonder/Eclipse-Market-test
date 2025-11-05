@@ -2,6 +2,7 @@
 // Track positions across Marinade, Jito, Kamino, Raydium
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct YieldTracker {
