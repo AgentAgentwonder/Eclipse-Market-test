@@ -503,7 +503,7 @@ pub async fn phantom_sign_transaction(
     })?;
 
     let message_bytes = transaction.message.serialize();
-    let pubkey = Pubkey::from_str(&session_data.public_key).map_err(|err| {
+    let pubkey = Pubkey::from_str(&session.public_key).map_err(|err| {
         PhantomError::new(
             PhantomErrorCode::InvalidInput,
             format!("Invalid session public key: {err}"),
