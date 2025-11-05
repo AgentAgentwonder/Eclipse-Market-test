@@ -2,6 +2,7 @@
 // Publish, rate, and subscribe to trading strategies
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct StrategyMarketplace {
