@@ -17,7 +17,6 @@ pub mod governance;
 pub mod auto_compound;
 
 pub use types::*;
-pub use jupiter::JupiterClient;
 pub use yield_tracker::YieldTracker;
 pub use lp_analyzer::LpAnalyzer;
 
