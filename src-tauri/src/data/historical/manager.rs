@@ -70,15 +70,13 @@ impl HistoricalReplayManager {
         &self,
         request: FetchRequest,
         chunk_size_hours: i64,
-        mut progress_callback: F,
+        progress_callback: F,
     ) -> Result<HistoricalDataSet, Box<dyn std::error::Error>>
     where
-        F: FnMut(FetchProgress) + Send,
+        F: Fn(FetchProgress) + Send,
     {
         self.fetcher()
-            .fetch_in_chunks(request, chunk_size_hours, |progress| {
-                progress_callback(progress);
-            })
+            .fetch_in_chunks(request, chunk_size_hours, progress_callback)
             .await
     }
 
