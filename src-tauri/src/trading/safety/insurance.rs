@@ -170,13 +170,17 @@ impl InsuranceCoordinator {
         price_impact_percent: f64,
         mev_risk_level: f64,
     ) -> Option<InsuranceQuote> {
-        let providers = self.list_providers();
-
-        providers
+        // Collect provider IDs first to avoid borrowing conflict
+        let provider_ids: Vec<String> = self.list_providers()
             .into_iter()
-            .filter_map(|provider| {
+            .map(|p| p.id.clone())
+            .collect();
+
+        provider_ids
+            .into_iter()
+            .filter_map(|provider_id| {
                 self.request_quote(
-                    &provider.id,
+                    &provider_id,
                     trade_amount_usd,
                     price_impact_percent,
                     mev_risk_level,
