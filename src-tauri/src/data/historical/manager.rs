@@ -34,7 +34,7 @@ impl HistoricalReplayManager {
         let mut db_path = app_handle
             .path()
             .app_data_dir()
-            .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+            .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
 
         std::fs::create_dir_all(&db_path)
             .map_err(|e| format!("Failed to create data directory: {e}"))?;
