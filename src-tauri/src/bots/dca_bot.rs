@@ -139,7 +139,7 @@ pub struct DcaPerformance {
     pub remaining_budget: f64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DcaExecutionEvent {
     pub dca_id: String,
     pub name: String,

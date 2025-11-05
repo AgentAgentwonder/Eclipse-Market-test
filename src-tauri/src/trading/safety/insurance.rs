@@ -1,6 +1,7 @@
+use chrono::{DateTime, Duration as ChronoDuration, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InsuranceProvider {
@@ -21,7 +22,7 @@ pub struct InsuranceQuote {
     pub coverage_percentage: f64,
     pub estimated_slippage_reimbursement: f64,
     pub mev_protection_included: bool,
-    pub expires_at: Instant,
+    pub expires_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -117,7 +118,7 @@ impl InsuranceCoordinator {
 
         // Check cache first
         if let Some(quote) = self.quote_cache.get(provider_id) {
-            if quote.expires_at > Instant::now() {
+            if quote.expires_at > Utc::now() {
                 return Ok(quote.clone());
             }
         }
@@ -145,6 +146,8 @@ impl InsuranceCoordinator {
         }
 
         let total_premium_usd = trade_amount_usd * premium_rate * premium_multiplier;
+        let cache_ttl = ChronoDuration::from_std(self.cache_ttl)
+            .unwrap_or_else(|_| ChronoDuration::seconds(self.cache_ttl.as_secs() as i64));
 
         let quote = InsuranceQuote {
             provider_id: provider_id.to_string(),
@@ -153,7 +156,7 @@ impl InsuranceCoordinator {
             coverage_percentage,
             estimated_slippage_reimbursement: coverage_amount_usd * 0.6,
             mev_protection_included: mev_risk_level > 0.5,
-            expires_at: Instant::now() + self.cache_ttl,
+            expires_at: Utc::now() + cache_ttl,
         };
 
         self.quote_cache

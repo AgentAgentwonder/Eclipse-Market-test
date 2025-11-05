@@ -146,7 +146,7 @@ pub struct WalletActivity {
     pub pnl: Option<f64>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct CopyTradeEvent {
     pub config_id: String,
     pub name: String,
