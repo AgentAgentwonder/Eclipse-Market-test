@@ -9,7 +9,7 @@ use std::sync::Arc;
 use tauri::State;
 use tokio::sync::RwLock;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Trade {
     pub id: String,
@@ -22,13 +22,34 @@ pub struct Trade {
     pub total_value: f64,
     pub fee: f64,
     pub tx_signature: String,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
     pub pnl: Option<f64>,
     pub hold_duration_seconds: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for Trade {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(Trade {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            token_mint: row.try_get("token_mint")?,
+            token_symbol: row.try_get("token_symbol")?,
+            side: row.try_get("side")?,
+            amount: row.try_get("amount")?,
+            price: row.try_get("price")?,
+            total_value: row.try_get("total_value")?,
+            fee: row.try_get("fee")?,
+            tx_signature: row.try_get("tx_signature")?,
+            timestamp: Rfc3339DateTime::try_from(row.try_get::<String, _>("timestamp")?)?.into(),
+            pnl: row.try_get("pnl")?,
+            hold_duration_seconds: row.try_get("hold_duration_seconds")?,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PerformanceScore {
     pub id: i64,
@@ -49,8 +70,35 @@ pub struct PerformanceScore {
     pub avg_hold_duration_seconds: f64,
     pub best_trade_pnl: f64,
     pub worst_trade_pnl: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub calculated_at: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for PerformanceScore {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(PerformanceScore {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            score: row.try_get("score")?,
+            win_rate: row.try_get("win_rate")?,
+            total_trades: row.try_get("total_trades")?,
+            winning_trades: row.try_get("winning_trades")?,
+            losing_trades: row.try_get("losing_trades")?,
+            total_profit: row.try_get("total_profit")?,
+            total_loss: row.try_get("total_loss")?,
+            net_pnl: row.try_get("net_pnl")?,
+            avg_profit_per_trade: row.try_get("avg_profit_per_trade")?,
+            avg_loss_per_trade: row.try_get("avg_loss_per_trade")?,
+            profit_factor: row.try_get("profit_factor")?,
+            sharpe_ratio: row.try_get("sharpe_ratio")?,
+            consistency_score: row.try_get("consistency_score")?,
+            avg_hold_duration_seconds: row.try_get("avg_hold_duration_seconds")?,
+            best_trade_pnl: row.try_get("best_trade_pnl")?,
+            worst_trade_pnl: row.try_get("worst_trade_pnl")?,
+            calculated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("calculated_at")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -911,22 +959,17 @@ impl PerformanceDatabase {
     }
 }
 
-impl FromRow<'_, sqlx::sqlite::SqliteRow> for ScoreAlert {
-    fn from_row(row: &sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for ScoreAlert {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
         use sqlx::Row;
         Ok(Self {
-            id: row.get("id"),
-            wallet_address: row.get("wallet_address"),
-            old_score: row.get("old_score"),
-            new_score: row.get("new_score"),
-            change_percent: row.get("change_percent"),
-            reason: row.get("reason"),
-            created_at: row.get::<String, _>("created_at").parse().map_err(|_| {
-                sqlx::Error::Decode(Box::new(std::io::Error::new(
-                    std::io::ErrorKind::InvalidData,
-                    "Invalid timestamp format",
-                )))
-            })?,
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            old_score: row.try_get("old_score")?,
+            new_score: row.try_get("new_score")?,
+            change_percent: row.try_get("change_percent")?,
+            reason: row.try_get("reason")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
         })
     }
 }

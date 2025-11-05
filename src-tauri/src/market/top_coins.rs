@@ -7,6 +7,18 @@ use tokio::sync::RwLock;
 
 const CACHE_TTL_MINUTES: i64 = 5;
 
+#[derive(Debug, Clone)]
+pub struct CacheEntry {
+    pub data: Vec<TopCoin>,
+    pub timestamp: SystemTime,
+}
+
+pub struct TopCoinsCache {
+    cache: RwLock<Option<CacheEntry>>,
+    ttl: Duration,
+    page_size: usize,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopCoin {
@@ -127,18 +139,22 @@ impl TopCoinsCache {
             .data
             .into_iter()
             .enumerate()
-            .map(|(idx, item)| TopCoin {
-                rank: idx + 1,
-                address: item.address,
-                symbol: item.symbol,
-                name: item.name,
-                price: item.price,
-                price_change_24h: item.price_change_24h,
-                market_cap: item.market_cap,
-                volume_24h: item.volume_24h,
-                liquidity: item.liquidity,
-                circulating_supply: item.circulating_supply,
-                sparkline: Self::generate_sparkline(item.price),
+            .map(|(idx, item)| {
+                let price_change_7d = item.price_change_24h * 3.0; // Approximate 7d from 24h
+                TopCoin {
+                    rank: (idx + 1) as i32,
+                    address: item.address,
+                    symbol: item.symbol,
+                    name: item.name,
+                    logo_uri: None,
+                    price: item.price,
+                    market_cap: item.market_cap,
+                    volume_24h: item.volume_24h,
+                    price_change_24h: item.price_change_24h,
+                    price_change_7d,
+                    sparkline: Self::generate_sparkline(item.price),
+                    market_cap_category: determine_market_cap_category(item.market_cap),
+                }
             })
             .collect();
 
@@ -227,18 +243,21 @@ impl TopCoinsCache {
                 let (name, symbol, address, base_price, base_cap) =
                     base_coins[idx % base_coins.len()];
                 let price = base_price * (1.0 + rng.gen_range(-0.1..0.1));
+                let market_cap = base_cap * (1.0 + rng.gen_range(-0.1..0.1));
+                let price_change_24h = rng.gen_range(-15.0..20.0);
                 TopCoin {
-                    rank: idx + 1,
+                    rank: (idx + 1) as i32,
                     address: address.to_string(),
                     symbol: symbol.to_string(),
                     name: name.to_string(),
+                    logo_uri: None,
                     price,
-                    price_change_24h: rng.gen_range(-15.0..20.0),
-                    market_cap: base_cap * (1.0 + rng.gen_range(-0.1..0.1)),
+                    market_cap,
                     volume_24h: rng.gen_range(5_000_000.0..800_000_000.0),
-                    liquidity: Some(rng.gen_range(1_000_000.0..50_000_000.0)),
-                    circulating_supply: Some(rng.gen_range(1_000_000.0..100_000_000.0)),
+                    price_change_24h,
+                    price_change_7d: rng.gen_range(-30.0..40.0),
                     sparkline: Self::generate_sparkline(price),
+                    market_cap_category: determine_market_cap_category(market_cap),
                 }
             })
             .collect()

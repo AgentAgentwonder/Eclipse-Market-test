@@ -6,7 +6,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
-    notification::Notification,
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Emitter, Manager, WindowEvent,
 };
@@ -440,10 +439,11 @@ impl TrayManager {
             return;
         }
 
-        let _ = Notification::new()
+        let _ = app_handle.notification()
+            .builder()
             .title("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
-            .show(app_handle);
+            .show();
     }
 }
 

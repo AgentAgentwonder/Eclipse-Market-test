@@ -480,7 +480,7 @@ impl SmartMoneyDetector {
         Ok(SentimentComparison {
             token_mint: token_mint.to_string(),
             token_symbol: None,
-            smart_money_sentiment,
+            smart_money_sentiment: smart_sentiment,
             retail_sentiment,
             divergence,
             smart_money_volume: smart_total,

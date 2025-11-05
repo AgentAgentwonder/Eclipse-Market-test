@@ -10,7 +10,7 @@ use tokio::sync::{OnceCell, RwLock};
 use tokio::time::{interval, Duration};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyTradeConfig {
     pub id: String,
     pub name: String,
@@ -28,13 +28,38 @@ pub struct CopyTradeConfig {
     pub max_daily_trades: Option<i32>,
     pub max_total_loss: Option<f64>,
     pub is_active: bool,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for CopyTradeConfig {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(CopyTradeConfig {
+            id: row.try_get("id")?,
+            name: row.try_get("name")?,
+            wallet_address: row.try_get("wallet_address")?,
+            source_wallet: row.try_get("source_wallet")?,
+            allocation_percentage: row.try_get("allocation_percentage")?,
+            multiplier: row.try_get("multiplier")?,
+            min_trade_amount: row.try_get("min_trade_amount")?,
+            max_trade_amount: row.try_get("max_trade_amount")?,
+            delay_seconds: row.try_get("delay_seconds")?,
+            token_whitelist: row.try_get("token_whitelist")?,
+            token_blacklist: row.try_get("token_blacklist")?,
+            stop_loss_percentage: row.try_get("stop_loss_percentage")?,
+            take_profit_percentage: row.try_get("take_profit_percentage")?,
+            max_daily_trades: row.try_get("max_daily_trades")?,
+            max_total_loss: row.try_get("max_total_loss")?,
+            is_active: row.try_get("is_active")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyTradeExecution {
     pub id: String,
     pub config_id: String,
@@ -48,10 +73,33 @@ pub struct CopyTradeExecution {
     pub output_symbol: String,
     pub price: f64,
     pub pnl: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub executed_at: DateTime<Utc>,
     pub status: String,
     pub error_message: Option<String>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for CopyTradeExecution {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(CopyTradeExecution {
+            id: row.try_get("id")?,
+            config_id: row.try_get("config_id")?,
+            source_tx_signature: row.try_get("source_tx_signature")?,
+            copied_tx_signature: row.try_get("copied_tx_signature")?,
+            source_amount: row.try_get("source_amount")?,
+            copied_amount: row.try_get("copied_amount")?,
+            input_mint: row.try_get("input_mint")?,
+            output_mint: row.try_get("output_mint")?,
+            input_symbol: row.try_get("input_symbol")?,
+            output_symbol: row.try_get("output_symbol")?,
+            price: row.try_get("price")?,
+            pnl: row.try_get("pnl")?,
+            executed_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("executed_at")?)?.into(),
+            status: row.try_get("status")?,
+            error_message: row.try_get("error_message")?,
+        })
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

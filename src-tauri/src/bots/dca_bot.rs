@@ -74,7 +74,7 @@ impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for DcaConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DcaExecution {
     pub id: String,
     pub dca_config_id: String,
@@ -82,11 +82,29 @@ pub struct DcaExecution {
     pub output_amount: f64,
     pub price: f64,
     pub total_cost: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub executed_at: DateTime<Utc>,
     pub status: String,
     pub error_message: Option<String>,
     pub tx_signature: Option<String>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for DcaExecution {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(DcaExecution {
+            id: row.try_get("id")?,
+            dca_config_id: row.try_get("dca_config_id")?,
+            input_amount: row.try_get("input_amount")?,
+            output_amount: row.try_get("output_amount")?,
+            price: row.try_get("price")?,
+            total_cost: row.try_get("total_cost")?,
+            executed_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("executed_at")?)?.into(),
+            status: row.try_get("status")?,
+            error_message: row.try_get("error_message")?,
+            tx_signature: row.try_get("tx_signature")?,
+        })
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
