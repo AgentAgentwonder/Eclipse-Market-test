@@ -1015,6 +1015,35 @@ pub fn run() {
                 Arc::new(RwLock::new(governance_manager));
             app.manage(governance_state.clone());
 
+            // Initialize feature flags database
+            let mut features_db_path = app
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+
+            features_db_path.push("features.db");
+
+            let features_pool = tauri::async_runtime::block_on(async {
+                let pool = sqlx::SqlitePool::connect(&format!("sqlite:{}", features_db_path.display()))
+                    .await
+                    .map_err(|e| format!("Failed to connect to features database: {e}"))?;
+
+                // Run migrations
+                sqlx::migrate!("./migrations")
+                    .run(&pool)
+                    .await
+                    .map_err(|e| format!("Failed to run migrations: {e}"))?;
+
+                Ok::<_, String>(pool)
+            })
+            .map_err(|e: String| {
+                eprintln!("Failed to initialize features database: {e}");
+                e
+            })?;
+
+            let feature_flags = features::FeatureFlags::new(features_pool);
+            app.manage(feature_flags);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
