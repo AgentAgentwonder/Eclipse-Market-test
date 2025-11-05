@@ -55,4 +55,4 @@ impl CollabState {
     }
 }
 
-pub type CollabStateHandle = State<CollabState>;
+pub type CollabStateHandle<'a> = State<'a, CollabState>;
