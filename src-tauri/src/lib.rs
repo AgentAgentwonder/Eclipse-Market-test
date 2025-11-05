@@ -402,9 +402,9 @@ pub fn run() {
 
             // Initialize multisig database
             let mut multisig_db_path = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             std::fs::create_dir_all(&multisig_db_path)
                 .map_err(|e| format!("Failed to create app data directory: {e}"))?;
@@ -424,9 +424,9 @@ pub fn run() {
 
             // Initialize performance database
             let mut performance_db_path = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             std::fs::create_dir_all(&performance_db_path)
                 .map_err(|e| format!("Failed to create app data directory: {e}"))?;
@@ -446,9 +446,9 @@ pub fn run() {
 
             // Initialize journal database
             let mut journal_db_path = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             journal_db_path.push("journal.db");
 
@@ -582,9 +582,9 @@ pub fn run() {
 
             // Initialize indicator manager
             let app_data_dir = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             let indicator_manager = IndicatorManager::new(app_data_dir.clone());
             let indicator_state: SharedIndicatorManager = Arc::new(RwLock::new(indicator_manager));
@@ -642,9 +642,9 @@ pub fn run() {
 
             // Initialize social analysis service
             let mut social_data_dir = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
             social_data_dir.push("social");
             std::fs::create_dir_all(&social_data_dir)
                 .map_err(|e| format!("Failed to create social data directory: {e}"))?;
@@ -683,9 +683,9 @@ pub fn run() {
 
             // Initialize event store
             let mut event_store_path = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             event_store_path.push("events.db");
 
@@ -700,9 +700,9 @@ pub fn run() {
 
             // Initialize compression manager
             let mut compression_db_path = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
             compression_db_path.push("events.db");
 
@@ -972,9 +972,9 @@ pub fn run() {
 
             // Initialize mobile managers
             let mut mobile_data_dir = app
-            .path()
-            .app_data_dir()
-            .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .path()
+                .app_data_dir()
+                .map_err(|_| "Unable to resolve app data directory".to_string())?;
             mobile_data_dir.push("mobile");
             std::fs::create_dir_all(&mobile_data_dir)
                 .map_err(|e| format!("Failed to create mobile directory: {e}"))?;

@@ -689,12 +689,9 @@ fn bind_values<'q>(
 }
 
 fn activity_log_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
-    let mut path = app
-        .path()
-        .app_data_dir()
-        .map_err(|err| {
-            ActivityLogError::Internal(format!("Unable to resolve app data directory: {err}"))
-        })?;
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        ActivityLogError::Internal(format!("Unable to resolve app data directory: {err}"))
+    })?;
     if !path.exists() {
         fs::create_dir_all(&path)?;
     }
@@ -703,12 +700,9 @@ fn activity_log_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
 }
 
 fn activity_config_path(app: &AppHandle) -> Result<PathBuf, ActivityLogError> {
-    let mut path = app
-        .path()
-        .app_data_dir()
-        .map_err(|err| {
-            ActivityLogError::Internal(format!("Unable to resolve app data directory: {err}"))
-        })?;
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        ActivityLogError::Internal(format!("Unable to resolve app data directory: {err}"))
+    })?;
     if !path.exists() {
         fs::create_dir_all(&path)?;
     }

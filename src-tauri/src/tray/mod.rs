@@ -231,10 +231,7 @@ impl TrayManager {
     fn register_shortcut(&self, app_handle: &AppHandle) -> Result<(), String> {
         let mut registered = self.shortcut.write();
         if let Some(existing) = registered.clone() {
-            if let Err(err) = app_handle
-            .global_shortcut()
-            .unregister(existing.as_str())
-            {
+            if let Err(err) = app_handle.global_shortcut().unregister(existing.as_str()) {
                 eprintln!("Failed to unregister previous tray shortcut: {err}");
             }
             registered.take();
@@ -244,8 +241,8 @@ impl TrayManager {
         if let Some(shortcut) = shortcut {
             let app_clone = app_handle.clone();
             app_handle
-            .global_shortcut()
-            .register(shortcut.as_str(), move || {
+                .global_shortcut()
+                .register(shortcut.as_str(), move || {
                     if let Some(window) = app_clone.get_webview_window("main") {
                         let _ = window.show();
                         let _ = window.unminimize();
@@ -353,8 +350,9 @@ impl TrayManager {
         }
 
         builder = builder.separator();
-        let settings_item = MenuItem::with_id(app_handle, "settings", "Settings", true, None::<&str>)
-            .map_err(|e| format!("Failed to create menu item: {e}"))?;
+        let settings_item =
+            MenuItem::with_id(app_handle, "settings", "Settings", true, None::<&str>)
+                .map_err(|e| format!("Failed to create menu item: {e}"))?;
         builder = builder.item(&settings_item);
 
         builder = builder.separator();
@@ -369,7 +367,7 @@ impl TrayManager {
 
     pub fn refresh_tray_menu(&self, app_handle: &AppHandle) -> Result<(), String> {
         let menu = self.build_menu(app_handle)?;
-        
+
         let tray_guard = self.tray_handle.read();
         if let Some(tray) = tray_guard.as_ref() {
             tray.set_menu(Some(menu))
@@ -466,10 +464,7 @@ pub fn attach_window_listeners(window: &tauri::Window, tray_manager: SharedTrayM
         }
         WindowEvent::Destroyed => {
             if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
-                if let Err(err) = handle_clone
-                    .global_shortcut()
-                    .unregister(shortcut.as_str())
-                {
+                if let Err(err) = handle_clone.global_shortcut().unregister(shortcut.as_str()) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }

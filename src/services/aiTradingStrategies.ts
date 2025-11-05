@@ -101,7 +101,7 @@ export class AITradingStrategies {
       'TREND_FOLLOWER',
       'MACHINE_LEARNING_PREDICTOR',
       'NEURAL_NETWORK_SCANNER',
-      'QUANTUM_PATTERN_RECOGNIZER'
+      'QUANTUM_PATTERN_RECOGNIZER',
     ];
 
     strategies.forEach(strategy => {
@@ -122,7 +122,10 @@ export class AITradingStrategies {
   // Main signal generation method
   public async generateSignals(symbols: string[]): Promise<TradingSignal[]> {
     const startTime = performance.now();
-    this.logger.info('Generating AI trading signals', { symbols, strategies: Array.from(this.activeStrategies.keys()) });
+    this.logger.info('Generating AI trading signals', {
+      symbols,
+      strategies: Array.from(this.activeStrategies.keys()),
+    });
 
     const signals: TradingSignal[] = [];
 
@@ -144,7 +147,6 @@ export class AITradingStrategies {
         const topSignals = this.rankSignals(combinedSignals);
 
         signals.push(...topSignals);
-
       } catch (error) {
         this.logger.error(`Failed to generate signals for ${symbol}`, { error });
       }
@@ -218,7 +220,7 @@ export class AITradingStrategies {
 
     if (volatility < 0.15) return 'LOW';
     if (volatility < 0.25) return 'MEDIUM';
-    if (volatility < 0.40) return 'HIGH';
+    if (volatility < 0.4) return 'HIGH';
     return 'EXTREME';
   }
 
@@ -243,18 +245,14 @@ export class AITradingStrategies {
         this.getTechnicalSentiment(symbol),
       ]);
 
-      const combinedSentiment = (
-        newsSentiment * 0.4 +
-        socialSentiment * 0.3 +
-        technicalSentiment * 0.3
-      );
+      const combinedSentiment =
+        newsSentiment * 0.4 + socialSentiment * 0.3 + technicalSentiment * 0.3;
 
       if (combinedSentiment > 0.6) return 'VERY_BULLISH';
       if (combinedSentiment > 0.2) return 'BULLISH';
       if (combinedSentiment > -0.2) return 'NEUTRAL';
       if (combinedSentiment > -0.6) return 'BEARISH';
       return 'VERY_BEARISH';
-
     } catch (error) {
       this.logger.warn('Failed to get sentiment analysis', { symbol, error });
       return 'NEUTRAL';
@@ -385,7 +383,7 @@ export class AITradingStrategies {
         symbol,
         strategy: 'MEAN_REVERSION',
         action: 'BUY',
-        confidence: Math.min(0.8, ((bb.upper - currentPrice) / (bb.upper - bb.lower)) + 0.3),
+        confidence: Math.min(0.8, (bb.upper - currentPrice) / (bb.upper - bb.lower) + 0.3),
         price: currentPrice,
         quantity: this.calculatePositionSize(symbol, currentPrice, 'DAY'),
         stopLoss: currentPrice * 0.95,
@@ -399,7 +397,7 @@ export class AITradingStrategies {
           bbUpper: bb.upper,
           bbMiddle: bb.middle,
           bbLower: bb.lower,
-          rsi
+          rsi,
         },
         marketConditions,
       };
@@ -411,7 +409,7 @@ export class AITradingStrategies {
         symbol,
         strategy: 'MEAN_REVERSION',
         action: 'SELL',
-        confidence: Math.min(0.8, ((currentPrice - bb.lower) / (bb.upper - bb.lower)) + 0.3),
+        confidence: Math.min(0.8, (currentPrice - bb.lower) / (bb.upper - bb.lower) + 0.3),
         price: currentPrice,
         quantity: this.calculatePositionSize(symbol, currentPrice, 'DAY'),
         stopLoss: currentPrice * 1.05,
@@ -425,7 +423,7 @@ export class AITradingStrategies {
           bbUpper: bb.upper,
           bbMiddle: bb.middle,
           bbLower: bb.lower,
-          rsi
+          rsi,
         },
         marketConditions,
       };
@@ -473,7 +471,7 @@ export class AITradingStrategies {
         technicalIndicators: {
           breakoutLevel: recentHigh,
           atr,
-          volumeRatio: currentVolume / avgVolume
+          volumeRatio: currentVolume / avgVolume,
         },
         marketConditions,
       };
@@ -498,7 +496,7 @@ export class AITradingStrategies {
         technicalIndicators: {
           breakoutLevel: recentLow,
           atr,
-          volumeRatio: currentVolume / avgVolume
+          volumeRatio: currentVolume / avgVolume,
         },
         marketConditions,
       };
@@ -515,8 +513,10 @@ export class AITradingStrategies {
     const currentPrice = marketData.candles[marketData.candles.length - 1].close;
 
     // Extreme sentiment conditions
-    const extremeBullish = marketConditions.sentiment === 'VERY_BULLISH' && marketConditions.trend !== 'BULLISH';
-    const extremeBearish = marketConditions.sentiment === 'VERY_BEARISH' && marketConditions.trend !== 'BEARISH';
+    const extremeBullish =
+      marketConditions.sentiment === 'VERY_BULLISH' && marketConditions.trend !== 'BULLISH';
+    const extremeBearish =
+      marketConditions.sentiment === 'VERY_BEARISH' && marketConditions.trend !== 'BEARISH';
 
     if (extremeBullish) {
       return {
@@ -572,7 +572,7 @@ export class AITradingStrategies {
       // Get ML prediction from backend
       const prediction = await invoke('ml_predict_price', {
         symbol,
-        data: marketData.candles.slice(-100)
+        data: marketData.candles.slice(-100),
       });
 
       const currentPrice = marketData.candles[marketData.candles.length - 1].close;
@@ -600,7 +600,7 @@ export class AITradingStrategies {
           timeHorizon: 'SWING',
           technicalIndicators: {
             prediction: predictedPrice,
-            confidence
+            confidence,
           },
           marketConditions,
         };
@@ -628,7 +628,7 @@ export class AITradingStrategies {
 
     if (avgLoss === 0) return 100;
     const rs = avgGain / avgLoss;
-    return 100 - (100 / (1 + rs));
+    return 100 - 100 / (1 + rs);
   }
 
   private calculateMACD(prices: number[]): { histogram: number; signal: number; macd: number } {
@@ -646,28 +646,33 @@ export class AITradingStrategies {
     let ema = prices[0];
 
     for (let i = 1; i < prices.length; i++) {
-      ema = (prices[i] * multiplier) + (ema * (1 - multiplier));
+      ema = prices[i] * multiplier + ema * (1 - multiplier);
     }
 
     return ema;
   }
 
-  private calculateBollingerBands(prices: number[], period: number, stdDev: number): {
+  private calculateBollingerBands(
+    prices: number[],
+    period: number,
+    stdDev: number
+  ): {
     upper: number;
     middle: number;
     lower: number;
   } {
     const middle = this.calculateSMA(prices, period);
     const recentPrices = prices.slice(-period);
-    const variance = recentPrices.reduce((sum, price) => {
-      return sum + Math.pow(price - middle, 2);
-    }, 0) / period;
+    const variance =
+      recentPrices.reduce((sum, price) => {
+        return sum + Math.pow(price - middle, 2);
+      }, 0) / period;
     const standardDeviation = Math.sqrt(variance);
 
     return {
-      upper: middle + (standardDeviation * stdDev),
+      upper: middle + standardDeviation * stdDev,
       middle,
-      lower: middle - (standardDeviation * stdDev),
+      lower: middle - standardDeviation * stdDev,
     };
   }
 
@@ -679,11 +684,7 @@ export class AITradingStrategies {
       const low = candles[i].low;
       const prevClose = candles[i - 1].close;
 
-      const tr = Math.max(
-        high - low,
-        Math.abs(high - prevClose),
-        Math.abs(low - prevClose)
-      );
+      const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
 
       trueRanges.push(tr);
     }
@@ -718,11 +719,11 @@ export class AITradingStrategies {
 
   private getSentimentScore(sentiment: MarketConditions['sentiment']): number {
     const scores = {
-      'VERY_BEARISH': -1,
-      'BEARISH': -0.5,
-      'NEUTRAL': 0,
-      'BULLISH': 0.5,
-      'VERY_BULLISH': 1,
+      VERY_BEARISH: -1,
+      BEARISH: -0.5,
+      NEUTRAL: 0,
+      BULLISH: 0.5,
+      VERY_BULLISH: 1,
     };
     return scores[sentiment];
   }
@@ -733,12 +734,13 @@ export class AITradingStrategies {
     const riskMultiplier = this.config.riskPerTrade;
 
     // Adjust based on time horizon
-    const timeHorizonMultiplier = {
-      'SCALP': 0.5,
-      'DAY': 0.75,
-      'SWING': 1.0,
-      'POSITION': 1.5,
-    }[timeHorizon] || 1.0;
+    const timeHorizonMultiplier =
+      {
+        SCALP: 0.5,
+        DAY: 0.75,
+        SWING: 1.0,
+        POSITION: 1.5,
+      }[timeHorizon] || 1.0;
 
     const positionValue = baseSize * riskMultiplier * timeHorizonMultiplier;
     return positionValue / price;
@@ -767,8 +769,9 @@ export class AITradingStrategies {
       } else {
         // Combine multiple signals for the same trade
         const avgConfidence = group.reduce((sum, s) => sum + s.confidence, 0) / group.length;
-        const weightedPrice = group.reduce((sum, s) => sum + (s.price * s.confidence), 0) /
-                             group.reduce((sum, s) => sum + s.confidence, 0);
+        const weightedPrice =
+          group.reduce((sum, s) => sum + s.price * s.confidence, 0) /
+          group.reduce((sum, s) => sum + s.confidence, 0);
 
         combinedSignals.push({
           ...group[0],

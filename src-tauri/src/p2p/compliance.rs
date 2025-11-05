@@ -266,9 +266,8 @@ impl ComplianceChecker {
         warnings.push("⚠️ Only trade with users you trust or have verified reputation".to_string());
         warnings.push("⚠️ Never share your private keys or seed phrases".to_string());
         warnings.push("⚠️ Verify payment details carefully before releasing escrow".to_string());
-        warnings.push(
-            "⚠️ Use the built-in chat to maintain a record of all communications".to_string(),
-        );
+        warnings
+            .push("⚠️ Use the built-in chat to maintain a record of all communications".to_string());
 
         match risk_level {
             "high" | "critical" => {

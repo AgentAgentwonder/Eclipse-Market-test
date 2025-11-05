@@ -106,15 +106,15 @@ impl AnomalyDetector {
         if self.price_history.contains_key(token_address) {
             let history = self.price_history[token_address].clone();
             if history.len() < self.config.min_data_points {
-            return;
-    }
+                return;
+            }
 
-    let latest = &history[history.len() - 1];
+            let latest = &history[history.len() - 1];
 
             self.detect_zscore_anomaly(token_address, &history, latest);
             self.detect_iqr_anomaly(token_address, &history, latest);
-        self.detect_volume_anomaly(token_address, &history, latest);
-    }
+            self.detect_volume_anomaly(token_address, &history, latest);
+        }
     }
 
     fn detect_zscore_anomaly(

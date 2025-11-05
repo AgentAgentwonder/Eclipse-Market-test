@@ -4,8 +4,8 @@ use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::{AppHandle, Emitter, Manager, State};
 use sysinfo::CpuExt;
+use tauri::{AppHandle, Emitter, Manager, State};
 use tokio::sync::RwLock;
 
 const ALERTS_DB_FILE: &str = "price_alerts.db";

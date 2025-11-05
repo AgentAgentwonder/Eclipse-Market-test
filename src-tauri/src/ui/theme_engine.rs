@@ -137,9 +137,9 @@ impl ThemeEngine {
 
     fn resolve_storage_path(app: &AppHandle) -> Result<PathBuf, String> {
         let mut dir = app
-        .path()
-        .app_data_dir()
-        .or_else(|| "Unable to resolve app data directory".to_string())?;
+            .path()
+            .app_data_dir()
+            .or_else(|| "Unable to resolve app data directory".to_string())?;
 
         if !dir.exists() {
             fs::create_dir_all(&dir)

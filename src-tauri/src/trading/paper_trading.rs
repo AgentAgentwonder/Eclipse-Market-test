@@ -1,4 +1,4 @@
-use crate::utils::{Rfc3339DateTime};
+use crate::utils::Rfc3339DateTime;
 use chrono::{DateTime, Utc};
 use rand::Rng;
 use serde::{Deserialize, Serialize};

@@ -1,6 +1,6 @@
-use base64::{Engine as _, engine::general_purpose};
+use base64::{engine::general_purpose, Engine as _};
 use reqwest::{
-header::{HeaderMap, HeaderValue, AUTHORIZATION},
+    header::{HeaderMap, HeaderValue, AUTHORIZATION},
     Client, StatusCode,
 };
 use serde::{Deserialize, Serialize};

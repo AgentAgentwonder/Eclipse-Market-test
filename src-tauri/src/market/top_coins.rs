@@ -22,6 +22,19 @@ pub struct TopCoin {
     pub price_change_7d: f64,
     pub sparkline: Vec<f64>,
     pub market_cap_category: String,
+    pub liquidity: Option<f64>,
+    pub circulating_supply: Option<f64>,
+}
+
+pub struct CacheEntry {
+    pub data: Vec<TopCoin>,
+    pub timestamp: SystemTime,
+}
+
+pub struct TopCoinsCache {
+    cache: RwLock<Option<CacheEntry>>,
+    ttl: Duration,
+    page_size: usize,
 }
 
 impl TopCoinsCache {
@@ -260,6 +273,29 @@ impl TopCoinsCache {
         let mut cache = self.cache.write().await;
         *cache = None;
     }
+
+    pub fn get(&self) -> Option<Vec<TopCoin>> {
+        if let Ok(cache) = self.cache.try_read() {
+            cache.as_ref().map(|entry| entry.data.clone())
+        } else {
+            None
+        }
+    }
+
+    pub fn set(&mut self, data: Vec<TopCoin>) {
+        if let Ok(mut cache) = self.cache.try_write() {
+            *cache = Some(CacheEntry {
+                data,
+                timestamp: SystemTime::now(),
+            });
+        }
+    }
+
+    pub fn clear(&mut self) {
+        if let Ok(mut cache) = self.cache.try_write() {
+            *cache = None;
+        }
+    }
 }
 
 pub type SharedTopCoinsCache = Arc<RwLock<TopCoinsCache>>;
@@ -362,6 +398,8 @@ async fn fetch_birdeye_top_coins(
             price_change_7d: change_7d,
             sparkline: generate_sparkline(price, change_24h),
             market_cap_category: determine_market_cap_category(market_cap),
+            liquidity: None,
+            circulating_supply: None,
         });
     }
 
@@ -440,6 +478,8 @@ fn generate_mock_top_coins(limit: usize, offset: usize) -> Vec<TopCoin> {
             price_change_7d: change_7d,
             sparkline: generate_sparkline(price, change_24h),
             market_cap_category: determine_market_cap_category(market_cap),
+            liquidity: Some(rng.gen_range(500_000.0..10_000_000.0)),
+            circulating_supply: Some(rng.gen_range(1_000_000.0..500_000_000.0)),
         });
     }
 

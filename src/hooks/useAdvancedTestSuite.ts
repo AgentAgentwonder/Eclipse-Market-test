@@ -126,7 +126,7 @@ export const useAdvancedTestSuite = () => {
               metrics: {
                 executionTime: performance.now() - startTime,
                 priceAccuracy: Math.abs(result.price - result.expectedPrice) / result.expectedPrice,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -135,7 +135,7 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
+        },
       },
       {
         id: 'limit_order_001',
@@ -169,7 +169,7 @@ export const useAdvancedTestSuite = () => {
               metrics: {
                 placementTime: performance.now() - startTime,
                 orderStatus: result.status,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -178,7 +178,7 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
+        },
       },
       {
         id: 'slippage_control_001',
@@ -205,7 +205,9 @@ export const useAdvancedTestSuite = () => {
             const actualSlippage = Math.abs(result.price - marketPrice) / marketPrice;
 
             if (actualSlippage > order.slippage / 100) {
-              throw new Error(`Slippage ${(actualSlippage * 100).toFixed(2)}% exceeded limit of ${order.slippage}%`);
+              throw new Error(
+                `Slippage ${(actualSlippage * 100).toFixed(2)}% exceeded limit of ${order.slippage}%`
+              );
             }
 
             return {
@@ -215,7 +217,7 @@ export const useAdvancedTestSuite = () => {
               metrics: {
                 actualSlippage: actualSlippage * 100,
                 maxSlippage: order.slippage,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -224,9 +226,9 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
 
   // Security Tests
@@ -259,7 +261,7 @@ export const useAdvancedTestSuite = () => {
               details: { encryptionSuccess: true },
               metrics: {
                 encryptionTime: performance.now() - startTime,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -268,7 +270,7 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
+        },
       },
       {
         id: 'api_rate_limiting_001',
@@ -290,7 +292,8 @@ export const useAdvancedTestSuite = () => {
             const results = await Promise.allSettled(requests);
             const rejectedCount = results.filter(r => r.status === 'rejected').length;
 
-            if (rejectedCount < 20) { // At least 20% should be rate limited
+            if (rejectedCount < 20) {
+              // At least 20% should be rate limited
               throw new Error('Rate limiting not working properly');
             }
 
@@ -301,7 +304,7 @@ export const useAdvancedTestSuite = () => {
               metrics: {
                 rejectionRate: rejectedCount / 100,
                 totalRequests: 100,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -310,9 +313,9 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
 
   // Performance Tests
@@ -338,7 +341,8 @@ export const useAdvancedTestSuite = () => {
 
             const renderTime = performance.now() - renderStartTime;
 
-            if (renderTime > 100) { // Should render in under 100ms
+            if (renderTime > 100) {
+              // Should render in under 100ms
               throw new Error(`Chart rendering too slow: ${renderTime.toFixed(2)}ms`);
             }
 
@@ -350,7 +354,7 @@ export const useAdvancedTestSuite = () => {
                 renderTime,
                 dataSize: largeDataset.length,
                 dataPointsPerMs: largeDataset.length / renderTime,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -359,7 +363,7 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
+        },
       },
       {
         id: 'memory_usage_001',
@@ -382,7 +386,8 @@ export const useAdvancedTestSuite = () => {
             const memoryGrowth = finalMemory - initialMemory;
             const memoryGrowthMB = memoryGrowth / 1024 / 1024;
 
-            if (memoryGrowthMB > 100) { // Should not grow more than 100MB
+            if (memoryGrowthMB > 100) {
+              // Should not grow more than 100MB
               throw new Error(`Memory growth too high: ${memoryGrowthMB.toFixed(2)}MB`);
             }
 
@@ -393,7 +398,7 @@ export const useAdvancedTestSuite = () => {
               metrics: {
                 memoryGrowthMB,
                 finalMemoryMB: finalMemory / 1024 / 1024,
-              }
+              },
             };
           } catch (error) {
             return {
@@ -402,103 +407,106 @@ export const useAdvancedTestSuite = () => {
               error: error instanceof Error ? error.message : String(error),
             };
           }
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
 
   // Test suite runner
-  const runTestSuite = useCallback(async (suite: TestSuite): Promise<TestRun> => {
-    const runId = `run_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const startTime = performance.now();
+  const runTestSuite = useCallback(
+    async (suite: TestSuite): Promise<TestRun> => {
+      const runId = `run_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const startTime = performance.now();
 
-    const run: TestRun = {
-      id: runId,
-      timestamp: new Date().toISOString(),
-      suite: suite.name,
-      results: [],
-      summary: {
-        total: suite.tests.length,
-        passed: 0,
-        failed: 0,
-        skipped: 0,
-        totalDuration: 0,
-        successRate: 0,
-      }
-    };
+      const run: TestRun = {
+        id: runId,
+        timestamp: new Date().toISOString(),
+        suite: suite.name,
+        results: [],
+        summary: {
+          total: suite.tests.length,
+          passed: 0,
+          failed: 0,
+          skipped: 0,
+          totalDuration: 0,
+          successRate: 0,
+        },
+      };
 
-    setCurrentRun(run);
-    setIsRunning(true);
-    abortControllerRef.current = new AbortController();
+      setCurrentRun(run);
+      setIsRunning(true);
+      abortControllerRef.current = new AbortController();
 
-    logger.info(`Starting test suite: ${suite.name}`, {
-      totalTests: suite.tests.length,
-      runId,
-    });
+      logger.info(`Starting test suite: ${suite.name}`, {
+        totalTests: suite.tests.length,
+        runId,
+      });
 
-    for (const test of suite.tests) {
-      if (abortControllerRef.current?.signal.aborted) {
-        logger.warn(`Test suite aborted: ${suite.name}`);
-        break;
-      }
+      for (const test of suite.tests) {
+        if (abortControllerRef.current?.signal.aborted) {
+          logger.warn(`Test suite aborted: ${suite.name}`);
+          break;
+        }
 
-      try {
-        logger.debug(`Running test: ${test.name}`, { testId: test.id });
+        try {
+          logger.debug(`Running test: ${test.name}`, { testId: test.id });
 
-        const result = await Promise.race([
-          test.testFunction(),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Test timeout')), test.timeout)
-          ),
-        ]);
+          const result = await Promise.race([
+            test.testFunction(),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Test timeout')), test.timeout)
+            ),
+          ]);
 
-        run.results.push(result);
+          run.results.push(result);
 
-        if (result.passed) {
-          run.summary.passed++;
-          logger.info(`Test passed: ${test.name}`, {
-            duration: result.duration,
-            testId: test.id,
-          });
-        } else {
+          if (result.passed) {
+            run.summary.passed++;
+            logger.info(`Test passed: ${test.name}`, {
+              duration: result.duration,
+              testId: test.id,
+            });
+          } else {
+            run.summary.failed++;
+            logger.error(`Test failed: ${test.name}`, {
+              error: result.error,
+              duration: result.duration,
+              testId: test.id,
+            });
+          }
+        } catch (error) {
+          const failedResult: TestResult = {
+            passed: false,
+            duration: test.timeout,
+            error: error instanceof Error ? error.message : String(error),
+          };
+
+          run.results.push(failedResult);
           run.summary.failed++;
-          logger.error(`Test failed: ${test.name}`, {
-            error: result.error,
-            duration: result.duration,
+
+          logger.error(`Test failed with exception: ${test.name}`, {
+            error: failedResult.error,
             testId: test.id,
           });
         }
-      } catch (error) {
-        const failedResult: TestResult = {
-          passed: false,
-          duration: test.timeout,
-          error: error instanceof Error ? error.message : String(error),
-        };
-
-        run.results.push(failedResult);
-        run.summary.failed++;
-
-        logger.error(`Test failed with exception: ${test.name}`, {
-          error: failedResult.error,
-          testId: test.id,
-        });
       }
-    }
 
-    run.summary.totalDuration = performance.now() - startTime;
-    run.summary.successRate = (run.summary.passed / run.summary.total) * 100;
+      run.summary.totalDuration = performance.now() - startTime;
+      run.summary.successRate = (run.summary.passed / run.summary.total) * 100;
 
-    setTestRuns(prev => [...prev, run]);
-    setIsRunning(false);
-    setCurrentRun(null);
+      setTestRuns(prev => [...prev, run]);
+      setIsRunning(false);
+      setCurrentRun(null);
 
-    logger.info(`Test suite completed: ${suite.name}`, {
-      ...run.summary,
-      runId,
-    });
+      logger.info(`Test suite completed: ${suite.name}`, {
+        ...run.summary,
+        runId,
+      });
 
-    return run;
-  }, [logger]);
+      return run;
+    },
+    [logger]
+  );
 
   const runAllTests = useCallback(async (): Promise<TestRun[]> => {
     const suites = [tradingTests, securityTests, performanceTests];
@@ -549,13 +557,17 @@ export const useAdvancedTestSuite = () => {
 
     const slowTests = run.results.filter(r => r.duration > 1000);
     if (slowTests.length > 0) {
-      recommendations.push(`${slowTests.length} tests are running slowly (>1s) - optimize performance`);
+      recommendations.push(
+        `${slowTests.length} tests are running slowly (>1s) - optimize performance`
+      );
     }
 
     const failedTests = run.results.filter(r => !r.passed);
     const criticalFailures = failedTests.filter(r => r.error?.includes('CRITICAL'));
     if (criticalFailures.length > 0) {
-      recommendations.push(`${criticalFailures.length} critical test failures - immediate attention required`);
+      recommendations.push(
+        `${criticalFailures.length} critical test failures - immediate attention required`
+      );
     }
 
     return recommendations;
@@ -582,11 +594,12 @@ export const useAdvancedTestSuite = () => {
     analyzeResults,
 
     // Test helpers
-    generateMarketData: (count: number) => Array.from({ length: count }, (_, i) => ({
-      timestamp: Date.now() - (count - i) * 1000,
-      price: 100 + Math.sin(i / 100) * 10 + Math.random() * 2,
-      volume: 1000 + Math.random() * 5000,
-    })),
+    generateMarketData: (count: number) =>
+      Array.from({ length: count }, (_, i) => ({
+        timestamp: Date.now() - (count - i) * 1000,
+        price: 100 + Math.sin(i / 100) * 10 + Math.random() * 2,
+        volume: 1000 + Math.random() * 5000,
+      })),
   };
 };
 

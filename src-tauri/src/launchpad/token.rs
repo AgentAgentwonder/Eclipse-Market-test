@@ -95,20 +95,20 @@ impl TokenManager {
     }
 
     pub async fn mint_tokens(
-    &self,
-    mint_address: &str,
-    destination: &str,
-    amount: u64,
-    app: &AppHandle,
+        &self,
+        mint_address: &str,
+        destination: &str,
+        amount: u64,
+        app: &AppHandle,
     ) -> Result<String, AppError> {
-    // Validate addresses
-    let _mint_pubkey = Pubkey::from_str(mint_address)
-    .map_err(|e| AppError::Generic(format!("Invalid mint address: {}", e)))?;
-    let _dest_pubkey = Pubkey::from_str(destination)
-    .map_err(|e| AppError::Generic(format!("Invalid destination address: {}", e)))?;
+        // Validate addresses
+        let _mint_pubkey = Pubkey::from_str(mint_address)
+            .map_err(|e| AppError::Generic(format!("Invalid mint address: {}", e)))?;
+        let _dest_pubkey = Pubkey::from_str(destination)
+            .map_err(|e| AppError::Generic(format!("Invalid destination address: {}", e)))?;
 
-    // Get authority keypair from keystore
-    let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
+        // Get authority keypair from keystore
+        let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
         let _authority_secret = keystore
             .retrieve_secret("mint_authority")
             .map_err(|e| AppError::Generic(format!("Failed to retrieve mint authority: {}", e)))?;

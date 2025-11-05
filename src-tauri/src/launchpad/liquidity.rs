@@ -21,34 +21,34 @@ impl LiquidityLocker {
     }
 
     pub async fn create_lock(
-    &self,
-    request: LockLiquidityRequest,
-    app: &AppHandle,
+        &self,
+        request: LockLiquidityRequest,
+        app: &AppHandle,
     ) -> Result<LiquidityLockConfig, AppError> {
-    // Validate addresses
-    let _mint_pubkey = Pubkey::from_str(&request.token_mint)
-    .map_err(|e| AppError::Generic(format!("Invalid token mint: {}", e)))?;
-    let _pool_pubkey = Pubkey::from_str(&request.pool_address)
-    .map_err(|e| AppError::Generic(format!("Invalid pool address: {}", e)))?;
-    let _beneficiary_pubkey = Pubkey::from_str(&request.beneficiary)
-    .map_err(|e| AppError::Generic(format!("Invalid beneficiary address: {}", e)))?;
+        // Validate addresses
+        let _mint_pubkey = Pubkey::from_str(&request.token_mint)
+            .map_err(|e| AppError::Generic(format!("Invalid token mint: {}", e)))?;
+        let _pool_pubkey = Pubkey::from_str(&request.pool_address)
+            .map_err(|e| AppError::Generic(format!("Invalid pool address: {}", e)))?;
+        let _beneficiary_pubkey = Pubkey::from_str(&request.beneficiary)
+            .map_err(|e| AppError::Generic(format!("Invalid beneficiary address: {}", e)))?;
 
-    // Validate amounts
-    if request.amount == 0 {
-    return Err(AppError::Validation(
-    "Lock amount must be greater than 0".to_string(),
-    ));
-    }
+        // Validate amounts
+        if request.amount == 0 {
+            return Err(AppError::Validation(
+                "Lock amount must be greater than 0".to_string(),
+            ));
+        }
 
-    if request.duration_seconds < 86400 {
-    // At least 1 day
-    return Err(AppError::Validation(
-    "Lock duration must be at least 1 day".to_string(),
-    ));
-    }
+        if request.duration_seconds < 86400 {
+            // At least 1 day
+            return Err(AppError::Validation(
+                "Lock duration must be at least 1 day".to_string(),
+            ));
+        }
 
-    // Get authority keypair from keystore
-    let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
+        // Get authority keypair from keystore
+        let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
         let _authority_secret = keystore
             .retrieve_secret("wallet_keypair")
             .map_err(|e| AppError::Generic(format!("Failed to retrieve keypair: {}", e)))?;
@@ -75,26 +75,26 @@ impl LiquidityLocker {
     }
 
     pub async fn unlock_liquidity(
-    &self,
-    lock_id: &str,
-    app: &AppHandle,
+        &self,
+        lock_id: &str,
+        app: &AppHandle,
     ) -> Result<String, AppError> {
-    let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap();
 
-    let lock = locks
-    .iter_mut()
-    .find(|l| l.lock_id.as_deref() == Some(lock_id))
-    .ok_or_else(|| AppError::NotFound("Lock not found".to_string()))?;
+        let lock = locks
+            .iter_mut()
+            .find(|l| l.lock_id.as_deref() == Some(lock_id))
+            .ok_or_else(|| AppError::NotFound("Lock not found".to_string()))?;
 
-    // Check if unlock date has passed
-    if Utc::now() < lock.unlock_date {
-    return Err(AppError::Validation(
-    "Lock period has not expired yet".to_string(),
-    ));
-    }
+        // Check if unlock date has passed
+        if Utc::now() < lock.unlock_date {
+            return Err(AppError::Validation(
+                "Lock period has not expired yet".to_string(),
+            ));
+        }
 
-    // Get beneficiary keypair from keystore
-    let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
+        // Get beneficiary keypair from keystore
+        let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
         let _beneficiary_secret = keystore
             .retrieve_secret("wallet_keypair")
             .map_err(|e| AppError::Generic(format!("Failed to retrieve keypair: {}", e)))?;
@@ -108,19 +108,19 @@ impl LiquidityLocker {
     }
 
     pub async fn revoke_lock(&self, lock_id: &str, app: &AppHandle) -> Result<String, AppError> {
-    let mut locks = self.locks.lock().unwrap();
+        let mut locks = self.locks.lock().unwrap();
 
-    let lock = locks
-    .iter_mut()
-    .find(|l| l.lock_id.as_deref() == Some(lock_id))
-    .ok_or_else(|| AppError::NotFound("Lock not found".to_string()))?;
+        let lock = locks
+            .iter_mut()
+            .find(|l| l.lock_id.as_deref() == Some(lock_id))
+            .ok_or_else(|| AppError::NotFound("Lock not found".to_string()))?;
 
-    if !lock.is_revocable {
-    return Err(AppError::Validation("Lock is not revocable".to_string()));
-    }
+        if !lock.is_revocable {
+            return Err(AppError::Validation("Lock is not revocable".to_string()));
+        }
 
-    // Get authority keypair from keystore
-    let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
+        // Get authority keypair from keystore
+        let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();
         let _authority_secret = keystore
             .retrieve_secret("wallet_keypair")
             .map_err(|e| AppError::Generic(format!("Failed to retrieve keypair: {}", e)))?;

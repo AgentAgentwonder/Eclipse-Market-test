@@ -333,7 +333,7 @@ export class SocialTrading {
     // Apply sorting
     switch (filters.sortBy) {
       case 'POPULAR':
-        filtered.sort((a, b) => (b.likes + b.shares) - (a.likes + a.shares));
+        filtered.sort((a, b) => b.likes + b.shares - (a.likes + a.shares));
         break;
       case 'TRENDING':
         filtered.sort((a, b) => {
@@ -692,7 +692,9 @@ export class SocialTrading {
   }
 
   // Analytics & Insights
-  public async getSocialAnalytics(timeRange: 'WEEK' | 'MONTH' | 'QUARTER' | 'YEAR' = 'MONTH'): Promise<{
+  public async getSocialAnalytics(
+    timeRange: 'WEEK' | 'MONTH' | 'QUARTER' | 'YEAR' = 'MONTH'
+  ): Promise<{
     engagement: {
       posts: number;
       likes: number;
@@ -863,12 +865,14 @@ export class SocialTrading {
     }
   }
 
-  public async getTrendingAssets(timeRange: 'DAY' | 'WEEK' = 'WEEK'): Promise<{
-    asset: string;
-    mentions: number;
-    sentiment: number;
-    topContributors: string[];
-  }[]> {
+  public async getTrendingAssets(timeRange: 'DAY' | 'WEEK' = 'WEEK'): Promise<
+    {
+      asset: string;
+      mentions: number;
+      sentiment: number;
+      topContributors: string[];
+    }[]
+  > {
     try {
       const trends = await invoke('get_trending_assets', { timeRange });
       return trends;

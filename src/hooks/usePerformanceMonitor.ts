@@ -63,9 +63,19 @@ export function usePerformanceMonitor({ sampleIntervalMs = 2000 }: Options = {})
         setLowMemoryMode(lowMemoryMode);
 
         const connection =
-        navigator.connection ||
-        (navigator as { mozConnection?: NetworkInformation; webkitConnection?: NetworkInformation }).mozConnection ||
-        (navigator as { mozConnection?: NetworkInformation; webkitConnection?: NetworkInformation }).webkitConnection;
+          navigator.connection ||
+          (
+            navigator as {
+              mozConnection?: NetworkInformation;
+              webkitConnection?: NetworkInformation;
+            }
+          ).mozConnection ||
+          (
+            navigator as {
+              mozConnection?: NetworkInformation;
+              webkitConnection?: NetworkInformation;
+            }
+          ).webkitConnection;
 
         const storeSnapshot = usePerformanceStore.getState();
         const gpuStats = storeSnapshot.gpuStats;

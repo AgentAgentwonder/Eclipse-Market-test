@@ -282,10 +282,10 @@ impl BirdeyeStream {
         let volume = data.get("volume_24h").and_then(|v| v.as_f64());
 
         Ok(RawPriceUpdate {
-        symbol,
-        price: Some(price),
-        change: Some(change),
-        volume,
+            symbol,
+            price: Some(price),
+            change: Some(change),
+            volume,
             snapshot: msg_type == Some("snapshot"),
             ts: chrono::Utc::now().timestamp(),
         })

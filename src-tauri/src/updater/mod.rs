@@ -56,10 +56,10 @@ pub struct UpdaterState {
 
 impl UpdaterState {
     pub fn new(app_handle: &AppHandle) -> Result<Self, String> {
-    let app_data_dir = app_handle
-    .path()
-    .app_data_dir()
-    .or_else(|| "Unable to resolve app data directory".to_string())?;
+        let app_data_dir = app_handle
+            .path()
+            .app_data_dir()
+            .or_else(|| "Unable to resolve app data directory".to_string())?;
 
         let backup_path = app_data_dir.join("backups");
         if !backup_path.exists() {

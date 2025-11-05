@@ -45,6 +45,10 @@ pub enum KeystoreError {
     NotFound,
     #[error("internal keystore error")]
     Internal,
+    #[error("lock error")]
+    LockError,
+    #[error("serialization error")]
+    SerializationError,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
