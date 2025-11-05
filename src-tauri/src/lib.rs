@@ -156,6 +156,9 @@ use security::activity_log::ActivityLogger;
 use security::audit::AuditCache;
 use security::keystore::Keystore;
 use security::reputation::{ReputationEngine, SharedReputationEngine};
+use social::service::{SocialDataService, SharedSocialDataService};
+use social::cache::SocialCache;
+use social::analysis::{SocialAnalysisService, SharedSocialAnalysisService};
 use std::error::Error;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -1128,19 +1131,21 @@ pub fn run() {
             biometric_verify_fallback,
             connect_phantom,
             // Session Management
-            session_create,
-            session_renew,
-            session_end,
-            session_status,
-            session_verify,
-            session_update_activity,
-            session_configure_timeout,
+            // TODO: Re-enable when session commands are implemented
+            // session_create,
+            // session_renew,
+            // session_end,
+            // session_status,
+            // session_verify,
+            // session_update_activity,
+            // session_configure_timeout,
             // 2FA
-            two_factor_enroll,
-            two_factor_verify,
-            two_factor_disable,
-            two_factor_status,
-            two_factor_regenerate_backup_codes,
+            // TODO: Re-enable when 2FA commands are implemented
+            // two_factor_enroll,
+            // two_factor_verify,
+            // two_factor_disable,
+            // two_factor_status,
+            // two_factor_regenerate_backup_codes,
             // API Config
             save_api_key,
             remove_api_key,
