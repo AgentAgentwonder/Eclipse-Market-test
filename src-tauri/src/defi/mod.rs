@@ -1,19 +1,12 @@
-pub mod auto_compound;
-pub mod governance;
-pub mod kamino;
-pub mod marginfi;
-pub mod position_manager;
-pub mod solend;
-pub mod staking;
-pub mod types;
-pub mod yield_farming;
+// DeFi Integrations Module
+// Jupiter swaps, yield farming, and LP analytics
 
-pub use auto_compound::*;
-pub use governance::*;
-pub use kamino::*;
-pub use marginfi::*;
-pub use position_manager::*;
-pub use solend::*;
-pub use staking::*;
+pub mod types;
+pub mod jupiter;
+pub mod yield_tracker;
+pub mod lp_analyzer;
+
 pub use types::*;
-pub use yield_farming::*;
+pub use jupiter::JupiterClient;
+pub use yield_tracker::YieldTracker;
+pub use lp_analyzer::LpAnalyzer;
