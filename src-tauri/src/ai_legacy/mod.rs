@@ -529,7 +529,7 @@ pub async fn assess_risk(features: Vec<f32>) -> Result<f32, String> {
         return Err("Features cannot be empty".to_string());
     }
 
-    let model = RiskModel::new();
+    let _model = RiskModel::new();
     let weights = vec![0.3, 0.2, 0.15, 0.15, 0.1, 0.1];
 
     let score: f32 = features
