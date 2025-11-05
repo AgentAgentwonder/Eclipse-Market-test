@@ -435,7 +435,7 @@ impl LaunchPredictor {
 
         // Simple gradient descent for logistic regression
         // In a real implementation, this would be more sophisticated
-        let mut new_weights = Self::default_weights();
+        let new_weights = Self::default_weights();
         let new_intercept = 50.0;
 
         // Calculate accuracy on training set
