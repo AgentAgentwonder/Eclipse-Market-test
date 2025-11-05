@@ -94,7 +94,7 @@ impl PaperTrade {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaperPosition {
     pub id: String,
     pub account_id: String,
@@ -103,10 +103,26 @@ pub struct PaperPosition {
     pub entry_price: f64,
     pub current_price: f64,
     pub unrealized_pnl: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub opened_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for PaperPosition {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(PaperPosition {
+            id: row.try_get("id")?,
+            account_id: row.try_get("account_id")?,
+            symbol: row.try_get("symbol")?,
+            quantity: row.try_get("quantity")?,
+            entry_price: row.try_get("entry_price")?,
+            current_price: row.try_get("current_price")?,
+            unrealized_pnl: row.try_get("unrealized_pnl")?,
+            opened_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("opened_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
