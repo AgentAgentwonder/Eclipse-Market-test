@@ -1918,6 +1918,11 @@ pub fn run() {
             get_trader_profile,
             check_p2p_compliance,
             get_p2p_stats,
+            // Feature Flags
+            get_feature_flags,
+            enable_feature_flag,
+            disable_feature_flag,
+            is_feature_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
