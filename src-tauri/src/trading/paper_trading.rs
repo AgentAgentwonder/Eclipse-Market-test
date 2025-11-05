@@ -1,3 +1,4 @@
+use crate::utils::{Rfc3339DateTime};
 use chrono::{DateTime, Utc};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -23,7 +24,9 @@ pub struct PaperAccount {
     pub id: String,
     pub balance: f64,
     pub initial_balance: f64,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
 }
 
@@ -42,7 +45,7 @@ pub struct PaperTrade {
     pub fee: f64,
     pub slippage: f64,
     pub total_cost: f64,
-    #[sqlx(try_from = "String")]
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
 }
 
@@ -66,7 +69,9 @@ pub struct PaperPosition {
     pub entry_price: f64,
     pub current_price: f64,
     pub unrealized_pnl: f64,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub opened_at: DateTime<Utc>,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
 }
 

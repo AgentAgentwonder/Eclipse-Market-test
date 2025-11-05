@@ -1,3 +1,4 @@
+use crate::utils::{Rfc3339DateTime};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Pool, Row, Sqlite};
@@ -11,7 +12,9 @@ pub struct MonitoredWallet {
     pub min_transaction_size: Option<f64>,
     pub is_whale: bool,
     pub is_active: bool,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
 }
 
@@ -120,6 +123,7 @@ pub struct WalletActivityRecord {
     pub amount: Option<f64>,
     pub amount_usd: Option<f64>,
     pub price: Option<f64>,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
 }
 

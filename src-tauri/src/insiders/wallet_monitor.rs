@@ -82,7 +82,7 @@ impl WalletMonitor {
         let monitor = self.clone();
         let event_handler = self
             .app_handle
-            .listen_global("transaction_update", move |event| {
+            .listen_any("transaction_update", move |event| {
                 if let Some(payload) = event.payload() {
                     if let Ok(stream_event) = serde_json::from_str::<StreamEvent>(payload) {
                         if let StreamEvent::TransactionUpdate(tx) = stream_event {
@@ -487,7 +487,7 @@ pub async fn init_wallet_monitor(app_handle: &AppHandle) -> Result<(), String> {
     let app_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+        .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
     std::fs::create_dir_all(&app_dir)
         .map_err(|e| format!("Failed to create app data directory: {e}"))?;
 

@@ -1,6 +1,7 @@
 use crate::api::jupiter::{
     jupiter_quote, PriorityFeeConfig, QuoteCommandInput, QuoteResult, SwapMode,
 };
+use crate::utils::{OptionalRfc3339DateTime, Rfc3339DateTime};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use cron::Schedule;
 use serde::{Deserialize, Serialize};
@@ -14,7 +15,7 @@ use tokio::sync::{OnceCell, RwLock};
 use tokio::time::{interval, Duration};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DcaConfig {
     pub id: String,
     pub name: String,
@@ -42,6 +43,37 @@ pub struct DcaConfig {
     pub next_execution: Option<DateTime<Utc>>,
 }
 
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for DcaConfig {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+        
+        Ok(DcaConfig {
+            id: row.try_get("id")?,
+            name: row.try_get("name")?,
+            wallet_address: row.try_get("wallet_address")?,
+            input_mint: row.try_get("input_mint")?,
+            output_mint: row.try_get("output_mint")?,
+            input_symbol: row.try_get("input_symbol")?,
+            output_symbol: row.try_get("output_symbol")?,
+            input_decimals: row.try_get("input_decimals")?,
+            output_decimals: row.try_get("output_decimals")?,
+            amount_per_execution: row.try_get("amount_per_execution")?,
+            total_budget: row.try_get("total_budget")?,
+            spent_amount: row.try_get("spent_amount")?,
+            schedule_cron: row.try_get("schedule_cron")?,
+            slippage_bps: row.try_get("slippage_bps")?,
+            priority_fee_micro_lamports: row.try_get("priority_fee_micro_lamports")?,
+            max_price_impact_pct: row.try_get("max_price_impact_pct")?,
+            daily_spend_cap: row.try_get("daily_spend_cap")?,
+            is_active: row.try_get("is_active")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+            last_execution: OptionalRfc3339DateTime::try_from(row.try_get::<Option<String>, _>("last_execution")?)?.into(),
+            next_execution: OptionalRfc3339DateTime::try_from(row.try_get::<Option<String>, _>("next_execution")?)?.into(),
+        })
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct DcaExecution {
     pub id: String,
@@ -50,7 +82,7 @@ pub struct DcaExecution {
     pub output_amount: f64,
     pub price: f64,
     pub total_cost: f64,
-    #[sqlx(try_from = "String")]
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub executed_at: DateTime<Utc>,
     pub status: String,
     pub error_message: Option<String>,

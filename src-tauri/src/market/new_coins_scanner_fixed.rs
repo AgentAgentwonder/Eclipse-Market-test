@@ -181,7 +181,9 @@ impl NewCoinsScanner {
         if let Some(app) = &self.app_handle {
             for coin in &mock_coins {
                 if coin.safety_score >= 70 && !coin.is_spam {
-                    let _ = app.emit_all("new-coin-detected", coin);
+                    if let Err(err) = app.emit("new-coin-detected", coin) {
+                        eprintln!("Failed to emit new coin detected event: {err}");
+                    }
                 }
             }
         }
