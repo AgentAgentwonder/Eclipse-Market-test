@@ -542,12 +542,12 @@ impl WebSocketManager {
                 match provider {
                     StreamProvider::Birdeye => {
                         for symbol in &subs.prices {
-                            if let Ok(price) = get_coin_price(symbol.clone()).await {
+                            if let Ok(price) = get_coin_price(symbol.clone(), None).await {
                                 let delta = PriceDelta {
                                     symbol: symbol.clone(),
-                                    price: price.price,
-                                    change: price.change_24h,
-                                    volume: price.volume_24h,
+                                    price: Some(price.price),
+                                    change: price.price_change_24h,
+                                    volume: Some(price.volume_24h),
                                     ts: chrono::Utc::now().timestamp(),
                                     snapshot: true,
                                 };
