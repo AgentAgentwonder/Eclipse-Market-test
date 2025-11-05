@@ -3,6 +3,7 @@
 
 use super::types::*;
 use chrono::{DateTime, Utc};
+use log;
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
