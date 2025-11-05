@@ -777,17 +777,18 @@ pub fn run() {
             let shared_ai_assistant: ai_legacy::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
             app.manage(shared_ai_assistant.clone());
 
-            // Initialize launch predictor
-            let launch_predictor =
-                tauri::async_runtime::block_on(async { LaunchPredictor::new(&app.handle()).await })
-                    .map_err(|e| {
-                        eprintln!("Failed to initialize launch predictor: {e}");
-                        Box::new(e) as Box<dyn Error>
-                    })?;
-
-            let shared_launch_predictor: SharedLaunchPredictor =
-                Arc::new(RwLock::new(launch_predictor));
-            app.manage(shared_launch_predictor.clone());
+            // TODO: Re-enable when launch_predictor module is implemented
+            // // Initialize launch predictor
+            // let launch_predictor =
+            //     tauri::async_runtime::block_on(async { LaunchPredictor::new(&app.handle()).await })
+            //         .map_err(|e| {
+            //             eprintln!("Failed to initialize launch predictor: {e}");
+            //             Box::new(e) as Box<dyn Error>
+            //         })?;
+            //
+            // let shared_launch_predictor: SharedLaunchPredictor =
+            //     Arc::new(RwLock::new(launch_predictor));
+            // app.manage(shared_launch_predictor.clone());
 
             // Initialize updater state
             let updater_state = UpdaterState::new(&app.handle()).map_err(|e| {
