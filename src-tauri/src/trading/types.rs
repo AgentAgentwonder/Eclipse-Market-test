@@ -1,3 +1,4 @@
+use crate::utils::{OptionalRfc3339DateTime, Rfc3339DateTime};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -94,9 +95,12 @@ pub struct Order {
     pub slippage_bps: i32,
     pub priority_fee_micro_lamports: i32,
     pub wallet_address: String,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[sqlx(try_from = "crate::utils::OptionalRfc3339DateTime")]
     pub triggered_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tx_signature: Option<String>,
