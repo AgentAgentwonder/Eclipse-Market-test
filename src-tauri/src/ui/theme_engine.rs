@@ -702,18 +702,17 @@ pub async fn theme_import(
 
 #[tauri::command]
 pub async fn theme_get_os_preference(app: AppHandle) -> Result<String, String> {
+    // Note: Tauri v2 removed the system API for dark mode detection
+    // For now, default to dark theme to match app aesthetic
+    // TODO: Implement OS-specific detection if needed
     #[cfg(target_os = "macos")]
     {
-        use tauri::api::system::dark_mode;
-        let is_dark = dark_mode().unwrap_or(true);
-        Ok(if is_dark { "dark" } else { "light" }.into())
+        Ok("dark".into())
     }
 
     #[cfg(target_os = "windows")]
     {
-        use tauri::api::system::dark_mode;
-        let is_dark = dark_mode().unwrap_or(true);
-        Ok(if is_dark { "dark" } else { "light" }.into())
+        Ok("dark".into())
     }
 
     #[cfg(target_os = "linux")]
