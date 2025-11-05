@@ -739,14 +739,14 @@ pub fn run() {
             app.manage(stock_cache.clone());
             // Initialize risk analyzer
             let risk_analyzer = tauri::async_runtime::block_on(async {
-                ai::RiskAnalyzer::new(&app.handle()).await
+                ai_legacy::RiskAnalyzer::new(&app.handle()).await
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize risk analyzer: {e}");
                 Box::new(e) as Box<dyn Error>
             })?;
 
-            let shared_risk_analyzer: ai::SharedRiskAnalyzer = Arc::new(RwLock::new(risk_analyzer));
+            let shared_risk_analyzer: ai_legacy::SharedRiskAnalyzer = Arc::new(RwLock::new(risk_analyzer));
             app.manage(shared_risk_analyzer.clone());
 
             // Initialize AI portfolio advisor
