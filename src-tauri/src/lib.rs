@@ -763,14 +763,14 @@ pub fn run() {
 
             // Initialize AI Assistant
             let ai_assistant = tauri::async_runtime::block_on(async {
-                ai::AIAssistant::new(&app.handle(), &keystore).await
+                ai_legacy::AIAssistant::new(&app.handle(), &keystore).await
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize AI assistant: {e}");
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
 
-            let shared_ai_assistant: ai::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
+            let shared_ai_assistant: ai_legacy::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
             app.manage(shared_ai_assistant.clone());
 
             // Initialize launch predictor
