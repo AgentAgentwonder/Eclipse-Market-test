@@ -19,18 +19,30 @@ const MINIMUM_QUANTITY: f64 = 1e-9;
 // Types and Structs
 // ============================================================================
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaperAccount {
     pub id: String,
     pub balance: f64,
     pub initial_balance: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for PaperAccount {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(PaperAccount {
+            id: row.try_get("id")?,
+            balance: row.try_get("balance")?,
+            initial_balance: row.try_get("initial_balance")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaperTrade {
     pub id: String,
     pub account_id: String,
@@ -45,8 +57,30 @@ pub struct PaperTrade {
     pub fee: f64,
     pub slippage: f64,
     pub total_cost: f64,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for PaperTrade {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(PaperTrade {
+            id: row.try_get("id")?,
+            account_id: row.try_get("account_id")?,
+            symbol: row.try_get("symbol")?,
+            side: row.try_get("side")?,
+            order_type: row.try_get("order_type")?,
+            quantity: row.try_get("quantity")?,
+            price: row.try_get("price")?,
+            trading_fee: row.try_get("trading_fee")?,
+            network_fee: row.try_get("network_fee")?,
+            price_impact_fee: row.try_get("price_impact_fee")?,
+            fee: row.try_get("fee")?,
+            slippage: row.try_get("slippage")?,
+            total_cost: row.try_get("total_cost")?,
+            timestamp: Rfc3339DateTime::try_from(row.try_get::<String, _>("timestamp")?)?.into(),
+        })
+    }
 }
 
 impl PaperTrade {
