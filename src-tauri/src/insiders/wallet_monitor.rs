@@ -21,7 +21,7 @@ pub struct WalletMonitor {
     alert_manager: Arc<AlertManager>,
     monitored_wallets: Arc<RwLock<HashSet<String>>>,
     processed_transactions: Arc<RwLock<HashSet<String>>>,
-    event_handler: Arc<tokio::sync::Mutex<Option<tauri::EventHandler>>>,
+    event_handler: Arc<tokio::sync::Mutex<Option<tauri::EventId>>>,
     batch_queue: Arc<tokio::sync::Mutex<Vec<WalletActivity>>>,
 }
 
