@@ -402,17 +402,23 @@ impl MultiWalletManager {
     ) -> Result<WalletInfo, MultiWalletError> {
         let mut guard = self.lock_state()?;
 
-        let wallet = guard
-            .wallets
-            .get_mut(wallet_id)
-            .ok_or_else(|| MultiWalletError::WalletNotFound(wallet_id.to_string()))?;
+        // Check wallet exists and update its fields
+        {
+            let wallet = guard
+                .wallets
+                .get_mut(wallet_id)
+                .ok_or_else(|| MultiWalletError::WalletNotFound(wallet_id.to_string()))?;
 
-        wallet.last_used = Some(Utc::now());
-        wallet.updated_at = Utc::now();
+            wallet.last_used = Some(Utc::now());
+            wallet.updated_at = Utc::now();
+        }
+
+        // Update guard fields after wallet borrow is dropped
         guard.active_wallet_id = Some(wallet_id.to_string());
         guard.last_updated = Utc::now();
 
-        let active_wallet = wallet.clone();
+        // Clone result
+        let active_wallet = guard.wallets.get(wallet_id).unwrap().clone();
         self.persist_locked(&guard, keystore)?;
 
         Ok(active_wallet)
