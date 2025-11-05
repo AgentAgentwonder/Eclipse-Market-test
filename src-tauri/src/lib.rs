@@ -48,6 +48,7 @@ mod trading;
 mod tray;
 mod ui;
 mod updater;
+mod utils;
 mod voice;
 mod wallet;
 mod webhooks;

@@ -1,3 +1,4 @@
+use crate::utils::{Rfc3339DateTime};
 use chrono::{DateTime, Utc};
 use chrono::{Datelike, Timelike};
 use serde::{Deserialize, Serialize};
@@ -21,6 +22,7 @@ pub struct Trade {
     pub total_value: f64,
     pub fee: f64,
     pub tx_signature: String,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
     pub pnl: Option<f64>,
     pub hold_duration_seconds: Option<i64>,
@@ -47,6 +49,7 @@ pub struct PerformanceScore {
     pub avg_hold_duration_seconds: f64,
     pub best_trade_pnl: f64,
     pub worst_trade_pnl: f64,
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub calculated_at: DateTime<Utc>,
 }
 
@@ -102,7 +105,7 @@ pub struct ScoreAlert {
     pub new_score: f64,
     pub change_percent: f64,
     pub reason: String,
-    #[sqlx(try_from = "String")]
+    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
 }
 
