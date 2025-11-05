@@ -147,7 +147,7 @@ use mobile::{
     SharedMobileAuthManager, SharedMobileSyncManager, SharedPushNotificationManager, WidgetManager,
 };
 use notifications::router::{NotificationRouter, SharedNotificationRouter};
-use p2p::{init_p2p_system, SharedP2PDatabase};
+use p2p::init_p2p_system;
 use portfolio::{
     AIPortfolioAdvisor, SharedAIPortfolioAdvisor, SharedWatchlistManager, WatchlistManager,
 };
