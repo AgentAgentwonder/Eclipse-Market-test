@@ -129,7 +129,7 @@ impl Default for TaxLotsState {
 }
 
 impl TaxLotsState {
-    fn open_lots(&self) -> Vec<TaxLot> {
+    pub fn open_lots(&self) -> Vec<TaxLot> {
         self.lots
             .iter()
             .filter(|l| l.disposed_at.is_none())
@@ -137,11 +137,11 @@ impl TaxLotsState {
             .collect()
     }
 
-    fn all_lots(&self) -> Vec<TaxLot> {
+    pub fn all_lots(&self) -> Vec<TaxLot> {
         self.lots.clone()
     }
 
-    fn add_lot(&mut self, lot: TaxLot) {
+    pub fn add_lot(&mut self, lot: TaxLot) {
         self.lots.push(lot);
     }
 

@@ -75,7 +75,7 @@ export function useLedger(): UseLedgerReturn {
       setDevice(connectedDevice);
       await refreshDevices();
       return connectedDevice;
-      } catch (err: unknown) {
+    } catch (err: unknown) {
       const errorMessage =
         err instanceof LedgerError ? err.message : 'Failed to connect to Ledger device';
       setError(errorMessage);

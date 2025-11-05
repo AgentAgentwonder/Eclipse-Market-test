@@ -153,7 +153,12 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to disable wallet stream:', err);
       });
     }
-  }, [preferences.enablePriceStream, preferences.enableWalletStream, priceSubscriptions, walletSubscriptions]);
+  }, [
+    preferences.enablePriceStream,
+    preferences.enableWalletStream,
+    priceSubscriptions,
+    walletSubscriptions,
+  ]);
 
   const subscribePrices = useCallback(
     async (symbols: string[]) => {

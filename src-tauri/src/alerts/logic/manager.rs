@@ -414,12 +414,9 @@ impl SmartAlertManager {
 }
 
 fn smart_alerts_db_path(app: &AppHandle) -> Result<PathBuf, SmartAlertError> {
-    let mut app_data_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|err| {
-            SmartAlertError::Internal(format!("Unable to resolve app data directory: {err}"))
-        })?;
+    let mut app_data_dir = app.path().app_data_dir().map_err(|err| {
+        SmartAlertError::Internal(format!("Unable to resolve app data directory: {err}"))
+    })?;
 
     std::fs::create_dir_all(&app_data_dir)?;
     app_data_dir.push(SMART_ALERTS_DB_FILE);

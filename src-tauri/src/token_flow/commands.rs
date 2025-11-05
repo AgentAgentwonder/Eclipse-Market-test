@@ -1,4 +1,3 @@
-use base64::{Engine as _, engine::general_purpose};
 use crate::token_flow::clustering::{
     assess_cluster_risk, build_wallet_clusters, detect_cluster_performance,
     perform_louvain_clustering, LouvainConfig,
@@ -8,6 +7,7 @@ use crate::token_flow::detection::{
 };
 use crate::token_flow::graph::{generate_sankey_data, TransactionGraph};
 use crate::token_flow::types::*;
+use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::RwLock;

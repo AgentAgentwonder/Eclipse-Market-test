@@ -4,10 +4,10 @@ use std::str;
 use std::future::IntoFuture;
 
 use argon2::{
-password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
-Argon2,
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2,
 };
-use base64::{Engine as _, engine::general_purpose};
+use base64::{engine::general_purpose, Engine as _};
 use keyring::{Entry, Error as KeyringError};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;

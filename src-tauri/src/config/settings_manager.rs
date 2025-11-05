@@ -89,16 +89,12 @@ impl SettingsManager {
     }
 
     fn settings_path(&self) -> Result<PathBuf, SettingsError> {
-        let mut path = self
-            .app_handle
-            .path()
-            .app_data_dir()
-            .ok_or_else(|| {
-                SettingsError::Io(std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
-                    "App data directory not found",
-                ))
-            })?;
+        let mut path = self.app_handle.path().app_data_dir().ok_or_else(|| {
+            SettingsError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "App data directory not found",
+            ))
+        })?;
 
         if !path.exists() {
             fs::create_dir_all(&path)?;
@@ -109,16 +105,12 @@ impl SettingsManager {
     }
 
     fn profiles_path(&self) -> Result<PathBuf, SettingsError> {
-        let mut path = self
-            .app_handle
-            .path()
-            .app_data_dir()
-            .ok_or_else(|| {
-                SettingsError::Io(std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
-                    "App data directory not found",
-                ))
-            })?;
+        let mut path = self.app_handle.path().app_data_dir().ok_or_else(|| {
+            SettingsError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "App data directory not found",
+            ))
+        })?;
 
         path.push("settings_profiles.json");
         Ok(path)

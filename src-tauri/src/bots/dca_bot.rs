@@ -46,7 +46,7 @@ pub struct DcaConfig {
 impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for DcaConfig {
     fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
         use sqlx::Row;
-        
+
         Ok(DcaConfig {
             id: row.try_get("id")?,
             name: row.try_get("name")?,
@@ -68,8 +68,14 @@ impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for DcaConfig {
             is_active: row.try_get("is_active")?,
             created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
             updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
-            last_execution: OptionalRfc3339DateTime::try_from(row.try_get::<Option<String>, _>("last_execution")?)?.into(),
-            next_execution: OptionalRfc3339DateTime::try_from(row.try_get::<Option<String>, _>("next_execution")?)?.into(),
+            last_execution: OptionalRfc3339DateTime::try_from(
+                row.try_get::<Option<String>, _>("last_execution")?,
+            )?
+            .into(),
+            next_execution: OptionalRfc3339DateTime::try_from(
+                row.try_get::<Option<String>, _>("next_execution")?,
+            )?
+            .into(),
         })
     }
 }

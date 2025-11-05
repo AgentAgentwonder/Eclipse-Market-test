@@ -207,7 +207,7 @@ class Logger {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
         body: JSON.stringify(entry),
       });
@@ -219,7 +219,7 @@ class Logger {
 
   private cleanupOldLogs(): void {
     // Keep only logs from the last 24 hours
-    const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+    const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
     this.logBuffer = this.logBuffer.filter(
       entry => new Date(entry.timestamp).getTime() > twentyFourHoursAgo
     );
@@ -283,13 +283,17 @@ class Logger {
       const duration = performance.now() - startTime;
       this.performanceMarks.delete(operation);
 
-      this.info(`Performance: ${operation}`, {
-        ...context,
-        performance: {
-          duration: Math.round(duration * 100) / 100,
-          operation,
+      this.info(
+        `Performance: ${operation}`,
+        {
+          ...context,
+          performance: {
+            duration: Math.round(duration * 100) / 100,
+            operation,
+          },
         },
-      }, 'Performance');
+        'Performance'
+      );
     }
   }
 
@@ -297,41 +301,53 @@ class Logger {
   public logMemoryUsage(context?: Record<string, any>): void {
     if (this.config.enablePerformanceMonitoring && 'memory' in performance) {
       const memory = (performance as any).memory;
-      this.info('Memory Usage', {
-        ...context,
-        performance: {
-          memory: {
-            used: Math.round(memory.usedJSHeapSize / 1024 / 1024 * 100) / 100,
-            total: Math.round(memory.totalJSHeapSize / 1024 / 1024 * 100) / 100,
-            limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024 * 100) / 100,
+      this.info(
+        'Memory Usage',
+        {
+          ...context,
+          performance: {
+            memory: {
+              used: Math.round((memory.usedJSHeapSize / 1024 / 1024) * 100) / 100,
+              total: Math.round((memory.totalJSHeapSize / 1024 / 1024) * 100) / 100,
+              limit: Math.round((memory.jsHeapSizeLimit / 1024 / 1024) * 100) / 100,
+            },
           },
         },
-      }, 'Memory');
+        'Memory'
+      );
     }
   }
 
   // Trading specific logging
   public logTrade(order: any, result: any, executionTime: number): void {
-    this.info('Trade Executed', {
-      orderId: order.id,
-      symbol: order.symbol,
-      side: order.side,
-      amount: order.amount,
-      price: result.price,
-      executionTime,
-    }, 'Trading');
+    this.info(
+      'Trade Executed',
+      {
+        orderId: order.id,
+        symbol: order.symbol,
+        side: order.side,
+        amount: order.amount,
+        price: result.price,
+        executionTime,
+      },
+      'Trading'
+    );
   }
 
   public logAPIError(endpoint: string, error: any, context?: Record<string, any>): void {
-    this.error(`API Error: ${endpoint}`, {
-      ...context,
-      error: {
-        name: error.name || 'APIError',
-        message: error.message,
-        stack: error.stack,
+    this.error(
+      `API Error: ${endpoint}`,
+      {
+        ...context,
+        error: {
+          name: error.name || 'APIError',
+          message: error.message,
+          stack: error.stack,
+        },
+        endpoint,
       },
-      endpoint,
-    }, 'API');
+      'API'
+    );
   }
 
   public logSecurityEvent(event: string, context: Record<string, any>): void {

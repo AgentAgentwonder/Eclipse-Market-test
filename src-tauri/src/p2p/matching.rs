@@ -69,12 +69,12 @@ impl LocalMatcher {
             let geographic_score = rng.random_range(0.7..0.98);
 
             let payment_match_score = offer
-            .payment_methods
-            .iter()
-            .map(|method| self.payment_priority.get(method).copied().unwrap_or(50) as f64)
-            .fold(f64::NEG_INFINITY, f64::max)
-            .max(50.0)
-            / 100.0;
+                .payment_methods
+                .iter()
+                .map(|method| self.payment_priority.get(method).copied().unwrap_or(50) as f64)
+                .fold(f64::NEG_INFINITY, f64::max)
+                .max(50.0)
+                / 100.0;
 
             matches.push(TraderMatch {
                 offer: offer.clone(),

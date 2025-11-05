@@ -346,8 +346,18 @@ export class MultiChainDeFi {
     try {
       // Get major token prices from multiple sources
       const tokens = [
-        'ETH', 'BTC', 'BNB', 'MATIC', 'AVAX', 'FTM', 'SOL',
-        'USDC', 'USDT', 'DAI', 'WBTC', 'WETH'
+        'ETH',
+        'BTC',
+        'BNB',
+        'MATIC',
+        'AVAX',
+        'FTM',
+        'SOL',
+        'USDC',
+        'USDT',
+        'DAI',
+        'WBTC',
+        'WETH',
       ];
 
       for (const token of tokens) {
@@ -399,18 +409,18 @@ export class MultiChainDeFi {
     }
   }
 
-  private async getChainPositions(walletAddress: string, chainId: number): Promise<CrossChainPosition[]> {
+  private async getChainPositions(
+    walletAddress: string,
+    chainId: number
+  ): Promise<CrossChainPosition[]> {
     const positions: CrossChainPosition[] = [];
-    const chainProtocols = Array.from(this.supportedProtocols.values())
-      .filter(p => p.chainId === chainId && p.isActive);
+    const chainProtocols = Array.from(this.supportedProtocols.values()).filter(
+      p => p.chainId === chainId && p.isActive
+    );
 
     for (const protocol of chainProtocols) {
       try {
-        const protocolPositions = await this.getProtocolPositions(
-          walletAddress,
-          protocol,
-          chainId
-        );
+        const protocolPositions = await this.getProtocolPositions(walletAddress, protocol, chainId);
         positions.push(...protocolPositions);
       } catch (error) {
         this.logger.warn(`Failed to get positions from ${protocol.name}`, { error });
@@ -437,7 +447,10 @@ export class MultiChainDeFi {
           return [];
       }
     } catch (error) {
-      this.logger.error(`Failed to get ${protocol.type} positions`, { protocol: protocol.id, error });
+      this.logger.error(`Failed to get ${protocol.type} positions`, {
+        protocol: protocol.id,
+        error,
+      });
       return [];
     }
   }
@@ -553,7 +566,8 @@ export class MultiChainDeFi {
           if (tokenA === tokenB) continue;
 
           const opportunity = await this.analyzeArbitrageOpportunity(tokenA, tokenB);
-          if (opportunity && opportunity.profitPotential > 0.5) { // Minimum 0.5% profit
+          if (opportunity && opportunity.profitPotential > 0.5) {
+            // Minimum 0.5% profit
             opportunities.push(opportunity);
           }
         }
@@ -610,10 +624,7 @@ export class MultiChainDeFi {
     }
   }
 
-  private async getTokenPricesAcrossChains(
-    tokenA: string,
-    tokenB: string
-  ): Promise<any[]> {
+  private async getTokenPricesAcrossChains(tokenA: string, tokenB: string): Promise<any[]> {
     const prices = [];
 
     for (const protocol of this.supportedProtocols.values()) {
@@ -637,7 +648,10 @@ export class MultiChainDeFi {
     return prices;
   }
 
-  private calculatePriceDifference(exchanges: any[]): { profitPotential: number; exchanges: any[] } {
+  private calculatePriceDifference(exchanges: any[]): {
+    profitPotential: number;
+    exchanges: any[];
+  } {
     if (exchanges.length < 2) return { profitPotential: 0, exchanges: [] };
 
     // Sort by price
@@ -676,7 +690,7 @@ export class MultiChainDeFi {
       });
 
       // Select best bridge protocol
-      const protocol = bridgeProtocol || await this.selectBestBridge(fromChain, toChain);
+      const protocol = bridgeProtocol || (await this.selectBestBridge(fromChain, toChain));
       const protocolInfo = this.supportedProtocols.get(protocol);
 
       if (!protocolInfo || protocolInfo.type !== 'BRIDGE') {
@@ -731,8 +745,9 @@ export class MultiChainDeFi {
   }
 
   private async selectBestBridge(fromChain: number, toChain: number): Promise<string> {
-    const bridgeProtocols = Array.from(this.supportedProtocols.values())
-      .filter(p => p.type === 'BRIDGE' && p.isActive);
+    const bridgeProtocols = Array.from(this.supportedProtocols.values()).filter(
+      p => p.type === 'BRIDGE' && p.isActive
+    );
 
     const scores = await Promise.all(
       bridgeProtocols.map(async protocol => {
@@ -842,7 +857,11 @@ export class MultiChainDeFi {
     return opportunities.sort((a, b) => b.apy - a.apy);
   }
 
-  private optimizeYieldStrategy(opportunities: any[], amount: string, timeHorizon: number): {
+  private optimizeYieldStrategy(
+    opportunities: any[],
+    amount: string,
+    timeHorizon: number
+  ): {
     recommendations: any[];
     expectedAPY: number;
   } {
@@ -884,7 +903,10 @@ export class MultiChainDeFi {
     };
   }
 
-  private generateYieldRecommendationReasoning(opportunity: any, allocationPercent: number): string {
+  private generateYieldRecommendationReasoning(
+    opportunity: any,
+    allocationPercent: number
+  ): string {
     const reasons = [];
 
     if (opportunity.apy > 20) {
@@ -913,7 +935,11 @@ export class MultiChainDeFi {
     }
   }
 
-  private async getDEXPrice(protocol: string, tokenA: string, tokenB: string): Promise<number | null> {
+  private async getDEXPrice(
+    protocol: string,
+    tokenA: string,
+    tokenB: string
+  ): Promise<number | null> {
     try {
       return await invoke('get_dex_price', { protocol, tokenA, tokenB });
     } catch (error) {
@@ -980,8 +1006,10 @@ export class MultiChainDeFi {
   }
 
   public getPortfolioValue(): number {
-    return Array.from(this.portfolio.values())
-      .reduce((total, position) => total + position.valueUSD, 0);
+    return Array.from(this.portfolio.values()).reduce(
+      (total, position) => total + position.valueUSD,
+      0
+    );
   }
 
   public getPortfolioBreakdown(): { [type: string]: number } {

@@ -386,9 +386,7 @@ impl WalletMonitor {
                 timestamp: activity.timestamp,
             };
 
-            let _ = self
-                .app_handle
-                .emit("wallet_activity", &wallet_activity);
+            let _ = self.app_handle.emit("wallet_activity", &wallet_activity);
 
             if let Err(err) = self
                 .alert_manager

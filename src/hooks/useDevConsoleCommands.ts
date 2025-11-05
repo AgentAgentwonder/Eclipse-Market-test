@@ -149,8 +149,27 @@ export function useDevConsoleCommands() {
         description: 'Display current memory usage',
         category: 'system' as const,
         execute: () => {
-          if ('memory' in performance && (performance as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory) {
-            const memory = (performance as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+          if (
+            'memory' in performance &&
+            (
+              performance as {
+                memory?: {
+                  usedJSHeapSize: number;
+                  totalJSHeapSize: number;
+                  jsHeapSizeLimit: number;
+                };
+              }
+            ).memory
+          ) {
+            const memory = (
+              performance as {
+                memory?: {
+                  usedJSHeapSize: number;
+                  totalJSHeapSize: number;
+                  jsHeapSizeLimit: number;
+                };
+              }
+            ).memory;
             return Promise.resolve({
               usedJSHeapSize: memory.usedJSHeapSize,
               totalJSHeapSize: memory.totalJSHeapSize,

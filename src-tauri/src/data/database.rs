@@ -160,7 +160,7 @@ impl CompressionManager {
             SELECT enabled, age_threshold_days, compression_level, auto_compress
             FROM compression_config
             WHERE id = 1
-            "#
+            "#,
         )
         .fetch_one(&self.pool)
         .await?;
@@ -307,7 +307,7 @@ impl CompressionManager {
             WHERE timestamp < ?1
             AND id NOT IN (SELECT id FROM compressed_data WHERE record_type = 'event')
             LIMIT 1000
-            "#
+            "#,
         )
         .bind(threshold_date.to_rfc3339())
         .fetch_all(&self.pool)
@@ -320,7 +320,7 @@ impl CompressionManager {
             let event_id: String = event.get("id");
             let event_data: String = event.get("event_data");
             let timestamp_str: String = event.get("timestamp");
-            
+
             let data = event_data.as_bytes();
             let original_size = data.len() as i64;
 
@@ -330,12 +330,11 @@ impl CompressionManager {
                 .await?;
 
             // Get compressed size
-            let compressed = sqlx::query(
-                "SELECT compressed_size FROM compressed_data WHERE id = ?1"
-            )
-            .bind(&event_id)
-            .fetch_one(&self.pool)
-            .await?;
+            let compressed =
+                sqlx::query("SELECT compressed_size FROM compressed_data WHERE id = ?1")
+                    .bind(&event_id)
+                    .fetch_one(&self.pool)
+                    .await?;
 
             space_saved += original_size - compressed.get::<i64, _>("compressed_size");
             compressed_count += 1;
@@ -377,7 +376,7 @@ impl CompressionManager {
             r#"
             SELECT name FROM sqlite_master 
             WHERE type='table' AND name='orders'
-            "#
+            "#,
         )
         .fetch_optional(&self.pool)
         .await?;
@@ -395,7 +394,7 @@ impl CompressionManager {
             AND created_at < ?1
             AND id NOT IN (SELECT id FROM compressed_data WHERE record_type = 'trade')
             LIMIT 1000
-            "#
+            "#,
         )
         .bind(threshold_date.to_rfc3339())
         .fetch_all(&self.pool)
@@ -447,7 +446,7 @@ impl CompressionManager {
                 COALESCE(SUM(compressed_size), 0) as total_compressed,
                 COUNT(*) as num_records
             FROM compressed_data
-            "#
+            "#,
         )
         .fetch_one(&self.pool)
         .await?;
@@ -458,7 +457,7 @@ impl CompressionManager {
             FROM compression_log
             ORDER BY timestamp DESC
             LIMIT 1
-            "#
+            "#,
         )
         .fetch_optional(&self.pool)
         .await?;
@@ -466,7 +465,7 @@ impl CompressionManager {
         let total_uncompressed = totals.get::<i64, _>("total_original");
         let total_compressed = totals.get::<i64, _>("total_compressed");
         let num_records = totals.get::<i64, _>("num_records");
-        
+
         let compression_ratio = if total_uncompressed > 0 {
             ((total_uncompressed - total_compressed) as f64 / total_uncompressed as f64) * 100.0
         } else {
