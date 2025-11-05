@@ -439,10 +439,11 @@ impl TrayManager {
             return;
         }
 
-        let _ = Notification::new()
+        let _ = app_handle.notification()
+            .builder()
             .title("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
-            .show(app_handle);
+            .show();
     }
 }
 
