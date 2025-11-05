@@ -959,22 +959,17 @@ impl PerformanceDatabase {
     }
 }
 
-impl FromRow<'_, sqlx::sqlite::SqliteRow> for ScoreAlert {
-    fn from_row(row: &sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for ScoreAlert {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
         use sqlx::Row;
         Ok(Self {
-            id: row.get("id"),
-            wallet_address: row.get("wallet_address"),
-            old_score: row.get("old_score"),
-            new_score: row.get("new_score"),
-            change_percent: row.get("change_percent"),
-            reason: row.get("reason"),
-            created_at: row.get::<String, _>("created_at").parse().map_err(|_| {
-                sqlx::Error::Decode(Box::new(std::io::Error::new(
-                    std::io::ErrorKind::InvalidData,
-                    "Invalid timestamp format",
-                )))
-            })?,
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            old_score: row.try_get("old_score")?,
+            new_score: row.try_get("new_score")?,
+            change_percent: row.try_get("change_percent")?,
+            reason: row.try_get("reason")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
         })
     }
 }
