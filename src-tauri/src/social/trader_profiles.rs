@@ -2,6 +2,7 @@
 // Public trader profiles and social following
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct TraderProfileManager {

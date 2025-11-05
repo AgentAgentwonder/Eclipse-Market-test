@@ -2,6 +2,7 @@
 // Rankings and achievements
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct Leaderboard {
