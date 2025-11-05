@@ -6,7 +6,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
-    notification::Notification,
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Emitter, Manager, WindowEvent,
 };
