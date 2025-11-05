@@ -10,7 +10,7 @@ use tokio::sync::{OnceCell, RwLock};
 use tokio::time::{interval, Duration};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyTradeConfig {
     pub id: String,
     pub name: String,
@@ -28,10 +28,35 @@ pub struct CopyTradeConfig {
     pub max_daily_trades: Option<i32>,
     pub max_total_loss: Option<f64>,
     pub is_active: bool,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for CopyTradeConfig {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(CopyTradeConfig {
+            id: row.try_get("id")?,
+            name: row.try_get("name")?,
+            wallet_address: row.try_get("wallet_address")?,
+            source_wallet: row.try_get("source_wallet")?,
+            allocation_percentage: row.try_get("allocation_percentage")?,
+            multiplier: row.try_get("multiplier")?,
+            min_trade_amount: row.try_get("min_trade_amount")?,
+            max_trade_amount: row.try_get("max_trade_amount")?,
+            delay_seconds: row.try_get("delay_seconds")?,
+            token_whitelist: row.try_get("token_whitelist")?,
+            token_blacklist: row.try_get("token_blacklist")?,
+            stop_loss_percentage: row.try_get("stop_loss_percentage")?,
+            take_profit_percentage: row.try_get("take_profit_percentage")?,
+            max_daily_trades: row.try_get("max_daily_trades")?,
+            max_total_loss: row.try_get("max_total_loss")?,
+            is_active: row.try_get("is_active")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
