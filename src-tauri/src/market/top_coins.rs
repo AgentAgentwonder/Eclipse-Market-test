@@ -139,18 +139,22 @@ impl TopCoinsCache {
             .data
             .into_iter()
             .enumerate()
-            .map(|(idx, item)| TopCoin {
-                rank: idx + 1,
-                address: item.address,
-                symbol: item.symbol,
-                name: item.name,
-                price: item.price,
-                price_change_24h: item.price_change_24h,
-                market_cap: item.market_cap,
-                volume_24h: item.volume_24h,
-                liquidity: item.liquidity,
-                circulating_supply: item.circulating_supply,
-                sparkline: Self::generate_sparkline(item.price),
+            .map(|(idx, item)| {
+                let price_change_7d = item.price_change_24h * 3.0; // Approximate 7d from 24h
+                TopCoin {
+                    rank: (idx + 1) as i32,
+                    address: item.address,
+                    symbol: item.symbol,
+                    name: item.name,
+                    logo_uri: None,
+                    price: item.price,
+                    market_cap: item.market_cap,
+                    volume_24h: item.volume_24h,
+                    price_change_24h: item.price_change_24h,
+                    price_change_7d,
+                    sparkline: Self::generate_sparkline(item.price),
+                    market_cap_category: determine_market_cap_category(item.market_cap),
+                }
             })
             .collect();
 
