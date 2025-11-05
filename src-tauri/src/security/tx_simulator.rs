@@ -2,6 +2,7 @@
 // Pre-execution simulation and risk analysis
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct TxSimulator {
