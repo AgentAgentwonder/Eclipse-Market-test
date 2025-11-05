@@ -83,6 +83,7 @@ pub use defi::*;
 pub use dev_tools::*;
 pub use drawings::*;
 pub use errors::*;
+pub use features::*;
 pub use fixer::*;
 pub use indicators::*;
 pub use insiders::*;
