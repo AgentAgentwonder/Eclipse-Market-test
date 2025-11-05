@@ -70,7 +70,7 @@ pub async fn get_database_size(app_handle: tauri::AppHandle) -> Result<DatabaseS
     let mut data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+        .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
 
     let mut total_size = 0u64;
     let mut compressed_db_size = 0u64;
