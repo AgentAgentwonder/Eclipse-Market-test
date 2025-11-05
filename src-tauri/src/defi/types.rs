@@ -140,3 +140,112 @@ pub struct GovernanceProposal {
     pub quorum: f64,
     pub execution_eta: Option<i64>,
 }
+
+// Yield position structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct YieldPosition {
+    pub id: String,
+    pub protocol: Protocol,
+    pub asset: String,
+    pub deposited_amount: f64,
+    pub current_value_usd: f64,
+    pub apy: f64,
+    pub rewards_earned: Vec<Reward>,
+    pub start_date: i64,
+    pub last_compounded: Option<i64>,
+}
+
+// Impermanent loss data structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ImpermanentLossData {
+    pub lp_position_id: String,
+    pub initial_value_usd: f64,
+    pub current_value_usd: f64,
+    pub hold_value_usd: f64,
+    pub il_percentage: f64,
+    pub il_usd: f64,
+    pub fees_earned_usd: f64,
+    pub net_result_usd: f64,
+    pub calculation_time: i64,
+}
+
+// LP analytics structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LpAnalytics {
+    pub position_id: String,
+    pub pool_address: String,
+    pub token_a: String,
+    pub token_b: String,
+    pub liquidity_provided: f64,
+    pub current_value_usd: f64,
+    pub fees_earned_24h: f64,
+    pub fees_earned_7d: f64,
+    pub fees_earned_total: f64,
+    pub il_current: ImpermanentLossData,
+    pub apy_7d: f64,
+    pub apy_30d: f64,
+    pub price_range: Option<PriceRange>,
+    pub in_range: bool,
+}
+
+// Price range structure for concentrated liquidity
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PriceRange {
+    pub min_price: f64,
+    pub max_price: f64,
+    pub current_price: f64,
+    pub optimal_min: Option<f64>,
+    pub optimal_max: Option<f64>,
+}
+
+// Lending pool structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LendingPool {
+    pub pool_address: String,
+    pub protocol: Protocol,
+    pub asset: String,
+    pub total_supply: f64,
+    pub total_borrowed: f64,
+    pub supply_apy: f64,
+    pub borrow_apy: f64,
+    pub utilization_rate: f64,
+    pub liquidation_threshold: f64,
+    pub liquidation_bonus: f64,
+}
+
+// Yield farm structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct YieldFarm {
+    pub farm_address: String,
+    pub protocol: Protocol,
+    pub lp_token: String,
+    pub reward_tokens: Vec<String>,
+    pub tvl_usd: f64,
+    pub base_apy: f64,
+    pub reward_apy: f64,
+    pub total_apy: f64,
+    pub deposit_fee: f64,
+    pub withdrawal_fee: f64,
+    pub lock_period: Option<u64>,
+}
+
+// Staking pool structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StakingPool {
+    pub pool_address: String,
+    pub protocol: Protocol,
+    pub stake_token: String,
+    pub reward_token: String,
+    pub total_staked: f64,
+    pub apy: f64,
+    pub lock_duration: Option<u64>,
+    pub early_withdrawal_penalty: f64,
+    pub minimum_stake: f64,
+}

@@ -153,7 +153,6 @@ pub struct ScoreAlert {
     pub new_score: f64,
     pub change_percent: f64,
     pub reason: String,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
 }
 
