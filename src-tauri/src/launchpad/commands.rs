@@ -5,20 +5,20 @@ use super::security::LaunchpadKeyManager;
 use super::token::TokenManager;
 use super::types::*;
 use super::vesting::VestingManager;
-use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager};
+use tokio::sync::RwLock;
 use uuid::Uuid;
 
 pub type SharedLaunchpadState = Arc<RwLock<LaunchpadState>>;
 
 pub struct LaunchpadState {
     pub launches: HashMap<String, TokenLaunchConfig>,
-    pub token_manager: TokenManager,
-    pub liquidity_locker: LiquidityLocker,
-    pub vesting_manager: VestingManager,
-    pub airdrop_manager: AirdropManager,
+    pub token_manager: Arc<TokenManager>,
+    pub liquidity_locker: Arc<LiquidityLocker>,
+    pub vesting_manager: Arc<VestingManager>,
+    pub airdrop_manager: Arc<AirdropManager>,
     pub key_manager: LaunchpadKeyManager,
 }
 
@@ -26,10 +26,10 @@ impl LaunchpadState {
     pub fn new(rpc_url: String) -> Self {
         Self {
             launches: HashMap::new(),
-            token_manager: TokenManager::new(rpc_url),
-            liquidity_locker: LiquidityLocker::new(),
-            vesting_manager: VestingManager::new(),
-            airdrop_manager: AirdropManager::new(),
+            token_manager: Arc::new(TokenManager::new(rpc_url)),
+            liquidity_locker: Arc::new(LiquidityLocker::new()),
+            vesting_manager: Arc::new(VestingManager::new()),
+            airdrop_manager: Arc::new(AirdropManager::new()),
             key_manager: LaunchpadKeyManager::new(),
         }
     }
@@ -74,7 +74,8 @@ pub async fn create_launch_config(
         status: LaunchStatus::Draft,
     };
 
-    state.write().launches.insert(launch_id, config.clone());
+    let mut state_guard = state.write().await;
+    state_guard.launches.insert(launch_id, config.clone());
 
     Ok(config)
 }
@@ -85,11 +86,11 @@ pub async fn update_launch_config(
     launch_id: String,
     config: TokenLaunchConfig,
 ) -> Result<TokenLaunchConfig, String> {
-    let mut state = state.write();
+    let mut state_guard = state.write().await;
     let mut updated_config = config;
     updated_config.updated_at = chrono::Utc::now();
 
-    state.launches.insert(launch_id, updated_config.clone());
+    state_guard.launches.insert(launch_id, updated_config.clone());
 
     Ok(updated_config)
 }
@@ -99,8 +100,8 @@ pub async fn get_launch_config(
     state: tauri::State<'_, SharedLaunchpadState>,
     launch_id: String,
 ) -> Result<TokenLaunchConfig, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .launches
         .get(&launch_id)
         .cloned()
@@ -111,7 +112,8 @@ pub async fn get_launch_config(
 pub async fn list_launches(
     state: tauri::State<'_, SharedLaunchpadState>,
 ) -> Result<Vec<TokenLaunchConfig>, String> {
-    let launches: Vec<_> = state.read().launches.values().cloned().collect();
+    let state_guard = state.read().await;
+    let launches: Vec<_> = state_guard.launches.values().cloned().collect();
     Ok(launches)
 }
 
@@ -120,7 +122,11 @@ pub async fn simulate_token_creation(
     state: tauri::State<'_, SharedLaunchpadState>,
     request: CreateTokenRequest,
 ) -> Result<TransactionSimulation, String> {
-    let token_manager = state.read().token_manager.clone();
+    let token_manager = {
+        let state_guard = state.read().await;
+        state_guard.token_manager.clone()
+    };
+
     token_manager
         .simulate_token_creation(&request)
         .await
@@ -133,7 +139,11 @@ pub async fn launchpad_create_token(
     request: CreateTokenRequest,
     app: AppHandle,
 ) -> Result<CreateTokenResponse, String> {
-    let token_manager = state.read().token_manager.clone();
+    let token_manager = {
+        let state_guard = state.read().await;
+        state_guard.token_manager.clone()
+    };
+
     token_manager
         .create_token(request, &app)
         .await
@@ -171,7 +181,11 @@ pub async fn create_liquidity_lock(
     request: LockLiquidityRequest,
     app: AppHandle,
 ) -> Result<LiquidityLockConfig, String> {
-    let liquidity_locker = state.read().liquidity_locker.clone();
+    let liquidity_locker = {
+        let state_guard = state.read().await;
+        state_guard.liquidity_locker.clone()
+    };
+
     liquidity_locker
         .create_lock(request, &app)
         .await
@@ -184,7 +198,11 @@ pub async fn unlock_liquidity(
     lock_id: String,
     app: AppHandle,
 ) -> Result<String, String> {
-    let liquidity_locker = state.read().liquidity_locker.clone();
+    let liquidity_locker = {
+        let state_guard = state.read().await;
+        state_guard.liquidity_locker.clone()
+    };
+
     liquidity_locker
         .unlock_liquidity(&lock_id, &app)
         .await
@@ -196,8 +214,8 @@ pub async fn get_liquidity_lock(
     state: tauri::State<'_, SharedLaunchpadState>,
     lock_id: String,
 ) -> Result<LiquidityLockConfig, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .liquidity_locker
         .get_lock(&lock_id)
         .map_err(|e| e.to_string())
@@ -207,7 +225,8 @@ pub async fn get_liquidity_lock(
 pub async fn list_liquidity_locks(
     state: tauri::State<'_, SharedLaunchpadState>,
 ) -> Result<Vec<LiquidityLockConfig>, String> {
-    Ok(state.read().liquidity_locker.get_all_locks())
+    let state_guard = state.read().await;
+    Ok(state_guard.liquidity_locker.get_all_locks())
 }
 
 // Vesting Commands
@@ -217,8 +236,8 @@ pub async fn create_vesting_schedule(
     state: tauri::State<'_, SharedLaunchpadState>,
     request: CreateVestingRequest,
 ) -> Result<VestingSchedule, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .vesting_manager
         .create_schedule(request)
         .map_err(|e| e.to_string())
@@ -230,8 +249,8 @@ pub async fn release_vested_tokens(
     schedule_id: String,
     amount: u64,
 ) -> Result<VestingSchedule, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .vesting_manager
         .release_tokens(&schedule_id, amount)
         .map_err(|e| e.to_string())
@@ -242,8 +261,8 @@ pub async fn get_vesting_schedule(
     state: tauri::State<'_, SharedLaunchpadState>,
     schedule_id: String,
 ) -> Result<VestingSchedule, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .vesting_manager
         .get_schedule(&schedule_id)
         .map_err(|e| e.to_string())
@@ -255,7 +274,8 @@ pub async fn list_vesting_schedules(
     token_mint: Option<String>,
     beneficiary: Option<String>,
 ) -> Result<Vec<VestingSchedule>, String> {
-    let manager = &state.read().vesting_manager;
+    let state_guard = state.read().await;
+    let manager = &state_guard.vesting_manager;
 
     Ok(if let Some(mint) = token_mint {
         manager.get_schedules_for_mint(&mint)
@@ -273,8 +293,8 @@ pub async fn create_airdrop(
     state: tauri::State<'_, SharedLaunchpadState>,
     request: CreateAirdropRequest,
 ) -> Result<AirdropConfig, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .airdrop_manager
         .create_airdrop(request)
         .map_err(|e| e.to_string())
@@ -285,8 +305,8 @@ pub async fn activate_airdrop(
     state: tauri::State<'_, SharedLaunchpadState>,
     airdrop_id: String,
 ) -> Result<AirdropConfig, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .airdrop_manager
         .activate_airdrop(&airdrop_id)
         .map_err(|e| e.to_string())
@@ -298,8 +318,8 @@ pub async fn claim_airdrop_tokens(
     airdrop_id: String,
     recipient_address: String,
 ) -> Result<AirdropRecipient, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .airdrop_manager
         .claim_airdrop(&airdrop_id, &recipient_address)
         .map_err(|e| e.to_string())
@@ -310,8 +330,8 @@ pub async fn get_airdrop(
     state: tauri::State<'_, SharedLaunchpadState>,
     airdrop_id: String,
 ) -> Result<AirdropConfig, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .airdrop_manager
         .get_airdrop(&airdrop_id)
         .map_err(|e| e.to_string())
@@ -322,8 +342,8 @@ pub async fn get_airdrop_metrics(
     state: tauri::State<'_, SharedLaunchpadState>,
     airdrop_id: String,
 ) -> Result<AirdropMetrics, String> {
-    state
-        .read()
+    let state_guard = state.read().await;
+    state_guard
         .airdrop_manager
         .get_airdrop_metrics(&airdrop_id)
         .map_err(|e| e.to_string())
@@ -336,10 +356,10 @@ pub async fn get_distribution_metrics(
     state: tauri::State<'_, SharedLaunchpadState>,
     token_mint: String,
 ) -> Result<DistributionMetrics, String> {
-    let state = state.read();
+    let state_guard = state.read().await;
 
-    let airdrops = state.airdrop_manager.get_airdrops_for_mint(&token_mint);
-    let vesting = state.vesting_manager.get_schedules_for_mint(&token_mint);
+    let airdrops = state_guard.airdrop_manager.get_airdrops_for_mint(&token_mint);
+    let vesting = state_guard.vesting_manager.get_schedules_for_mint(&token_mint);
 
     let total_distributed: u64 = airdrops
         .iter()
@@ -362,7 +382,7 @@ pub async fn get_distribution_metrics(
         .filter(|v| v.released_amount >= v.total_amount)
         .count() as u32;
 
-    let liquidity_locked_amount = state
+    let liquidity_locked_amount = state_guard
         .liquidity_locker
         .get_active_locks()
         .iter()
