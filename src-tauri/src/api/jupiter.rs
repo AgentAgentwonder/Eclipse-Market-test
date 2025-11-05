@@ -365,7 +365,8 @@ fn parse_route_plan(quote: &QuoteResponse) -> ParsedRoutePlan {
 fn decode_versioned_transaction(encoded: &str) -> Result<EncodedTransaction, String> {
     use solana_sdk::{signature::Signature, transaction::VersionedTransaction};
 
-    let bytes = base64::decode(encoded)
+    let bytes = general_purpose::STANDARD
+        .decode(encoded.as_bytes())
         .map_err(|e| JupiterError::Serialization(format!("invalid base64 transaction: {e}")))?;
 
     let tx: VersionedTransaction = bincode::deserialize(&bytes)
