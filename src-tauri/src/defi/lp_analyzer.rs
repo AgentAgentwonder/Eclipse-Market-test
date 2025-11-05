@@ -2,6 +2,7 @@
 // Deep analytics on LP positions with IL tracking
 
 use super::types::*;
+use log;
 use sqlx::SqlitePool;
 
 pub struct LpAnalyzer {
