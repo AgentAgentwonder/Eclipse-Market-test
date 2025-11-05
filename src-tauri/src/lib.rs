@@ -119,11 +119,12 @@ pub use wallet::multisig::*;
 pub use wallet::performance::*;
 pub use windowing::*;
 
-use ai_legacy::launch_predictor::{
-    add_launch_training_data, extract_token_features, get_launch_bias_report,
-    get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
-    retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
-};
+// TODO: Re-enable when launch_predictor module is implemented
+// use ai_legacy::launch_predictor::{
+//     add_launch_training_data, extract_token_features, get_launch_bias_report,
+//     get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
+//     retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
+// };
 use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
