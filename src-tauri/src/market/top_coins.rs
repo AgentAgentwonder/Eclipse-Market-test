@@ -7,6 +7,18 @@ use tokio::sync::RwLock;
 
 const CACHE_TTL_MINUTES: i64 = 5;
 
+#[derive(Debug, Clone)]
+pub struct CacheEntry {
+    pub data: Vec<TopCoin>,
+    pub timestamp: SystemTime,
+}
+
+pub struct TopCoinsCache {
+    cache: RwLock<Option<CacheEntry>>,
+    ttl: Duration,
+    page_size: usize,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TopCoin {
