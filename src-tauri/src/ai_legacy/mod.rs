@@ -577,7 +577,8 @@ pub async fn get_token_risk_score(
     // Calculate token age
     let token_age_days = {
         let creation_date = chrono::DateTime::parse_from_rfc3339(&metadata.creation_date)
-            .map_err(|e| format!("Failed to parse creation date: {}", e))?;
+            .map_err(|e| format!("Failed to parse creation date: {}", e))?
+            .with_timezone(&Utc);
         let now = Utc::now();
         (now - creation_date).num_days() as f64
     };
