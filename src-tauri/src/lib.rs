@@ -62,6 +62,7 @@ pub use governance::*;
 pub use journal::*;
 mod p2p;
 pub use ai::*;
+pub use ai_legacy::*;
 pub use ai_chat::*;
 pub use alerts::*;
 pub use anomalies::*;
