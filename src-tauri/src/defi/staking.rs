@@ -21,22 +21,22 @@ impl StakingAdapter {
         Ok(self.generate_mock_pools())
     }
 
-    pub async fn get_positions(&self, wallet: &str) -> Result<Vec<DeFiPosition>, String> {
+    pub async fn get_positions(&self, _wallet: &str) -> Result<Vec<DeFiPosition>, String> {
         let pools = self.get_pools().await?;
         let timestamp = chrono::Utc::now().timestamp();
 
         let mut positions = Vec::new();
         for pool in pools {
             positions.push(DeFiPosition {
-                id: format!("staking-{}", pool.id),
+                id: format!("staking-{}", pool.pool_address),
                 protocol: pool.protocol.clone(),
                 position_type: PositionType::Staking,
-                asset: pool.asset.clone(),
+                asset: pool.stake_token.clone(),
                 amount: 100.0,
-                value_usd: pool.tvl / 1000.0,
+                value_usd: pool.total_staked / 1000.0,
                 apy: pool.apy,
                 rewards: vec![Reward {
-                    token: pool.asset.clone(),
+                    token: pool.reward_token.clone(),
                     amount: 2.5,
                     value_usd: 2.5,
                 }],
