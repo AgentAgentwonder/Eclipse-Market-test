@@ -119,12 +119,12 @@ pub use wallet::multisig::*;
 pub use wallet::performance::*;
 pub use windowing::*;
 
-use ai::launch_predictor::{
+use ai_legacy::launch_predictor::{
     add_launch_training_data, extract_token_features, get_launch_bias_report,
     get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
     retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
 };
-use ai::SharedAIAssistant;
+use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
 use auth::session_manager::SessionManager;
