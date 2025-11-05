@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Window, WindowBuilder, WindowUrl};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Window, WindowBuilder, WebviewUrl};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitorInfo {
