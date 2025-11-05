@@ -186,7 +186,7 @@ impl HeliusStream {
         let params = value
             .get("params")
             .and_then(|v| v.get("result"))
-            .ok_or_else(|| anyhow::anyhow!("Missing params"))?;
+            .ok_or_else(|| anyhow::anyhow!("Missing params parameter"))?;
 
         Ok(TransactionUpdate {
             signature: params
