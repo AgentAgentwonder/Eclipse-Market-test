@@ -239,18 +239,21 @@ impl TopCoinsCache {
                 let (name, symbol, address, base_price, base_cap) =
                     base_coins[idx % base_coins.len()];
                 let price = base_price * (1.0 + rng.gen_range(-0.1..0.1));
+                let market_cap = base_cap * (1.0 + rng.gen_range(-0.1..0.1));
+                let price_change_24h = rng.gen_range(-15.0..20.0);
                 TopCoin {
-                    rank: idx + 1,
+                    rank: (idx + 1) as i32,
                     address: address.to_string(),
                     symbol: symbol.to_string(),
                     name: name.to_string(),
+                    logo_uri: None,
                     price,
-                    price_change_24h: rng.gen_range(-15.0..20.0),
-                    market_cap: base_cap * (1.0 + rng.gen_range(-0.1..0.1)),
+                    market_cap,
                     volume_24h: rng.gen_range(5_000_000.0..800_000_000.0),
-                    liquidity: Some(rng.gen_range(1_000_000.0..50_000_000.0)),
-                    circulating_supply: Some(rng.gen_range(1_000_000.0..100_000_000.0)),
+                    price_change_24h,
+                    price_change_7d: rng.gen_range(-30.0..40.0),
                     sparkline: Self::generate_sparkline(price),
+                    market_cap_category: determine_market_cap_category(market_cap),
                 }
             })
             .collect()
