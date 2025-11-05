@@ -124,7 +124,6 @@ use ai_legacy::launch_predictor::{
     get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
     retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
 };
-use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
 use auth::session_manager::SessionManager;
