@@ -24,6 +24,7 @@ mod dev_tools;
 mod diagnostics;
 mod drawings;
 mod errors;
+mod features;
 mod fixer;
 mod governance;
 mod indicators;
