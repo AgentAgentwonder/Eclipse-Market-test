@@ -56,7 +56,7 @@ impl RateLimitEntry {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct RateLimiter {
     inner: Mutex<HashMap<String, RateLimitEntry>>,
 }
