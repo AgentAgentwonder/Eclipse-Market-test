@@ -114,19 +114,24 @@ impl TrayManager {
     }
 
     pub fn initialize(&self, app_handle: &AppHandle) {
-        if let Some(mut data_dir) = app_handle.path().app_data_dir() {
-            if let Err(err) = fs::create_dir_all(&data_dir) {
-                eprintln!("Failed to ensure tray settings directory: {err}");
-            } else {
-                data_dir.push("tray_settings.json");
-                let mut settings_guard = self.settings.write();
-                self.settings_path.write().replace(data_dir.clone());
+        match app_handle.path().app_data_dir() {
+            Ok(mut data_dir) => {
+                if let Err(err) = fs::create_dir_all(&data_dir) {
+                    eprintln!("Failed to ensure tray settings directory: {err}");
+                } else {
+                    data_dir.push("tray_settings.json");
+                    let mut settings_guard = self.settings.write();
+                    self.settings_path.write().replace(data_dir.clone());
 
-                if let Ok(contents) = fs::read_to_string(&data_dir) {
-                    if let Ok(parsed) = serde_json::from_str::<TraySettings>(&contents) {
-                        *settings_guard = parsed;
+                    if let Ok(contents) = fs::read_to_string(&data_dir) {
+                        if let Ok(parsed) = serde_json::from_str::<TraySettings>(&contents) {
+                            *settings_guard = parsed;
+                        }
                     }
                 }
+            }
+            Err(err) => {
+                eprintln!("Failed to resolve app data directory for tray: {err}");
             }
         }
 
