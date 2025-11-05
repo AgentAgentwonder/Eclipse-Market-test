@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Pool, Row, Sqlite};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitoredWallet {
     pub id: String,
     pub wallet_address: String,
@@ -12,10 +12,25 @@ pub struct MonitoredWallet {
     pub min_transaction_size: Option<f64>,
     pub is_whale: bool,
     pub is_active: bool,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub created_at: DateTime<Utc>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub updated_at: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for MonitoredWallet {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(MonitoredWallet {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            label: row.try_get("label")?,
+            min_transaction_size: row.try_get("min_transaction_size")?,
+            is_whale: row.try_get("is_whale")?,
+            is_active: row.try_get("is_active")?,
+            created_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("created_at")?)?.into(),
+            updated_at: Rfc3339DateTime::try_from(row.try_get::<String, _>("updated_at")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
