@@ -30,11 +30,11 @@ impl YieldFarmingAdapter {
         let farms = self.get_all_farms().await?;
         let opportunities: Vec<FarmingOpportunity> = farms
             .into_iter()
-            .filter(|farm| farm.apy >= min_apy && farm.risk_score <= max_risk)
+            .filter(|farm| farm.total_apy >= min_apy && farm.risk_score <= max_risk)
             .map(|farm| FarmingOpportunity {
-                projected_earnings_24h: (farm.tvl * farm.apy / 100.0) / 365.0,
-                projected_earnings_30d: (farm.tvl * farm.apy / 100.0) / 12.0,
-                risk_adjusted_apy: farm.apy * (1.0 - (farm.risk_score as f64 / 100.0) * 0.3),
+                projected_earnings_24h: (farm.tvl_usd * farm.total_apy / 100.0) / 365.0,
+                projected_earnings_30d: (farm.tvl_usd * farm.total_apy / 100.0) / 12.0,
+                risk_adjusted_apy: farm.total_apy * (1.0 - (farm.risk_score as f64 / 100.0) * 0.3),
                 farm,
             })
             .collect();
