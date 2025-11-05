@@ -125,7 +125,7 @@ pub struct ActivityFilter {
     pub end_date: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WalletActivityRecord {
     pub id: String,
     pub wallet_address: String,
@@ -138,8 +138,28 @@ pub struct WalletActivityRecord {
     pub amount: Option<f64>,
     pub amount_usd: Option<f64>,
     pub price: Option<f64>,
-    #[sqlx(try_from = "crate::utils::Rfc3339DateTime")]
     pub timestamp: DateTime<Utc>,
+}
+
+impl<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> for WalletActivityRecord {
+    fn from_row(row: &'r sqlx::sqlite::SqliteRow) -> Result<Self, sqlx::Error> {
+        use sqlx::Row;
+
+        Ok(WalletActivityRecord {
+            id: row.try_get("id")?,
+            wallet_address: row.try_get("wallet_address")?,
+            tx_signature: row.try_get("tx_signature")?,
+            action_type: row.try_get("action_type")?,
+            input_mint: row.try_get("input_mint")?,
+            output_mint: row.try_get("output_mint")?,
+            input_symbol: row.try_get("input_symbol")?,
+            output_symbol: row.try_get("output_symbol")?,
+            amount: row.try_get("amount")?,
+            amount_usd: row.try_get("amount_usd")?,
+            price: row.try_get("price")?,
+            timestamp: Rfc3339DateTime::try_from(row.try_get::<String, _>("timestamp")?)?.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
