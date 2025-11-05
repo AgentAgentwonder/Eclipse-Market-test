@@ -257,3 +257,60 @@ pub async fn voice_set_volume(
     let voice_state = state.read().await;
     voice_state.tts_engine.set_volume(volume)
 }
+
+// Voice Trading Stubs - Not yet implemented
+
+#[tauri::command]
+pub async fn execute_voice_trade(command: String) -> Result<String, String> {
+    Err("Voice trading feature not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn get_portfolio_data() -> Result<serde_json::Value, String> {
+    Err("Voice portfolio feature not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn get_current_price(token: String) -> Result<f64, String> {
+    Err("Voice price feature not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn create_price_alert(token: String, price: f64) -> Result<String, String> {
+    Err("Voice alert feature not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn list_alerts() -> Result<Vec<String>, String> {
+    Err("Voice alerts list not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn get_market_summary() -> Result<serde_json::Value, String> {
+    Err("Voice market summary not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn synthesize_speech(text: String) -> Result<(), String> {
+    Err("Voice synthesis not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn validate_voice_mfa(code: String) -> Result<bool, String> {
+    Err("Voice MFA not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn check_voice_permission() -> Result<bool, String> {
+    Err("Voice permission check not yet implemented".to_string())
+}
+
+#[tauri::command]
+pub async fn get_voice_capabilities() -> Result<serde_json::Value, String> {
+    use serde_json::json;
+    Ok(json!({
+        "enabled": false,
+        "features": [],
+        "message": "Voice trading not yet implemented"
+    }))
+}
