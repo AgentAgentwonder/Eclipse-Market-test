@@ -9,7 +9,7 @@ use crossbeam::queue::SegQueue;
 use parking_lot::{Mutex, RwLock};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use sysinfo::{CpuExt, CpuRefreshKind, RefreshKind, System, SystemExt};
+use sysinfo::{CpuRefreshKind, RefreshKind, System};
 use tauri::{AppHandle, Emitter, Manager};
 use tracing::{info, trace, warn};
 
