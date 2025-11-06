@@ -260,6 +260,8 @@ impl TopCoinsCache {
                     price_change_7d: rng.gen_range(-30.0..40.0),
                     sparkline: Self::generate_sparkline(price),
                     market_cap_category: determine_market_cap_category(market_cap),
+                    liquidity: Some(rng.gen_range(500_000.0..10_000_000.0)),
+                    circulating_supply: Some(rng.gen_range(1_000_000.0..500_000_000.0)),
                 }
             })
             .collect()
