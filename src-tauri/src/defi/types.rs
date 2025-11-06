@@ -76,7 +76,7 @@ pub struct DeFiPosition {
 }
 
 // Portfolio summary structure
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PortfolioSummary {
     pub total_value_usd: f64,
