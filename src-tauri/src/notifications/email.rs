@@ -555,7 +555,7 @@ fn email_db_path(app: &AppHandle) -> Result<PathBuf, EmailError> {
     let app_dir = app
         .path()
         .app_data_dir()
-        .ok_or_else(|| EmailError::Internal("Unable to resolve app data directory".to_string()))?;
+        .map_err(|e| EmailError::Internal(format!("Unable to resolve app data directory: {}", e)))?;
 
     std::fs::create_dir_all(&app_dir)
         .map_err(|e| EmailError::Internal(format!("Failed to create app data directory: {}", e)))?;

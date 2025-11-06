@@ -946,7 +946,7 @@ pub async fn init_copy_trading(app_handle: &AppHandle) -> Result<(), String> {
     let app_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+        .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
     std::fs::create_dir_all(&app_dir)
         .map_err(|e| format!("Failed to create app data directory: {e}"))?;
 

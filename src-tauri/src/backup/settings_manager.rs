@@ -109,10 +109,12 @@ impl SettingsManager {
             .app_handle
             .path()
             .app_data_dir()
-            .ok_or(SettingsError::Io(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                "App data directory not found",
-            )))?;
+            .map_err(|e| {
+                SettingsError::Io(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("App data directory not found: {}", e),
+                ))
+            })?;
 
         if !path.exists() {
             fs::create_dir_all(&path)?;

@@ -97,7 +97,7 @@ pub async fn get_diagnostics_settings(
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or("Failed to resolve app data directory")?;
+        .map_err(|e| format!("Failed to resolve app data directory: {}", e))?;
 
     let settings_file = app_data_dir.join("settings").join("diagnostics.json");
 
@@ -118,7 +118,7 @@ pub async fn save_diagnostics_settings(
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or("Failed to resolve app data directory")?;
+        .map_err(|e| format!("Failed to resolve app data directory: {}", e))?;
 
     let settings_dir = app_data_dir.join("settings");
     std::fs::create_dir_all(&settings_dir)
@@ -139,7 +139,7 @@ pub async fn backup_before_repair(app_handle: tauri::AppHandle) -> Result<String
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or("Failed to resolve app data directory")?;
+        .map_err(|e| format!("Failed to resolve app data directory: {}", e))?;
 
     let backup_dir = app_data_dir.join("backups");
     std::fs::create_dir_all(&backup_dir)
@@ -174,7 +174,7 @@ pub async fn export_diagnostics_report(
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or("Failed to resolve app data directory")?;
+        .map_err(|e| format!("Failed to resolve app data directory: {}", e))?;
 
     let exports_dir = app_data_dir.join("exports");
     std::fs::create_dir_all(&exports_dir)
@@ -198,7 +198,7 @@ pub fn initialize_diagnostics_engine(
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
-        .ok_or("Failed to resolve app data directory")?;
+        .map_err(|e| format!("Failed to resolve app data directory: {}", e))?;
 
     let project_root =
         std::env::current_dir().map_err(|e| format!("Failed to resolve project root: {}", e))?;

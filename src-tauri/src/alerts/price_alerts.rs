@@ -679,7 +679,7 @@ fn alerts_db_path(app: &AppHandle) -> Result<PathBuf, AlertError> {
     let app_data_dir = app
         .path()
         .app_data_dir()
-        .ok_or_else(|| AlertError::Internal("Unable to resolve app data directory".to_string()))?;
+        .map_err(|e| AlertError::Internal(format!("Unable to resolve app data directory: {}", e)))?;
 
     std::fs::create_dir_all(&app_data_dir)?;
     Ok(app_data_dir.join(ALERTS_DB_FILE))
