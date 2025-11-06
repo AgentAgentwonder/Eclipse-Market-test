@@ -334,7 +334,7 @@ impl ComprehensiveLogger {
 }
 
 fn get_system_metrics() -> (Option<f64>, Option<f64>) {
-    use sysinfo::{System, SystemExt};
+    use sysinfo::System;
 
     let mut sys = System::new_all();
     sys.refresh_all();
