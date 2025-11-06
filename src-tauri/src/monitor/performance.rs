@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use sysinfo::{CpuExt, DiskExt, NetworkExt, ProcessExt, System, SystemExt};
+use sysinfo::System;
 use tokio::sync::broadcast;
 use tokio::time::{self, Duration};
 
