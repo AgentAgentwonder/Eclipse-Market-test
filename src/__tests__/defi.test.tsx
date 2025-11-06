@@ -1,5 +1,6 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { DeFiHub } from '../components/defi/DeFiHub';
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -58,39 +59,49 @@ describe('DeFi Hub', () => {
 
   it('renders total value correctly', async () => {
     render(<DeFiHub wallet="test-wallet" />);
-    await waitFor(() => {
-      expect(screen.getByText('DeFi Control Center')).toBeInTheDocument();
-    });
-    expect(screen.getByText('$50,000.00')).toBeInTheDocument();
+
+    const heading = await screen.findByText('DeFi Control Center');
+
+    expect(heading).not.toBeNull();
+    expect(screen.queryByText('$50,000.00')).not.toBeNull();
   });
 
   it('displays average APY', async () => {
     render(<DeFiHub wallet="test-wallet" />);
-    await waitFor(() => {
-      expect(screen.getByText('12.50%')).toBeInTheDocument();
-    });
+
+    await screen.findByText('DeFi Control Center');
+
+    expect(screen.queryByText('12.50%')).not.toBeNull();
   });
 
   it('renders tabs correctly', async () => {
     render(<DeFiHub wallet="test-wallet" />);
-    await waitFor(() => {
-      expect(screen.getByText('Overview')).toBeInTheDocument();
-      expect(screen.getByText('Lending')).toBeInTheDocument();
-      expect(screen.getByText('Yield Farming')).toBeInTheDocument();
-      expect(screen.getByText('Positions')).toBeInTheDocument();
-      expect(screen.getByText('Governance')).toBeInTheDocument();
-    });
+
+    const [overviewTab, lendingTab, yieldTab, positionsTab, governanceTab] = await Promise.all([
+      screen.findByRole('button', { name: /Overview/i }),
+      screen.findByRole('button', { name: /Lending/i }),
+      screen.findByRole('button', { name: /Yield Farming/i }),
+      screen.findByRole('button', { name: /Positions/i }),
+      screen.findByRole('button', { name: /Governance/i }),
+    ]);
+
+    expect(overviewTab).not.toBeNull();
+    expect(lendingTab).not.toBeNull();
+    expect(yieldTab).not.toBeNull();
+    expect(positionsTab).not.toBeNull();
+    expect(governanceTab).not.toBeNull();
   });
 
   it('loads data from backend', async () => {
     render(<DeFiHub wallet="test-wallet" />);
-    await waitFor(() => {
-      expect(invoke).toHaveBeenCalledWith('get_defi_portfolio_summary', {
-        wallet: 'test-wallet',
-      });
-      expect(invoke).toHaveBeenCalledWith('get_defi_risk_metrics', {
-        wallet: 'test-wallet',
-      });
+
+    await screen.findByText('DeFi Control Center');
+
+    expect(invoke).toHaveBeenCalledWith('get_defi_portfolio_summary', {
+      wallet: 'test-wallet',
+    });
+    expect(invoke).toHaveBeenCalledWith('get_defi_risk_metrics', {
+      wallet: 'test-wallet',
     });
   });
 });
@@ -119,9 +130,11 @@ describe('Risk Warnings', () => {
     });
 
     render(<DeFiHub wallet="test-wallet" />);
-    await waitFor(() => {
-      expect(screen.getByText('Risk Alert')).toBeInTheDocument();
-      expect(screen.getByText('HIGH')).toBeInTheDocument();
-    });
+
+    const riskAlertHeading = await screen.findByText('Risk Alert');
+    const highBadge = await screen.findByText('HIGH');
+
+    expect(riskAlertHeading).not.toBeNull();
+    expect(highBadge).not.toBeNull();
   });
 });

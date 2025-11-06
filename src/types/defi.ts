@@ -39,11 +39,16 @@ export interface YieldFarm {
   id: string;
   protocol: Protocol;
   name: string;
-  tokenA: string;
-  tokenB: string;
-  apy: number;
-  tvl: number;
-  rewardsToken: string[];
+  farmAddress: string;
+  lpToken: string;
+  rewardTokens: string[];
+  tvlUsd: number;
+  baseApy: number;
+  rewardApy: number;
+  totalApy: number;
+  depositFee: number;
+  withdrawalFee: number;
+  lockPeriod: number | null;
   riskScore: number;
 }
 

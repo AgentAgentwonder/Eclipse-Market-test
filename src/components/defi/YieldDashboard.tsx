@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { TrendingUp, Droplet, AlertCircle } from 'lucide-react';
 import { YieldFarm, FarmingOpportunity, DeFiPosition } from '../../types/defi';
@@ -133,10 +133,10 @@ export function YieldDashboard({ wallet }: YieldDashboardProps) {
                   <tr key={opp.farm.id} className="text-sm text-gray-200">
                     <td className="py-3">{opp.farm.name}</td>
                     <td className="py-3 uppercase">{opp.farm.protocol}</td>
-                    <td className="py-3 text-green-400">{opp.farm.apy.toFixed(2)}%</td>
+                    <td className="py-3 text-green-400">{opp.farm.totalApy.toFixed(2)}%</td>
                     <td className="py-3 text-blue-400">{opp.riskAdjustedApy.toFixed(2)}%</td>
                     <td className="py-3">
-                      ${opp.farm.tvl.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      ${opp.farm.tvlUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </td>
                     <td className="py-3">
                       <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export function YieldDashboard({ wallet }: YieldDashboardProps) {
                         <span className="text-xs">{opp.farm.riskScore}</span>
                       </div>
                     </td>
-                    <td className="py-3 text-xs">{opp.farm.rewardsToken.join(', ')}</td>
+                    <td className="py-3 text-xs">{opp.farm.rewardTokens.join(', ')}</td>
                   </tr>
                 ))
               )}
