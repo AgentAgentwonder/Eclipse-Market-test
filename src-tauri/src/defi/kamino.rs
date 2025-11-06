@@ -48,16 +48,22 @@ impl KaminoAdapter {
         let vaults = self.get_vaults().await?;
         let farms: Vec<YieldFarm> = vaults
             .into_iter()
-            .map(|vault| YieldFarm {
-                id: vault.address.clone(),
-                protocol: Protocol::Kamino,
-                name: vault.name.clone(),
-                token_a: vault.token_a.clone(),
-                token_b: vault.token_b.clone(),
-                apy: vault.apy,
-                tvl: vault.tvl,
-                rewards_token: vec!["KMNO".to_string()],
-                risk_score: 65,
+            .map(|vault| {
+                let lp_token = format!("{}-{}", vault.token_a, vault.token_b);
+                YieldFarm {
+                    farm_address: vault.address.clone(),
+                    protocol: Protocol::Kamino,
+                    lp_token,
+                    reward_tokens: vec!["KMNO".to_string()],
+                    tvl_usd: vault.tvl,
+                    base_apy: vault.fee_apr,
+                    reward_apy: vault.reward_apr,
+                    total_apy: vault.apy,
+                    deposit_fee: 0.0,
+                    withdrawal_fee: 0.0,
+                    lock_period: None,
+                    risk_score: 65,
+                }
             })
             .collect();
         Ok(farms)
