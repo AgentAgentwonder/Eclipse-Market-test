@@ -82,7 +82,7 @@ impl WalletMonitor {
         let monitor = self.clone();
         let event_handler = self
             .app_handle
-            .listen_any("transaction_update", move |event| {
+            .listen("transaction_update", move |event| {
                 if let Some(payload) = event.payload() {
                     if let Ok(stream_event) = serde_json::from_str::<StreamEvent>(payload) {
                         if let StreamEvent::TransactionUpdate(tx) = stream_event {
