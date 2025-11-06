@@ -2,7 +2,7 @@ use super::types::*;
 use chrono::Utc;
 use std::collections::HashMap;
 use std::path::Path;
-use sysinfo::{CpuExt, System, SystemExt};
+use sysinfo::System;
 use uuid::Uuid;
 
 pub struct PerformanceRepairModule {
