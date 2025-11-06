@@ -8,6 +8,7 @@ use std::str::FromStr;
 use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct TokenManager {
     rpc_url: String,
 }

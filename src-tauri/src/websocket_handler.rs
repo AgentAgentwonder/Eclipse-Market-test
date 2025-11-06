@@ -52,8 +52,8 @@ pub async fn start_price_stream(symbol: String, window: Window) -> Result<(), St
             
             let update = PriceUpdate {
                 symbol: symbol.clone(),
-                price: base_price * (1.0 + rng.gen_range(-0.02..0.02)),
-                change: rng.gen_range(-5.0..5.0),
+                price: base_price * (1.0 + rng.random_range(-0.02..0.02)),
+                change: rng.random_range(-5.0..5.0),
                 timestamp: chrono::Utc::now().timestamp(),
             };
             

@@ -13,6 +13,15 @@ pub struct LiquidityLocker {
     locks: Mutex<Vec<LiquidityLockConfig>>,
 }
 
+impl Clone for LiquidityLocker {
+    fn clone(&self) -> Self {
+        let locks = self.locks.lock().unwrap().clone();
+        Self {
+            locks: Mutex::new(locks),
+        }
+    }
+}
+
 impl LiquidityLocker {
     pub fn new() -> Self {
         Self {

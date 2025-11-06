@@ -13,6 +13,7 @@ pub use holders::*;
 pub use new_coins_scanner_clean::{
     CreatorInfo, LiquidityInfo, NewCoin, NewCoinsScanner, NewCoinsScannerError, SafetyAnalysis,
     SafetyChecks, SafetyReport, SharedNewCoinsScanner, start_new_coins_scanner,
+    get_new_coins, get_coin_safety_report, scan_for_new_coins,
 };
 pub use polymarket_adapter::*;
 pub use predictions::*;
@@ -108,11 +109,11 @@ fn generate_mock_price(symbol: &str) -> CoinPrice {
         address: "mock".to_string(),
         symbol: symbol.to_string(),
         name: format!("{} Token", symbol),
-        price: base_price * (1.0 + rng.gen_range(-0.05..0.05)),
-        price_change_24h: rng.gen_range(-20.0..20.0),
-        volume_24h: rng.gen_range(100000.0..10000000.0),
-        market_cap: rng.gen_range(1000000.0..100000000.0),
-        liquidity: Some(rng.gen_range(50000.0..5000000.0)),
+        price: base_price * (1.0 + rng.random_range(-0.05..0.05)),
+        price_change_24h: rng.random_range(-20.0..20.0),
+        volume_24h: rng.random_range(100000.0..10000000.0),
+        market_cap: rng.random_range(1000000.0..100000000.0),
+        liquidity: Some(rng.random_range(50000.0..5000000.0)),
     }
 }
 
@@ -125,17 +126,17 @@ fn generate_mock_history(hours: i64) -> Vec<PricePoint> {
     let now = chrono::Utc::now().timestamp();
 
     for i in (0..hours).rev() {
-        let change = rng.gen_range(-2.0..2.0);
+        let change = rng.random_range(-2.0..2.0);
         price += change;
-        let volatility = rng.gen_range(0.5..2.0);
+        let volatility = rng.random_range(0.5..2.0);
 
         history.push(PricePoint {
             timestamp: now - (i * 3600),
             open: price,
             high: price + volatility,
             low: price - volatility,
-            close: price + rng.gen_range(-1.0..1.0),
-            volume: rng.gen_range(10000.0..100000.0),
+            close: price + rng.random_range(-1.0..1.0),
+            volume: rng.random_range(10000.0..100000.0),
         });
     }
 

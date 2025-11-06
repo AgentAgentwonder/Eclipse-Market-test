@@ -29,6 +29,12 @@ pub enum ChainId {
     Arbitrum,
 }
 
+impl Default for ChainId {
+    fn default() -> Self {
+        ChainId::Solana
+    }
+}
+
 impl ChainId {
     pub fn as_str(&self) -> &'static str {
         match self {

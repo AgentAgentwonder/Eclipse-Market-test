@@ -272,11 +272,11 @@ fn generate_mock_trending(limit: usize) -> Vec<TrendingCoin> {
         .take(limit)
         .enumerate()
         .map(|(idx, (symbol, name, address, base_price))| {
-            let price = base_price * (1.0 + rng.gen_range(-0.1..0.1));
-            let price_change = rng.gen_range(-25.0..35.0);
-            let volume_change = rng.gen_range(-30.0..50.0);
-            let mc_change = rng.gen_range(-15.0..25.0);
-            let volume = rng.gen_range(100_000.0..10_000_000.0);
+            let price = base_price * (1.0 + rng.random_range(-0.1..0.1));
+            let price_change = rng.random_range(-25.0..35.0);
+            let volume_change = rng.random_range(-30.0..50.0);
+            let mc_change = rng.random_range(-15.0..25.0);
+            let volume = rng.random_range(100_000.0..10_000_000.0);
 
             TrendingCoin {
                 address: address.to_string(),
@@ -286,9 +286,9 @@ fn generate_mock_trending(limit: usize) -> Vec<TrendingCoin> {
                 price_change_24h: price_change,
                 volume_24h: volume,
                 volume_change_24h: volume_change,
-                market_cap: rng.gen_range(1_000_000.0..100_000_000.0),
+                market_cap: rng.random_range(1_000_000.0..100_000_000.0),
                 market_cap_change_24h: mc_change,
-                liquidity: rng.gen_range(50_000.0..5_000_000.0),
+                liquidity: rng.random_range(50_000.0..5_000_000.0),
                 trend_score: calculate_trend_score(price_change, volume_change, mc_change, volume),
                 logo_uri: None,
             }
@@ -300,7 +300,7 @@ fn generate_mock_sentiment(symbol: &str) -> CoinSentiment {
     use rand::Rng;
     let mut rng = rand::thread_rng();
 
-    let score = rng.gen_range(-1.0..1.0);
+    let score = rng.random_range(-1.0..1.0);
     let label = if score > 0.3 {
         "Positive"
     } else if score < -0.3 {
@@ -313,7 +313,7 @@ fn generate_mock_sentiment(symbol: &str) -> CoinSentiment {
         symbol: symbol.to_string(),
         score,
         label: label.to_string(),
-        mentions: rng.gen_range(10..1000),
+        mentions: rng.random_range(10..1000),
         positive_ratio: ((score + 1.0) / 2.0).clamp(0.0, 1.0),
     }
 }

@@ -406,15 +406,15 @@ impl HolderAnalyzer {
         ];
 
         let mut holders = Vec::new();
-        let num_holders = rng.gen_range(500..2000);
+        let num_holders = rng.random_range(500..2000);
 
         // Top holders (whale distribution)
         for i in 0..20 {
             let is_known = i < 5;
             let balance = if i < 5 {
-                rng.gen_range(5000000.0..15000000.0)
+                rng.random_range(5000000.0..15000000.0)
             } else {
-                rng.gen_range(500000.0..5000000.0)
+                rng.random_range(500000.0..5000000.0)
             };
 
             let (is_known_wallet, wallet_label, address) = if is_known {
@@ -442,7 +442,7 @@ impl HolderAnalyzer {
         for i in 20..200 {
             holders.push(HolderInfo {
                 address: format!("{}xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", i),
-                balance: rng.gen_range(10000.0..500000.0),
+                balance: rng.random_range(10000.0..500000.0),
                 percentage: 0.0,
                 is_known_wallet: false,
                 wallet_label: None,
@@ -454,7 +454,7 @@ impl HolderAnalyzer {
         for i in 200..num_holders {
             holders.push(HolderInfo {
                 address: format!("{}xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", i),
-                balance: rng.gen_range(1.0..10000.0),
+                balance: rng.random_range(1.0..10000.0),
                 percentage: 0.0,
                 is_known_wallet: false,
                 wallet_label: None,
@@ -478,7 +478,7 @@ impl HolderAnalyzer {
 
         for day in (0..days).rev() {
             let timestamp = Utc::now() - chrono::Duration::days(day as i64);
-            let new_holders = rng.gen_range(10..100);
+            let new_holders = rng.random_range(10..100);
             let existing_holders = base_holders as u32;
 
             base_holders += new_holders as u64;
@@ -503,13 +503,13 @@ impl HolderAnalyzer {
         let mut rng = rand::thread_rng();
 
         let mut transfers = Vec::new();
-        let num_transfers = rng.gen_range(3..10);
+        let num_transfers = rng.random_range(3..10);
 
         for i in 0..num_transfers {
-            let days_ago = rng.gen_range(0..days);
+            let days_ago = rng.random_range(0..days);
             let timestamp = Utc::now() - chrono::Duration::days(days_ago as i64);
-            let amount = rng.gen_range(100000.0..5000000.0);
-            let percentage = rng.gen_range(0.1..5.0);
+            let amount = rng.random_range(100000.0..5000000.0);
+            let percentage = rng.random_range(0.1..5.0);
 
             transfers.push(LargeTransfer {
                 id: uuid::Uuid::new_v4().to_string(),
@@ -565,7 +565,7 @@ impl HolderAnalyzer {
         let verified = rng.gen_bool(0.6);
         let has_audit = rng.gen_bool(0.4);
         let num_vulnerabilities = if rng.gen_bool(0.3) {
-            rng.gen_range(1..3)
+            rng.random_range(1..3)
         } else {
             0
         };
@@ -587,8 +587,8 @@ impl HolderAnalyzer {
             });
         }
 
-        let upvotes = rng.gen_range(50..500);
-        let downvotes = rng.gen_range(10..100);
+        let upvotes = rng.random_range(50..500);
+        let downvotes = rng.random_range(10..100);
         let total_votes = upvotes + downvotes;
         let trust_score = upvotes as f64 / total_votes as f64;
 

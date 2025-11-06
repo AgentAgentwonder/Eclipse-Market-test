@@ -404,6 +404,7 @@ pub fn check_rebalance_triggers_internal(
     let mut notifications = Vec::new();
     let now = Utc::now();
 
+    // Collect histories during the loop
     for profile_state in rebalancer.profiles.values_mut() {
         if !profile_state.profile.enabled {
             continue;
@@ -439,8 +440,12 @@ pub fn check_rebalance_triggers_internal(
         let history = create_history(&profile_state.profile.id, trigger_type, actions, false);
 
         profile_state.last_notification_at = Some(now);
-        rebalancer.record_history(history.clone());
         notifications.push(history);
+    }
+
+    // Record all histories after the loop to avoid borrowing conflict
+    for history in &notifications {
+        rebalancer.record_history(history.clone());
     }
 
     notifications

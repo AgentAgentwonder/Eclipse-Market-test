@@ -288,7 +288,7 @@ impl TwoFactorManager {
         (0..BACKUP_CODE_COUNT)
             .map(|_| {
                 (0..BACKUP_CODE_LENGTH)
-                    .map(|_| chars[rng.gen_range(0..chars.len())])
+                    .map(|_| chars[rng.random_range(0..chars.len())])
                     .collect()
             })
             .collect()

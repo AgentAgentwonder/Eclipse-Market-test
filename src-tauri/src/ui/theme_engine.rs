@@ -139,7 +139,7 @@ impl ThemeEngine {
         let mut dir = app
             .path()
             .app_data_dir()
-            .or_else(|| "Unable to resolve app data directory".to_string())?;
+            .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
         if !dir.exists() {
             fs::create_dir_all(&dir)
