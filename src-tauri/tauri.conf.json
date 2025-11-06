@@ -3,8 +3,7 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devUrl": "http://localhost:1420",
-    "frontendDist": "../dist"
+    "devUrl": "http://localhost:1420"
   },
   "productName": "Eclipse Market Pro",
   "version": "1.0.0",
