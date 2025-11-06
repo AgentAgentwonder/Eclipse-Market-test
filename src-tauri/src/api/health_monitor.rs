@@ -206,7 +206,7 @@ impl ApiHealthMonitor {
 
         for row in &rows {
             let success: i64 = row.try_get("success")?;
-            let latency: i64 = row.try_get("latency_ms")?.max(0);
+            let latency: i64 = row.try_get::<i64, _>("latency_ms")?.max(0);
             let timestamp_str: String = row.try_get("timestamp")?;
             let timestamp = DateTime::parse_from_rfc3339(&timestamp_str)
                 .map_err(|e| HealthMonitorError::Internal(format!("Invalid timestamp: {}", e)))?

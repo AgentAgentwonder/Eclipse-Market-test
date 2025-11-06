@@ -529,11 +529,11 @@ impl PaperTradingDatabase {
 
         let mut winning_trades = 0;
         let mut losing_trades = 0;
-        let mut total_win = 0.0;
-        let mut total_loss = 0.0;
-        let mut largest_win = 0.0;
-        let mut largest_loss = 0.0;
-        let mut total_fees = 0.0;
+        let mut total_win = 0.0_f64;
+        let mut total_loss = 0.0_f64;
+        let mut largest_win = 0.0_f64;
+        let mut largest_loss = 0.0_f64;
+        let mut total_fees = 0.0_f64;
 
         let mut lots: HashMap<String, VecDeque<PositionLot>> = HashMap::new();
 

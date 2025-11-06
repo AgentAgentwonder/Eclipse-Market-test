@@ -79,7 +79,7 @@ impl SentimentAnalyzer {
             .into_iter()
             .map(|row| SentimentDataPoint {
                 timestamp: chrono::DateTime::parse_from_rfc3339(&row.timestamp)
-                    .unwrap_or_else(|_| chrono::DateTime::default().into())
+                    .unwrap_or_else(|_| chrono::DateTime::<Utc>::default().into())
                     .with_timezone(&Utc),
                 sentiment_score: row.sentiment_score,
                 confidence: row.confidence,

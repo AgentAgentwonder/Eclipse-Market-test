@@ -172,7 +172,7 @@ impl HistoricalDataFetcher {
 
         let mut data = Vec::new();
         let mut current_time = request.start_time;
-        let mut price = 100.0;
+        let mut price = 100.0_f64;
 
         while current_time <= request.end_time {
             let change = rand::random_range(-0.02..0.02);
