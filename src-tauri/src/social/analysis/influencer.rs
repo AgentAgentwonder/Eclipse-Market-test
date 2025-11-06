@@ -91,8 +91,8 @@ impl InfluencerEngine {
             .values()
             .map(|s| s.engagement_total)
             .max()
-            .unwrap_or(1)
-            .max(1) as f32;
+            .unwrap_or(1_i64)
+            .max(1_i64) as f32;
 
         let mut scores = Vec::new();
 
