@@ -57,10 +57,12 @@ pub struct ChainQuoteResponse {
     pub estimated_fee: ChainFeeEstimate,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct WalletInfo {
+    #[serde(default)]
     pub public_key: String,
     pub label: Option<String>,
+    #[serde(default)]
     pub chain_id: ChainId,
 }
 
