@@ -1,9 +1,9 @@
 use base64::engine::general_purpose::STANDARD as BASE64_ENGINE;
 use base64::Engine;
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
 use tauri::State;
 use thiserror::Error;
+use tokio::sync::Mutex;
 
 #[derive(Debug, Error)]
 pub enum HardwareWalletError {
@@ -208,16 +208,11 @@ fn generate_deterministic_signature(device_id: &str, transaction: &str) -> Strin
 pub async fn list_hardware_wallets(
     state: State<'_, HardwareWalletState>,
 ) -> Result<Vec<HardwareWalletDevice>, HardwareWalletError> {
-    let is_simulated = *state.simulated.lock().map_err(|e| {
-        HardwareWalletError::Internal(format!("Failed to lock simulated flag: {}", e))
-    })?;
+    let is_simulated = *state.simulated.lock().await;
 
     if is_simulated {
         let devices = create_simulated_devices();
-        let mut devices_guard = state
-            .devices
-            .lock()
-            .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+        let mut devices_guard = state.devices.lock().await;
         *devices_guard = devices.clone();
         return Ok(devices);
     }
@@ -230,10 +225,7 @@ pub async fn connect_hardware_wallet(
     device_id: String,
     state: State<'_, HardwareWalletState>,
 ) -> Result<HardwareWalletDevice, HardwareWalletError> {
-    let mut devices_guard = state
-        .devices
-        .lock()
-        .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+    let mut devices_guard = state.devices.lock().await;
 
     if let Some(device) = devices_guard.iter_mut().find(|d| d.device_id == device_id) {
         device.connected = true;
@@ -248,10 +240,7 @@ pub async fn disconnect_hardware_wallet(
     device_id: String,
     state: State<'_, HardwareWalletState>,
 ) -> Result<(), HardwareWalletError> {
-    let mut devices_guard = state
-        .devices
-        .lock()
-        .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+    let mut devices_guard = state.devices.lock().await;
 
     if let Some(device) = devices_guard.iter_mut().find(|d| d.device_id == device_id) {
         device.connected = false;
@@ -266,10 +255,7 @@ pub async fn get_hardware_wallet_address(
     request: GetAddressRequest,
     state: State<'_, HardwareWalletState>,
 ) -> Result<GetAddressResponse, HardwareWalletError> {
-    let devices_guard = state
-        .devices
-        .lock()
-        .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+    let devices_guard = state.devices.lock().await;
 
     let device = devices_guard
         .iter()
@@ -300,10 +286,7 @@ pub async fn sign_with_hardware_wallet(
     state: State<'_, HardwareWalletState>,
 ) -> Result<SignTransactionResponse, HardwareWalletError> {
     let device_id = {
-        let devices_guard = state
-            .devices
-            .lock()
-            .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+        let devices_guard = state.devices.lock().await;
 
         let device = devices_guard
             .iter()
@@ -343,10 +326,7 @@ pub async fn get_firmware_version(
     device_id: String,
     state: State<'_, HardwareWalletState>,
 ) -> Result<FirmwareVersion, HardwareWalletError> {
-    let devices_guard = state
-        .devices
-        .lock()
-        .map_err(|e| HardwareWalletError::Internal(format!("Failed to lock devices: {}", e)))?;
+    let devices_guard = state.devices.lock().await;
 
     let device = devices_guard
         .iter()

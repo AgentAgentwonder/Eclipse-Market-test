@@ -6,13 +6,9 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use solana_sdk::{pubkey::Pubkey, signature::Signature, transaction::VersionedTransaction};
-use std::{
-    fs,
-    path::PathBuf,
-    str::FromStr,
-    sync::{Mutex, MutexGuard},
-};
+use std::{fs, path::PathBuf, str::FromStr};
 use tauri::{AppHandle, Emitter, Manager, State};
+use tokio::sync::{Mutex, MutexGuard};
 
 const SESSION_FILE: &str = "phantom_session.json";
 const DEFAULT_NETWORK: &str = "devnet";
@@ -158,18 +154,15 @@ impl WalletState {
     }
 }
 
-fn lock_session<'a>(
+async fn lock_session<'a>(
     state: &'a State<'_, WalletState>,
-) -> Result<MutexGuard<'a, Option<PhantomSession>>, PhantomError> {
-    state
-        .session
-        .lock()
-        .map_err(|_| PhantomError::internal("Failed to acquire wallet session lock"))
+) -> MutexGuard<'a, Option<PhantomSession>> {
+    state.session.lock().await
 }
 
 pub fn hydrate_wallet_state(app: &AppHandle) -> Result<(), PhantomError> {
     let state: State<WalletState> = app.state();
-    let mut guard = lock_session(&state)?;
+    let mut guard = tauri::async_runtime::block_on(state.session.lock());
     if guard.is_none() {
         if let Some(session) = read_persisted_session(app)? {
             *guard = Some(session);
@@ -273,23 +266,9 @@ pub async fn phantom_connect(
         return Err(err);
     }
 
-    if let Err(err) = lock_session(&state).map(|mut guard| {
+    {
+        let mut guard = lock_session(&state).await;
         *guard = Some(session.clone());
-    }) {
-        let _ = logger
-            .log_connect(
-                &public_key,
-                json!({
-                    "network": network.clone(),
-                    "label": label.clone(),
-                    "error": err.to_string(),
-                    "source": "phantom"
-                }),
-                false,
-                None,
-            )
-            .await;
-        return Err(err);
     }
 
     let _ = logger
@@ -327,7 +306,7 @@ pub async fn phantom_disconnect(
 ) -> Result<(), PhantomError> {
     let logger = app.state::<ActivityLogger>();
     let wallet_address = {
-        let guard = lock_session(&state)?;
+        let guard = lock_session(&state).await;
         guard.as_ref().map(|s| s.public_key.clone())
     };
 
@@ -335,7 +314,7 @@ pub async fn phantom_disconnect(
     let wallet_addr = wallet_address.unwrap_or_else(|| "unknown".to_string());
 
     {
-        let mut guard = lock_session(&state)?;
+        let mut guard = lock_session(&state).await;
         *guard = None;
     }
 
@@ -389,7 +368,7 @@ pub async fn phantom_disconnect(
 pub async fn phantom_session(
     state: State<'_, WalletState>,
 ) -> Result<Option<PhantomSession>, PhantomError> {
-    let guard = lock_session(&state)?;
+    let guard = lock_session(&state).await;
     Ok(guard.clone())
 }
 
@@ -400,7 +379,7 @@ pub async fn phantom_sign_message(
     app: AppHandle,
 ) -> Result<PhantomSignMessageResponse, PhantomError> {
     let logger = app.state::<ActivityLogger>();
-    let guard = lock_session(&state)?;
+    let guard = lock_session(&state).await;
     let session = guard.as_ref().ok_or_else(|| {
         PhantomError::new(PhantomErrorCode::NotConnected, "Wallet is not connected")
     })?;
@@ -477,10 +456,13 @@ pub async fn phantom_sign_transaction(
     request: PhantomSignTransactionRequest,
     state: State<'_, WalletState>,
 ) -> Result<PhantomSignTransactionResponse, PhantomError> {
-    let guard = lock_session(&state)?;
-    let session = guard.as_ref().ok_or_else(|| {
-        PhantomError::new(PhantomErrorCode::NotConnected, "Wallet is not connected")
-    })?;
+    let session_data = {
+        let guard = lock_session(&state).await;
+        let session = guard.as_ref().ok_or_else(|| {
+            PhantomError::new(PhantomErrorCode::NotConnected, "Wallet is not connected")
+        })?;
+        session.clone()
+    };
 
     let bytes = BASE64_ENGINE
         .decode(request.transaction.as_bytes())
@@ -503,7 +485,7 @@ pub async fn phantom_sign_transaction(
     })?;
 
     let message_bytes = transaction.message.serialize();
-    let pubkey = Pubkey::from_str(&session.public_key).map_err(|err| {
+    let pubkey = Pubkey::from_str(&session_data.public_key).map_err(|err| {
         PhantomError::new(
             PhantomErrorCode::InvalidInput,
             format!("Invalid session public key: {err}"),
@@ -549,7 +531,7 @@ pub async fn phantom_balance(
     })?;
 
     let network = {
-        let guard = lock_session(&state)?;
+        let guard = lock_session(&state).await;
         guard
             .as_ref()
             .map(|session| session.network.clone())
