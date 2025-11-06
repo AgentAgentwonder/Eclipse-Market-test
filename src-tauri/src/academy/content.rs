@@ -168,7 +168,7 @@ pub struct ContentService {
 
 impl ContentService {
     pub async fn new(app_handle: &AppHandle) -> Result<Self, ContentError> {
-        let app_dir = app_handle.path().app_data_dir().map_err(|err| {
+        let app_dir = app_handle.path_resolver().app_data_dir().map_err(|err| {
             ContentError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 format!("Unable to resolve app data directory: {err}"),

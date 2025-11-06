@@ -171,7 +171,7 @@ impl TrayManager {
     }
 
     pub fn initialize(&self, app_handle: &AppHandle) {
-        match app_handle.path().app_data_dir() {
+        match app_handle.path_resolver().app_data_dir() {
             Ok(mut data_dir) => {
                 if let Err(err) = fs::create_dir_all(&data_dir) {
                     eprintln!("Failed to ensure tray settings directory: {err}");

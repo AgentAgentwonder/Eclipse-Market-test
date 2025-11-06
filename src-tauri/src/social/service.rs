@@ -24,7 +24,7 @@ impl SocialDataService {
         let reddit_client = RedditClient::new().map_err(SocialError::from)?;
         let twitter_client = TwitterClient::new().map_err(SocialError::from)?;
 
-        let mut data_dir = app.path().app_data_dir().map_err(|err| {
+        let mut data_dir = app.path_resolver().app_data_dir().map_err(|err| {
             SocialError::Internal("Failed to resolve app data directory".to_string())
         })?;
 

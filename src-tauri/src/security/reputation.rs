@@ -161,7 +161,7 @@ pub struct ReputationEngine {
 
 impl ReputationEngine {
     pub async fn new(app_handle: &AppHandle) -> Result<Self, ReputationError> {
-        let app_dir = app_handle.path().app_data_dir().map_err(|err| {
+        let app_dir = app_handle.path_resolver().app_data_dir().map_err(|err| {
             ReputationError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "Unable to resolve app data directory",

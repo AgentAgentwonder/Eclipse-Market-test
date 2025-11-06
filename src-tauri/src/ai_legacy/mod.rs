@@ -277,7 +277,7 @@ pub type SharedRiskAnalyzer = Arc<RwLock<RiskAnalyzer>>;
 
 impl RiskAnalyzer {
     pub async fn new(app: &AppHandle) -> Result<Self, sqlx::Error> {
-        let mut db_path = app.path().app_data_dir().map_err(|_| {
+        let mut db_path = app.path_resolver().app_data_dir().map_err(|_| {
             sqlx::Error::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "App data dir not found",
@@ -1082,7 +1082,7 @@ pub struct ConversationManager {
 
 impl ConversationManager {
     pub async fn new(app: &AppHandle) -> Result<Self, sqlx::Error> {
-        let mut db_path = app.path().app_data_dir().map_err(|_| {
+        let mut db_path = app.path_resolver().app_data_dir().map_err(|_| {
             sqlx::Error::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "App data dir not found",
@@ -1327,7 +1327,7 @@ impl UsageThrottle {
         max_requests_per_hour: u32,
         max_tokens_per_day: u64,
     ) -> Result<Self, sqlx::Error> {
-        let mut db_path = app.path().app_data_dir().map_err(|_| {
+        let mut db_path = app.path_resolver().app_data_dir().map_err(|_| {
             sqlx::Error::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "App data dir not found",

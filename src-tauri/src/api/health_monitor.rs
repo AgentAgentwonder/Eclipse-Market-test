@@ -102,7 +102,7 @@ impl ApiHealthMonitor {
     }
 
     fn health_db_path(app: &AppHandle) -> Result<std::path::PathBuf, HealthMonitorError> {
-        let mut path = app.path().app_data_dir().map_err(|err| {
+        let mut path = app.path_resolver().app_data_dir().map_err(|err| {
             HealthMonitorError::Internal(format!("Unable to resolve app data directory: {err}"))
         })?;
 

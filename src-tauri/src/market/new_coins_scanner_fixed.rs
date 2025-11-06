@@ -439,7 +439,7 @@ pub fn start_new_coins_scanner(scanner: SharedNewCoinsScanner) {
 }
 
 fn get_new_coins_db_path(app: &AppHandle) -> Result<PathBuf, NewCoinsScannerError> {
-    let mut path = app.path().app_data_dir().map_err(|err| {
+    let mut path = app.path_resolver().app_data_dir().map_err(|err| {
         NewCoinsScannerError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 

@@ -33,7 +33,7 @@ pub struct CrashReporter {
 
 impl CrashReporter {
     pub fn new(app: &AppHandle, logger: SharedLogger) -> Result<Self, std::io::Error> {
-        let mut report_dir = app.path().app_data_dir().map_err(|err| {
+        let mut report_dir = app.path_resolver().app_data_dir().map_err(|err| {
             std::io::Error::new(std::io::ErrorKind::NotFound, "App data dir not found")
         })?;
 

@@ -170,7 +170,7 @@ pub enum NotificationError {
 }
 
 pub fn notifications_db_path(app: &AppHandle) -> Result<PathBuf, NotificationError> {
-    let mut path = app.path().app_data_dir().map_err(|err| {
+    let mut path = app.path_resolver().app_data_dir().map_err(|err| {
         NotificationError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 
