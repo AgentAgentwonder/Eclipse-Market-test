@@ -214,7 +214,6 @@ impl SolendAdapter {
 
     fn generate_mock_reserves(&self) -> Vec<SolendReserve> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         vec![
             SolendReserve {
@@ -222,12 +221,12 @@ impl SolendAdapter {
                 symbol: "USDC".to_string(),
                 liquidity_token: "cUSDC".to_string(),
                 liquidity_mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v".to_string(),
-                supply_apy: rng.random_range(3.5..8.5),
-                borrow_apy: rng.random_range(5.0..12.0),
-                total_supply: rng.random_range(50_000_000.0..200_000_000.0),
-                total_borrow: rng.random_range(20_000_000.0..100_000_000.0),
-                available_amount: rng.random_range(10_000_000.0..50_000_000.0),
-                utilization_ratio: rng.random_range(0.5..0.85),
+                supply_apy: rand::random_range(3.5..8.5),
+                borrow_apy: rand::random_range(5.0..12.0),
+                total_supply: rand::random_range(50_000_000.0..200_000_000.0),
+                total_borrow: rand::random_range(20_000_000.0..100_000_000.0),
+                available_amount: rand::random_range(10_000_000.0..50_000_000.0),
+                utilization_ratio: rand::random_range(0.5..0.85),
                 ltv: 0.80,
                 liquidation_threshold: 0.85,
                 liquidation_penalty: 0.05,
@@ -237,12 +236,12 @@ impl SolendAdapter {
                 symbol: "SOL".to_string(),
                 liquidity_token: "cSOL".to_string(),
                 liquidity_mint: "So11111111111111111111111111111111111111112".to_string(),
-                supply_apy: rng.random_range(2.0..6.0),
-                borrow_apy: rng.random_range(4.5..10.0),
-                total_supply: rng.random_range(500_000.0..2_000_000.0),
-                total_borrow: rng.random_range(200_000.0..1_000_000.0),
-                available_amount: rng.random_range(100_000.0..500_000.0),
-                utilization_ratio: rng.random_range(0.4..0.75),
+                supply_apy: rand::random_range(2.0..6.0),
+                borrow_apy: rand::random_range(4.5..10.0),
+                total_supply: rand::random_range(500_000.0..2_000_000.0),
+                total_borrow: rand::random_range(200_000.0..1_000_000.0),
+                available_amount: rand::random_range(100_000.0..500_000.0),
+                utilization_ratio: rand::random_range(0.4..0.75),
                 ltv: 0.75,
                 liquidation_threshold: 0.80,
                 liquidation_penalty: 0.05,
@@ -252,12 +251,12 @@ impl SolendAdapter {
                 symbol: "USDT".to_string(),
                 liquidity_token: "cUSDT".to_string(),
                 liquidity_mint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB".to_string(),
-                supply_apy: rng.random_range(3.0..7.5),
-                borrow_apy: rng.random_range(5.5..11.0),
-                total_supply: rng.random_range(40_000_000.0..150_000_000.0),
-                total_borrow: rng.random_range(15_000_000.0..80_000_000.0),
-                available_amount: rng.random_range(8_000_000.0..40_000_000.0),
-                utilization_ratio: rng.random_range(0.45..0.80),
+                supply_apy: rand::random_range(3.0..7.5),
+                borrow_apy: rand::random_range(5.5..11.0),
+                total_supply: rand::random_range(40_000_000.0..150_000_000.0),
+                total_borrow: rand::random_range(15_000_000.0..80_000_000.0),
+                available_amount: rand::random_range(8_000_000.0..40_000_000.0),
+                utilization_ratio: rand::random_range(0.45..0.80),
                 ltv: 0.80,
                 liquidation_threshold: 0.85,
                 liquidation_penalty: 0.05,
@@ -267,7 +266,6 @@ impl SolendAdapter {
 
     fn generate_mock_obligation(&self, _wallet: &str) -> Option<SolendObligation> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         Some(SolendObligation {
             address: "mock-obligation-address".to_string(),
@@ -276,25 +274,25 @@ impl SolendAdapter {
                 SolendDeposit {
                     reserve_address: "solend-usdc".to_string(),
                     symbol: "USDC".to_string(),
-                    amount: rng.random_range(5000.0..50000.0),
-                    value_usd: rng.random_range(5000.0..50000.0),
+                    amount: rand::random_range(5000.0..50000.0),
+                    value_usd: rand::random_range(5000.0..50000.0),
                 },
                 SolendDeposit {
                     reserve_address: "solend-sol".to_string(),
                     symbol: "SOL".to_string(),
-                    amount: rng.random_range(50.0..500.0),
-                    value_usd: rng.random_range(5000.0..50000.0),
+                    amount: rand::random_range(50.0..500.0),
+                    value_usd: rand::random_range(5000.0..50000.0),
                 },
             ],
             borrows: vec![SolendBorrow {
                 reserve_address: "solend-usdc".to_string(),
                 symbol: "USDC".to_string(),
-                amount: rng.random_range(1000.0..10000.0),
-                value_usd: rng.random_range(1000.0..10000.0),
+                amount: rand::random_range(1000.0..10000.0),
+                value_usd: rand::random_range(1000.0..10000.0),
             }],
-            borrowed_value: rng.random_range(1000.0..10000.0),
-            deposited_value: rng.random_range(10000.0..100000.0),
-            health_factor: rng.random_range(1.5..3.0),
+            borrowed_value: rand::random_range(1000.0..10000.0),
+            deposited_value: rand::random_range(10000.0..100000.0),
+            health_factor: rand::random_range(1.5..3.0),
             liquidation_threshold: 0.85,
         })
     }

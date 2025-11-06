@@ -276,7 +276,6 @@ impl DriftAdapter {
 // Mock data generator for development/testing
 pub fn generate_mock_drift_predictions() -> Vec<DriftPrediction> {
     use rand::Rng;
-    let mut rng = rand::thread_rng();
 
     vec![
         DriftPrediction {
@@ -285,8 +284,8 @@ pub fn generate_mock_drift_predictions() -> Vec<DriftPrediction> {
             title: "SOL Price Above $150 by EOY 2024".to_string(),
             description: "Will Solana's price exceed $150 by the end of 2024?".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.4..0.8), rng.random_range(0.2..0.6)],
-            total_volume: rng.random_range(500000.0..5000000.0),
+            outcome_prices: vec![rand::random_range(0.4..0.8), rand::random_range(0.2..0.6)],
+            total_volume: rand::random_range(500000.0..5000000.0),
             resolution_time: Some(1735689600), // Dec 31, 2024
             resolved: false,
             winning_outcome: None,
@@ -298,8 +297,8 @@ pub fn generate_mock_drift_predictions() -> Vec<DriftPrediction> {
             title: "Drift Protocol TVL Exceeds $1B".to_string(),
             description: "Will Drift's total value locked surpass $1 billion in 2024?".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.5..0.9), rng.random_range(0.1..0.5)],
-            total_volume: rng.random_range(250000.0..2500000.0),
+            outcome_prices: vec![rand::random_range(0.5..0.9), rand::random_range(0.1..0.5)],
+            total_volume: rand::random_range(250000.0..2500000.0),
             resolution_time: Some(1735689600),
             resolved: false,
             winning_outcome: None,
@@ -311,8 +310,8 @@ pub fn generate_mock_drift_predictions() -> Vec<DriftPrediction> {
             title: "Solana Mainnet Downtime < 1 Hour in Q1 2024".to_string(),
             description: "Will Solana experience less than 1 hour of downtime in Q1?".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.3..0.7), rng.random_range(0.3..0.7)],
-            total_volume: rng.random_range(100000.0..1000000.0),
+            outcome_prices: vec![rand::random_range(0.3..0.7), rand::random_range(0.3..0.7)],
+            total_volume: rand::random_range(100000.0..1000000.0),
             resolution_time: Some(1711929600), // Mar 31, 2024
             resolved: false,
             winning_outcome: None,
@@ -323,7 +322,6 @@ pub fn generate_mock_drift_predictions() -> Vec<DriftPrediction> {
 
 pub fn generate_mock_drift_markets() -> Vec<DriftMarket> {
     use rand::Rng;
-    let mut rng = rand::thread_rng();
 
     vec![
         DriftMarket {
@@ -332,13 +330,13 @@ pub fn generate_mock_drift_markets() -> Vec<DriftMarket> {
             symbol: "SOL-PERP".to_string(),
             base_asset_symbol: "SOL".to_string(),
             quote_asset_symbol: "USDC".to_string(),
-            oracle_price: rng.random_range(95.0..105.0),
-            mark_price: rng.random_range(95.0..105.0),
-            funding_rate: rng.random_range(-0.001..0.001),
-            open_interest: rng.random_range(10000000.0..50000000.0),
-            volume_24h: rng.random_range(50000000.0..500000000.0),
-            number_of_users: rng.random_range(1000..10000),
-            number_of_orders: rng.random_range(5000..50000),
+            oracle_price: rand::random_range(95.0..105.0),
+            mark_price: rand::random_range(95.0..105.0),
+            funding_rate: rand::random_range(-0.001..0.001),
+            open_interest: rand::random_range(10000000.0..50000000.0),
+            volume_24h: rand::random_range(50000000.0..500000000.0),
+            number_of_users: rand::random_range(1000..10000),
+            number_of_orders: rand::random_range(5000..50000),
         },
         DriftMarket {
             market_index: 1,
@@ -346,13 +344,13 @@ pub fn generate_mock_drift_markets() -> Vec<DriftMarket> {
             symbol: "BTC-PERP".to_string(),
             base_asset_symbol: "BTC".to_string(),
             quote_asset_symbol: "USDC".to_string(),
-            oracle_price: rng.random_range(60000.0..70000.0),
-            mark_price: rng.random_range(60000.0..70000.0),
-            funding_rate: rng.random_range(-0.001..0.001),
-            open_interest: rng.random_range(50000000.0..150000000.0),
-            volume_24h: rng.random_range(200000000.0..2000000000.0),
-            number_of_users: rng.random_range(5000..50000),
-            number_of_orders: rng.random_range(10000..100000),
+            oracle_price: rand::random_range(60000.0..70000.0),
+            mark_price: rand::random_range(60000.0..70000.0),
+            funding_rate: rand::random_range(-0.001..0.001),
+            open_interest: rand::random_range(50000000.0..150000000.0),
+            volume_24h: rand::random_range(200000000.0..2000000000.0),
+            number_of_users: rand::random_range(5000..50000),
+            number_of_orders: rand::random_range(10000..100000),
         },
         DriftMarket {
             market_index: 2,
@@ -360,13 +358,13 @@ pub fn generate_mock_drift_markets() -> Vec<DriftMarket> {
             symbol: "ETH-PERP".to_string(),
             base_asset_symbol: "ETH".to_string(),
             quote_asset_symbol: "USDC".to_string(),
-            oracle_price: rng.random_range(3000.0..3500.0),
-            mark_price: rng.random_range(3000.0..3500.0),
-            funding_rate: rng.random_range(-0.001..0.001),
-            open_interest: rng.random_range(30000000.0..100000000.0),
-            volume_24h: rng.random_range(150000000.0..1500000000.0),
-            number_of_users: rng.random_range(3000..30000),
-            number_of_orders: rng.random_range(8000..80000),
+            oracle_price: rand::random_range(3000.0..3500.0),
+            mark_price: rand::random_range(3000.0..3500.0),
+            funding_rate: rand::random_range(-0.001..0.001),
+            open_interest: rand::random_range(30000000.0..100000000.0),
+            volume_24h: rand::random_range(150000000.0..1500000000.0),
+            number_of_users: rand::random_range(3000..30000),
+            number_of_orders: rand::random_range(8000..80000),
         },
     ]
 }

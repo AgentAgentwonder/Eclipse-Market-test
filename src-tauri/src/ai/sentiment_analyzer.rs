@@ -207,9 +207,6 @@ impl SentimentAnalyzer {
     }
 
     async fn generate_mock_sentiment(&self, token_mint: &str) -> AiResult<()> {
-        use rand::Rng;
-        let mut rng = rand::thread_rng();
-
         let sources = vec![
             SentimentSource::Twitter,
             SentimentSource::Reddit,
@@ -218,11 +215,11 @@ impl SentimentAnalyzer {
 
         for source in sources {
             let id = Uuid::new_v4().to_string();
-            let sentiment_score = rng.random_range(-1.0..1.0);
-            let confidence = rng.random_range(0.5..0.95);
-            let positive = rng.random_range(10..100);
-            let negative = rng.random_range(5..50);
-            let neutral = rng.random_range(20..80);
+            let sentiment_score = rand::random_range(-1.0..1.0);
+            let confidence = rand::random_range(0.5..0.95);
+            let positive = rand::random_range(10..100);
+            let negative = rand::random_range(5..50);
+            let neutral = rand::random_range(20..80);
             let timestamp = Utc::now();
 
             sqlx::query(

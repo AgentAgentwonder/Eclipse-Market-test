@@ -280,9 +280,6 @@ impl PolymarketAdapter {
 
 // Mock data generator for development/testing
 pub fn generate_mock_polymarket_markets() -> Vec<PolymarketMarket> {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
-
     vec![
         PolymarketMarket {
             condition_id: "0x1234567890abcdef".to_string(),
@@ -293,9 +290,9 @@ pub fn generate_mock_polymarket_markets() -> Vec<PolymarketMarket> {
             question_id: "btc-100k-2024".to_string(),
             market_slug: "bitcoin-100k-2024".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.3..0.7), rng.random_range(0.3..0.7)],
-            volume: rng.random_range(100000.0..1000000.0),
-            liquidity: rng.random_range(50000.0..500000.0),
+            outcome_prices: vec![rand::random_range(0.3..0.7), rand::random_range(0.3..0.7)],
+            volume: rand::random_range(100000.0..1000000.0),
+            liquidity: rand::random_range(50000.0..500000.0),
             active: true,
             closed: false,
             accepting_orders: true,
@@ -312,9 +309,9 @@ pub fn generate_mock_polymarket_markets() -> Vec<PolymarketMarket> {
             question_id: "eth-merge-q1-2024".to_string(),
             market_slug: "ethereum-merge-2024".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.4..0.8), rng.random_range(0.2..0.6)],
-            volume: rng.random_range(50000.0..500000.0),
-            liquidity: rng.random_range(25000.0..250000.0),
+            outcome_prices: vec![rand::random_range(0.4..0.8), rand::random_range(0.2..0.6)],
+            volume: rand::random_range(50000.0..500000.0),
+            liquidity: rand::random_range(25000.0..250000.0),
             active: true,
             closed: false,
             accepting_orders: true,
@@ -331,9 +328,9 @@ pub fn generate_mock_polymarket_markets() -> Vec<PolymarketMarket> {
             question_id: "sol-tvl-10b-2024".to_string(),
             market_slug: "solana-tvl-2024".to_string(),
             outcomes: vec!["Yes".to_string(), "No".to_string()],
-            outcome_prices: vec![rng.random_range(0.5..0.9), rng.random_range(0.1..0.5)],
-            volume: rng.random_range(75000.0..750000.0),
-            liquidity: rng.random_range(35000.0..350000.0),
+            outcome_prices: vec![rand::random_range(0.5..0.9), rand::random_range(0.1..0.5)],
+            volume: rand::random_range(75000.0..750000.0),
+            liquidity: rand::random_range(35000.0..350000.0),
             active: true,
             closed: false,
             accepting_orders: true,

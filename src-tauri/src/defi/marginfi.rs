@@ -101,37 +101,36 @@ impl MarginfiAdapter {
 
     fn generate_mock_banks(&self) -> Vec<MarginfiBank> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         vec![
             MarginfiBank {
                 address: "marginfi-usdc".to_string(),
                 symbol: "USDC".to_string(),
-                lending_apy: rng.random_range(4.0..9.0),
-                borrowing_apy: rng.random_range(6.0..12.0),
-                total_deposits: rng.random_range(30_000_000.0..120_000_000.0),
-                total_loans: rng.random_range(10_000_000.0..80_000_000.0),
-                utilization: rng.random_range(0.4..0.75),
+                lending_apy: rand::random_range(4.0..9.0),
+                borrowing_apy: rand::random_range(6.0..12.0),
+                total_deposits: rand::random_range(30_000_000.0..120_000_000.0),
+                total_loans: rand::random_range(10_000_000.0..80_000_000.0),
+                utilization: rand::random_range(0.4..0.75),
                 risk_tier: RiskLevel::Low,
             },
             MarginfiBank {
                 address: "marginfi-sol".to_string(),
                 symbol: "SOL".to_string(),
-                lending_apy: rng.random_range(3.0..7.0),
-                borrowing_apy: rng.random_range(5.0..11.0),
-                total_deposits: rng.random_range(400_000.0..1_500_000.0),
-                total_loans: rng.random_range(200_000.0..900_000.0),
-                utilization: rng.random_range(0.35..0.70),
+                lending_apy: rand::random_range(3.0..7.0),
+                borrowing_apy: rand::random_range(5.0..11.0),
+                total_deposits: rand::random_range(400_000.0..1_500_000.0),
+                total_loans: rand::random_range(200_000.0..900_000.0),
+                utilization: rand::random_range(0.35..0.70),
                 risk_tier: RiskLevel::Medium,
             },
             MarginfiBank {
                 address: "marginfi-eth".to_string(),
                 symbol: "ETH".to_string(),
-                lending_apy: rng.random_range(2.5..6.5),
-                borrowing_apy: rng.random_range(4.5..9.5),
-                total_deposits: rng.random_range(10_000.0..50_000.0),
-                total_loans: rng.random_range(5_000.0..25_000.0),
-                utilization: rng.random_range(0.30..0.65),
+                lending_apy: rand::random_range(2.5..6.5),
+                borrowing_apy: rand::random_range(4.5..9.5),
+                total_deposits: rand::random_range(10_000.0..50_000.0),
+                total_loans: rand::random_range(5_000.0..25_000.0),
+                utilization: rand::random_range(0.30..0.65),
                 risk_tier: RiskLevel::Medium,
             },
         ]
@@ -139,28 +138,27 @@ impl MarginfiAdapter {
 
     fn generate_mock_account(&self, wallet: &str) -> MarginfiAccount {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         MarginfiAccount {
             authority: wallet.to_string(),
             assets: vec![MarginfiPosition {
                 bank: "marginfi-usdc".to_string(),
                 symbol: "USDC".to_string(),
-                amount: rng.random_range(5000.0..40000.0),
-                value_usd: rng.random_range(5000.0..40000.0),
+                amount: rand::random_range(5000.0..40000.0),
+                value_usd: rand::random_range(5000.0..40000.0),
                 entry_price: 1.0,
                 liquidation_price: None,
             }],
             liabilities: vec![MarginfiPosition {
                 bank: "marginfi-sol".to_string(),
                 symbol: "SOL".to_string(),
-                amount: rng.random_range(10.0..100.0),
-                value_usd: rng.random_range(1500.0..15000.0),
-                entry_price: rng.random_range(70.0..110.0),
-                liquidation_price: Some(rng.random_range(35.0..60.0)),
+                amount: rand::random_range(10.0..100.0),
+                value_usd: rand::random_range(1500.0..15000.0),
+                entry_price: rand::random_range(70.0..110.0),
+                liquidation_price: Some(rand::random_range(35.0..60.0)),
             }],
             bankruptcy: false,
-            health_factor: rng.random_range(1.7..3.5),
+            health_factor: rand::random_range(1.7..3.5),
         }
     }
 }

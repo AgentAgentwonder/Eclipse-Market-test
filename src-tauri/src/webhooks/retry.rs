@@ -1,5 +1,4 @@
 use super::types::{RetryPolicy, WebhookError};
-use rand::Rng;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -43,9 +42,8 @@ impl RetryExecutor {
         let delay_secs = (base_delay.as_secs() * multiplier).min(self.policy.max_delay_secs);
 
         let delay = if self.policy.jitter {
-            let mut rng = rand::thread_rng();
             let jitter_range = delay_secs / 4;
-            let jitter: i64 = rng.random_range(-(jitter_range as i64)..=(jitter_range as i64));
+            let jitter: i64 = rand::random_range(-(jitter_range as i64)..=(jitter_range as i64));
             Duration::from_secs((delay_secs as i64 + jitter).max(1) as u64)
         } else {
             Duration::from_secs(delay_secs)

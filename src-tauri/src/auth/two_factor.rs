@@ -276,19 +276,17 @@ impl TwoFactorManager {
     }
 
     fn generate_secret() -> String {
-        let mut rng = rand::thread_rng();
-        let secret: Vec<u8> = (0..20).map(|_| rng.gen()).collect();
+        let secret: Vec<u8> = (0..20).map(|_| rand::random::<u8>()).collect();
         BASE32.encode(&secret)
     }
 
     fn generate_backup_codes() -> Vec<String> {
-        let mut rng = rand::thread_rng();
         let chars: Vec<char> = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".chars().collect();
 
         (0..BACKUP_CODE_COUNT)
             .map(|_| {
                 (0..BACKUP_CODE_LENGTH)
-                    .map(|_| chars[rng.random_range(0..chars.len())])
+                    .map(|_| chars[rand::random_range(0..chars.len())])
                     .collect()
             })
             .collect()
