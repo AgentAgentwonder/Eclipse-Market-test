@@ -156,6 +156,8 @@ impl TopCoinsCache {
                     price_change_7d,
                     sparkline: Self::generate_sparkline(item.price),
                     market_cap_category: determine_market_cap_category(item.market_cap),
+                    liquidity: item.liquidity,
+                    circulating_supply: item.circulating_supply,
                 }
             })
             .collect();
