@@ -8,11 +8,16 @@ pub struct YieldFarm {
     pub id: String,
     pub protocol: Protocol,
     pub name: String,
-    pub token_a: String,
-    pub token_b: String,
-    pub apy: f64,
-    pub tvl: f64,
-    pub rewards_token: Vec<String>,
+    pub farm_address: String,
+    pub lp_token: String,
+    pub reward_tokens: Vec<String>,
+    pub tvl_usd: f64,
+    pub base_apy: f64,
+    pub reward_apy: f64,
+    pub total_apy: f64,
+    pub deposit_fee: f64,
+    pub withdrawal_fee: f64,
+    pub lock_period: Option<u64>,
     pub risk_score: u8,
 }
 
@@ -63,12 +68,14 @@ impl YieldFarmingAdapter {
 
     fn generate_mock_farms(&self) -> Vec<YieldFarm> {
         use rand::Rng;
-        let mut rng = rand::rng();
+        let mut rng = rand::thread_rng();
 
         vec![
             YieldFarm {
-                farm_address: "raydium-sol-usdc".to_string(),
+                id: "raydium-sol-usdc".to_string(),
                 protocol: Protocol::Raydium,
+                name: "Raydium SOL-USDC Farm".to_string(),
+                farm_address: "raydium-sol-usdc".to_string(),
                 lp_token: "SOL-USDC LP".to_string(),
                 reward_tokens: vec!["RAY".to_string()],
                 tvl_usd: rng.random_range(20_000_000.0..80_000_000.0),
@@ -81,8 +88,10 @@ impl YieldFarmingAdapter {
                 risk_score: 45,
             },
             YieldFarm {
-                farm_address: "raydium-ray-sol".to_string(),
+                id: "raydium-ray-sol".to_string(),
                 protocol: Protocol::Raydium,
+                name: "Raydium RAY-SOL Farm".to_string(),
+                farm_address: "raydium-ray-sol".to_string(),
                 lp_token: "RAY-SOL LP".to_string(),
                 reward_tokens: vec!["RAY".to_string()],
                 tvl_usd: rng.random_range(8_000_000.0..30_000_000.0),
@@ -95,8 +104,10 @@ impl YieldFarmingAdapter {
                 risk_score: 60,
             },
             YieldFarm {
-                farm_address: "orca-sol-usdc".to_string(),
+                id: "orca-sol-usdc".to_string(),
                 protocol: Protocol::Orca,
+                name: "Orca SOL-USDC Whirlpool".to_string(),
+                farm_address: "orca-sol-usdc".to_string(),
                 lp_token: "SOL-USDC Whirlpool".to_string(),
                 reward_tokens: vec!["ORCA".to_string()],
                 tvl_usd: rng.random_range(18_000_000.0..70_000_000.0),
@@ -109,8 +120,10 @@ impl YieldFarmingAdapter {
                 risk_score: 40,
             },
             YieldFarm {
-                farm_address: "orca-orca-usdc".to_string(),
+                id: "orca-orca-usdc".to_string(),
                 protocol: Protocol::Orca,
+                name: "Orca ORCA-USDC Whirlpool".to_string(),
+                farm_address: "orca-orca-usdc".to_string(),
                 lp_token: "ORCA-USDC Whirlpool".to_string(),
                 reward_tokens: vec!["ORCA".to_string()],
                 tvl_usd: rng.random_range(5_000_000.0..25_000_000.0),
@@ -127,7 +140,7 @@ impl YieldFarmingAdapter {
 
     fn generate_mock_positions(&self, _wallet: &str) -> Vec<DeFiPosition> {
         use rand::Rng;
-        let mut rng = rand::rng();
+        let mut rng = rand::thread_rng();
         let timestamp = chrono::Utc::now().timestamp();
 
         vec![

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { TrendingUp, TrendingDown, Shield } from 'lucide-react';
 import { DeFiPosition, LendingPool, RiskLevel } from '../../types/defi';

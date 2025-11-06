@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { motion } from 'framer-motion';
 import { TrendingUp, AlertTriangle, PieChart, RefreshCw } from 'lucide-react';
