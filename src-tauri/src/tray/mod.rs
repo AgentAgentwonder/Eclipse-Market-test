@@ -473,11 +473,14 @@ pub fn attach_window_listeners(window: &tauri::Window, tray_manager: SharedTrayM
             }
         }
         WindowEvent::Destroyed => {
+            // TODO: Uncomment when tauri-plugin-global-shortcut is added
+            /*
             if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
                 if let Err(err) = handle_clone.global_shortcut().unregister(shortcut.as_str()) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }
+            */
         }
         _ => {}
     });
