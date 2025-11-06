@@ -152,16 +152,16 @@ impl SolendAdapter {
         let pools: Vec<LendingPool> = reserves
             .into_iter()
             .map(|reserve| LendingPool {
-                id: reserve.address.clone(),
+                pool_address: reserve.address.clone(),
                 protocol: Protocol::Solend,
                 asset: reserve.symbol.clone(),
                 total_supply: reserve.total_supply,
-                total_borrow: reserve.total_borrow,
+                total_borrowed: reserve.total_borrow,
                 supply_apy: reserve.supply_apy,
                 borrow_apy: reserve.borrow_apy,
                 utilization_rate: reserve.utilization_ratio,
-                available_liquidity: reserve.available_amount,
-                collateral_factor: reserve.ltv,
+                liquidation_threshold: reserve.liquidation_threshold,
+                liquidation_bonus: reserve.liquidation_penalty,
             })
             .collect();
         Ok(pools)
