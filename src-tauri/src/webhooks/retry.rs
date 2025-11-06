@@ -45,7 +45,7 @@ impl RetryExecutor {
         let delay = if self.policy.jitter {
             let mut rng = rand::thread_rng();
             let jitter_range = delay_secs / 4;
-            let jitter: i64 = rng.gen_range(-(jitter_range as i64)..=(jitter_range as i64));
+            let jitter: i64 = rng.random_range(-(jitter_range as i64)..=(jitter_range as i64));
             Duration::from_secs((delay_secs as i64 + jitter).max(1) as u64)
         } else {
             Duration::from_secs(delay_secs)
