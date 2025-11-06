@@ -23,8 +23,7 @@ pub async fn init_p2p_system(
 ) -> Result<SharedP2PDatabase, Box<dyn std::error::Error>> {
     let app_dir = app_handle
         .path()
-        .app_data_dir()
-        .ok_or("Unable to resolve app data directory")?;
+        .app_data_dir()?;
 
     std::fs::create_dir_all(&app_dir)?;
     let db_path = app_dir.join("p2p.db");

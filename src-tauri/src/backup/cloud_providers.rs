@@ -89,7 +89,7 @@ impl CloudProviderManager {
             .app_handle
             .path()
             .app_data_dir()
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "app data dir"))?;
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::NotFound, format!("app data dir: {}", e)))?;
         path.push(STORAGE_DIR);
         if !path.exists() {
             fs::create_dir_all(&path)?;

@@ -59,7 +59,7 @@ impl UpdaterState {
         let app_data_dir = app_handle
             .path()
             .app_data_dir()
-            .or_else(|| "Unable to resolve app data directory".to_string())?;
+            .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
 
         let backup_path = app_data_dir.join("backups");
         if !backup_path.exists() {
@@ -86,7 +86,7 @@ impl UpdaterState {
         let app_data_dir = app_handle
             .path()
             .app_data_dir()
-            .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+            .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
 
         let settings_path = app_data_dir.join("updater_settings.json");
         let settings = self.settings.read().await;
