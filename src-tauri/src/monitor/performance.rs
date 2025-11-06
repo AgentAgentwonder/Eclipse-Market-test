@@ -74,18 +74,10 @@ impl PerformanceMonitor {
         let total_memory = system.total_memory() as f32 / 1024.0;
         let used_memory = system.used_memory() as f32 / 1024.0;
 
-        let disk_read = system
-            .disks()
-            .iter()
-            .map(|d| d.total_space())
-            .sum::<u64>() as f64
-            / 1024.0;
-        let disk_write = system
-            .disks()
-            .iter()
-            .map(|d| d.available_space())
-            .sum::<u64>() as f64
-            / 1024.0;
+        // Note: sysinfo 0.30+ removed disk I/O tracking due to platform inconsistencies
+        // These metrics are set to 0.0 - consider using a different library for disk I/O monitoring
+        let disk_read = 0.0;
+        let disk_write = 0.0;
 
         let net_sent = system
             .networks()
