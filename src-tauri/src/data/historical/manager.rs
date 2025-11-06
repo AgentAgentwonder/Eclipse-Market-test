@@ -34,7 +34,7 @@ impl HistoricalReplayManager {
         let mut db_path = app_handle
             .path()
             .app_data_dir()
-            .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+            .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
 
         std::fs::create_dir_all(&db_path)
             .map_err(|e| format!("Failed to create data directory: {e}"))?;
@@ -70,15 +70,13 @@ impl HistoricalReplayManager {
         &self,
         request: FetchRequest,
         chunk_size_hours: i64,
-        mut progress_callback: F,
+        progress_callback: F,
     ) -> Result<HistoricalDataSet, Box<dyn std::error::Error>>
     where
-        F: FnMut(FetchProgress) + Send,
+        F: Fn(FetchProgress) + Send,
     {
         self.fetcher()
-            .fetch_in_chunks(request, chunk_size_hours, |progress| {
-                progress_callback(progress);
-            })
+            .fetch_in_chunks(request, chunk_size_hours, progress_callback)
             .await
     }
 

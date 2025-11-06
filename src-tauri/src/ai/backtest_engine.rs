@@ -202,8 +202,8 @@ impl BacktestEngine {
         for i in 0..10 {
             let entry_time = *start_date + chrono::Duration::days(i * 3);
             let exit_time = entry_time + chrono::Duration::days(2);
-            let entry_price = 100.0 + rng.gen_range(-10.0..10.0);
-            let exit_price = entry_price * (1.0 + rng.gen_range(-0.1..0.15));
+            let entry_price = 100.0 + rng.random_range(-10.0..10.0);
+            let exit_price = entry_price * (1.0 + rng.random_range(-0.1..0.15));
             let position_size = 1000.0;
             let pnl = (exit_price - entry_price) * (position_size / entry_price);
             let pnl_percent = ((exit_price - entry_price) / entry_price) * 100.0;

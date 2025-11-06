@@ -42,22 +42,22 @@ pub struct WebSocketManager {
 
 #[derive(Debug, Clone)]
 struct FallbackState {
-    active: bool,
-    last_success: Option<Instant>,
-    interval: Duration,
-    reason: Option<String>,
+    pub active: bool,
+    pub last_success: Option<Instant>,
+    pub interval: Duration,
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 struct StreamStatisticsInternal {
-    messages_received: u64,
-    messages_sent: u64,
-    bytes_received: u64,
-    bytes_sent: u64,
-    reconnect_count: u64,
-    connected_at: Option<Instant>,
-    latency_samples: VecDeque<f64>,
-    dropped_messages: u64,
+    pub messages_received: u64,
+    pub messages_sent: u64,
+    pub bytes_received: u64,
+    pub bytes_sent: u64,
+    pub reconnect_count: u64,
+    pub connected_at: Option<Instant>,
+    pub latency_samples: VecDeque<f64>,
+    pub dropped_messages: u64,
 }
 
 impl Default for StreamStatisticsInternal {
@@ -542,12 +542,12 @@ impl WebSocketManager {
                 match provider {
                     StreamProvider::Birdeye => {
                         for symbol in &subs.prices {
-                            if let Ok(price) = get_coin_price(symbol.clone()).await {
+                            if let Ok(price) = get_coin_price(symbol.clone(), None).await {
                                 let delta = PriceDelta {
                                     symbol: symbol.clone(),
-                                    price: price.price,
-                                    change: price.change_24h,
-                                    volume: price.volume_24h,
+                                    price: Some(price.price),
+                                    change: price.price_change_24h,
+                                    volume: Some(price.volume_24h),
                                     ts: chrono::Utc::now().timestamp(),
                                     snapshot: true,
                                 };

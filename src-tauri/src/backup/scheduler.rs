@@ -107,8 +107,8 @@ impl BackupScheduler {
     }
 
     fn config_path(&self) -> Result<PathBuf, SchedulerError> {
-        let mut path = self.app_handle.path().app_data_dir().ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, "App data directory not found")
+        let mut path = self.app_handle.path().app_data_dir().map_err(|e| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, format!("App data directory not found: {}", e))
         })?;
 
         if !path.exists() {

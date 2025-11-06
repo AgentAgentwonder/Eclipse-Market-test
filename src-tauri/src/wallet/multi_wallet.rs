@@ -293,53 +293,77 @@ impl MultiWalletManager {
     ) -> Result<WalletInfo, MultiWalletError> {
         let mut guard = self.lock_state()?;
 
-        let wallet = guard
-            .wallets
-            .get_mut(&request.wallet_id)
-            .ok_or_else(|| MultiWalletError::WalletNotFound(request.wallet_id.clone()))?;
-
-        if let Some(label) = request.label {
-            wallet.label = label;
+        // Check wallet exists
+        if !guard.wallets.contains_key(&request.wallet_id) {
+            return Err(MultiWalletError::WalletNotFound(request.wallet_id.clone()));
         }
 
+        // Get wallet ID for later operations
+        let wallet_id = request.wallet_id.clone();
+
+        // Update basic fields
+        {
+            let wallet = guard.wallets.get_mut(&wallet_id).unwrap();
+
+            if let Some(label) = request.label {
+                wallet.label = label;
+            }
+
+            if let Some(chain_id) = request.chain_id {
+                wallet.chain_id = chain_id;
+            }
+
+            if let Some(preferences) = request.preferences {
+                wallet.preferences = preferences;
+            }
+        }
+
+        // Handle group changes (needs access to both wallets and groups)
         if let Some(group_id_update) = request.group_id {
             match group_id_update {
                 Some(group_id) => {
                     if !guard.groups.contains_key(&group_id) {
                         return Err(MultiWalletError::GroupNotFound(group_id));
                     }
-                    wallet.group_id = Some(group_id.clone());
+
+                    // Update wallet's group_id
+                    if let Some(wallet) = guard.wallets.get_mut(&wallet_id) {
+                        wallet.group_id = Some(group_id.clone());
+                    }
+
+                    // Update all groups
                     for group in guard.groups.values_mut() {
                         if group.id == group_id {
-                            if !group.wallet_ids.contains(&wallet.id) {
-                                group.wallet_ids.push(wallet.id.clone());
+                            if !group.wallet_ids.contains(&wallet_id) {
+                                group.wallet_ids.push(wallet_id.clone());
                             }
                         } else {
-                            group.wallet_ids.retain(|id| id != &wallet.id);
+                            group.wallet_ids.retain(|id| id != &wallet_id);
                         }
                     }
                 }
                 None => {
+                    // Remove from all groups
                     for group in guard.groups.values_mut() {
-                        group.wallet_ids.retain(|id| id != &wallet.id);
+                        group.wallet_ids.retain(|id| id != &wallet_id);
                     }
-                    wallet.group_id = None;
+
+                    // Update wallet's group_id
+                    if let Some(wallet) = guard.wallets.get_mut(&wallet_id) {
+                        wallet.group_id = None;
+                    }
                 }
             }
         }
 
-        if let Some(chain_id) = request.chain_id {
-            wallet.chain_id = chain_id;
+        // Update timestamps
+        if let Some(wallet) = guard.wallets.get_mut(&wallet_id) {
+            wallet.updated_at = Utc::now();
         }
-
-        if let Some(preferences) = request.preferences {
-            wallet.preferences = preferences;
-        }
-
-        wallet.updated_at = Utc::now();
         guard.last_updated = Utc::now();
 
-        let updated_wallet = wallet.clone();
+        // Clone result before persist
+        let updated_wallet = guard.wallets.get(&wallet_id).unwrap().clone();
         self.persist_locked(&guard, keystore)?;
 
         Ok(updated_wallet)
@@ -378,17 +402,23 @@ impl MultiWalletManager {
     ) -> Result<WalletInfo, MultiWalletError> {
         let mut guard = self.lock_state()?;
 
-        let wallet = guard
-            .wallets
-            .get_mut(wallet_id)
-            .ok_or_else(|| MultiWalletError::WalletNotFound(wallet_id.to_string()))?;
+        // Check wallet exists and update its fields
+        {
+            let wallet = guard
+                .wallets
+                .get_mut(wallet_id)
+                .ok_or_else(|| MultiWalletError::WalletNotFound(wallet_id.to_string()))?;
 
-        wallet.last_used = Some(Utc::now());
-        wallet.updated_at = Utc::now();
+            wallet.last_used = Some(Utc::now());
+            wallet.updated_at = Utc::now();
+        }
+
+        // Update guard fields after wallet borrow is dropped
         guard.active_wallet_id = Some(wallet_id.to_string());
         guard.last_updated = Utc::now();
 
-        let active_wallet = wallet.clone();
+        // Clone result
+        let active_wallet = guard.wallets.get(wallet_id).unwrap().clone();
         self.persist_locked(&guard, keystore)?;
 
         Ok(active_wallet)
@@ -500,47 +530,67 @@ impl MultiWalletManager {
     ) -> Result<WalletGroup, MultiWalletError> {
         let mut guard = self.lock_state()?;
 
-        let group = guard
-            .groups
-            .get_mut(&request.group_id)
-            .ok_or_else(|| MultiWalletError::GroupNotFound(request.group_id.clone()))?;
-
-        if let Some(name) = request.name {
-            group.name = name;
+        // Check group exists
+        if !guard.groups.contains_key(&request.group_id) {
+            return Err(MultiWalletError::GroupNotFound(request.group_id.clone()));
         }
 
-        if let Some(description) = request.description {
-            group.description = description;
+        let group_id = request.group_id.clone();
+
+        // Get the current group ID before any mutations
+        let current_group_id = guard.groups.get(&group_id).map(|g| g.id.clone()).unwrap();
+
+        // Update basic fields
+        {
+            let group = guard.groups.get_mut(&group_id).unwrap();
+
+            if let Some(name) = request.name {
+                group.name = name;
+            }
+
+            if let Some(description) = request.description {
+                group.description = description;
+            }
+
+            if let Some(shared_settings) = request.shared_settings {
+                group.shared_settings = shared_settings;
+            }
         }
 
+        // Handle wallet_ids changes (needs access to both wallets and groups)
         if let Some(wallet_ids) = &request.wallet_ids {
+            // Validate all wallet IDs exist
             for wallet_id in wallet_ids {
                 if !guard.wallets.contains_key(wallet_id) {
                     return Err(MultiWalletError::WalletNotFound(wallet_id.clone()));
                 }
             }
 
+            // Clear group_id from wallets that were in this group
             for wallet in guard.wallets.values_mut() {
-                if wallet.group_id.as_deref() == Some(&group.id) {
+                if wallet.group_id.as_deref() == Some(&current_group_id) {
                     wallet.group_id = None;
                 }
             }
 
-            group.wallet_ids = wallet_ids.clone();
+            // Update group's wallet_ids
+            if let Some(group) = guard.groups.get_mut(&group_id) {
+                group.wallet_ids = wallet_ids.clone();
+            }
 
-            for wallet_id in &group.wallet_ids {
+            // Set group_id on new wallets
+            for wallet_id in wallet_ids {
                 if let Some(wallet) = guard.wallets.get_mut(wallet_id) {
-                    wallet.group_id = Some(group.id.clone());
+                    wallet.group_id = Some(current_group_id.clone());
                 }
             }
         }
 
-        if let Some(shared_settings) = request.shared_settings {
-            group.shared_settings = shared_settings;
-        }
-
+        // Update timestamp
         guard.last_updated = Utc::now();
-        let updated_group = group.clone();
+
+        // Clone result
+        let updated_group = guard.groups.get(&group_id).unwrap().clone();
 
         self.persist_locked(&guard, keystore)?;
 

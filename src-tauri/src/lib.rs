@@ -130,7 +130,6 @@ use ai_legacy::launch_predictor::{
     get_launch_prediction_history, load_latest_launch_model, predict_launch_success,
     retrain_launch_model, LaunchPredictor, SharedLaunchPredictor,
 };
-use ai_legacy::SharedAIAssistant;
 use alerts::{AlertManager, SharedAlertManager, SharedSmartAlertManager, SmartAlertManager};
 use api::{ApiHealthMonitor, SharedApiHealthMonitor};
 use auth::session_manager::SessionManager;
@@ -154,7 +153,7 @@ use mobile::{
     SharedMobileAuthManager, SharedMobileSyncManager, SharedPushNotificationManager, WidgetManager,
 };
 use notifications::router::{NotificationRouter, SharedNotificationRouter};
-use p2p::{init_p2p_system, SharedP2PDatabase};
+use p2p::init_p2p_system;
 use portfolio::{
     AIPortfolioAdvisor, SharedAIPortfolioAdvisor, SharedWatchlistManager, WatchlistManager,
 };
@@ -163,11 +162,8 @@ use security::audit::AuditCache;
 use security::keystore::Keystore;
 use security::reputation::{ReputationEngine, SharedReputationEngine};
 use social::service::{SocialDataService, SharedSocialDataService};
-use social::cache::SocialCache;
-use social::analysis::{SocialAnalysisService, SharedSocialAnalysisService};
 use std::error::Error;
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use stream_commands::*;
 use tauri::Manager;
 use tokio::sync::RwLock;

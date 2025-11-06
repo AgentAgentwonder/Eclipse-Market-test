@@ -745,7 +745,7 @@ impl PaperTradingManager {
 
         let variance_range = self.slippage_config.randomness_factor;
         let variance = if variance_range > 0.0 {
-            rng.gen_range(-variance_range..variance_range)
+            rng.random_range(-variance_range..variance_range)
         } else {
             0.0
         };

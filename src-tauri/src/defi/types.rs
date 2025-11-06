@@ -76,7 +76,7 @@ pub struct DeFiPosition {
 }
 
 // Portfolio summary structure
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PortfolioSummary {
     pub total_value_usd: f64,
@@ -235,6 +235,7 @@ pub struct YieldFarm {
     pub deposit_fee: f64,
     pub withdrawal_fee: f64,
     pub lock_period: Option<u64>,
+    pub risk_score: u8,
 }
 
 // Staking pool structure

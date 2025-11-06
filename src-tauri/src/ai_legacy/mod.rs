@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -529,7 +529,7 @@ pub async fn assess_risk(features: Vec<f32>) -> Result<f32, String> {
         return Err("Features cannot be empty".to_string());
     }
 
-    let model = RiskModel::new();
+    let _model = RiskModel::new();
     let weights = vec![0.3, 0.2, 0.15, 0.15, 0.1, 0.1];
 
     let score: f32 = features
@@ -577,7 +577,8 @@ pub async fn get_token_risk_score(
     // Calculate token age
     let token_age_days = {
         let creation_date = chrono::DateTime::parse_from_rfc3339(&metadata.creation_date)
-            .map_err(|e| format!("Failed to parse creation date: {}", e))?;
+            .map_err(|e| format!("Failed to parse creation date: {}", e))?
+            .with_timezone(&Utc);
         let now = Utc::now();
         (now - creation_date).num_days() as f64
     };

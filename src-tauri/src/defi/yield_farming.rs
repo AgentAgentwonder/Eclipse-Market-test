@@ -45,11 +45,11 @@ impl YieldFarmingAdapter {
         let farms = self.get_all_farms().await?;
         let opportunities: Vec<FarmingOpportunity> = farms
             .into_iter()
-            .filter(|farm| farm.apy >= min_apy && farm.risk_score <= max_risk)
+            .filter(|farm| farm.total_apy >= min_apy && farm.risk_score <= max_risk)
             .map(|farm| FarmingOpportunity {
-                projected_earnings_24h: (farm.tvl * farm.apy / 100.0) / 365.0,
-                projected_earnings_30d: (farm.tvl * farm.apy / 100.0) / 12.0,
-                risk_adjusted_apy: farm.apy * (1.0 - (farm.risk_score as f64 / 100.0) * 0.3),
+                projected_earnings_24h: (farm.tvl_usd * farm.total_apy / 100.0) / 365.0,
+                projected_earnings_30d: (farm.tvl_usd * farm.total_apy / 100.0) / 12.0,
+                risk_adjusted_apy: farm.total_apy * (1.0 - (farm.risk_score as f64 / 100.0) * 0.3),
                 farm,
             })
             .collect();
@@ -63,51 +63,63 @@ impl YieldFarmingAdapter {
 
     fn generate_mock_farms(&self) -> Vec<YieldFarm> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         vec![
             YieldFarm {
-                id: "raydium-sol-usdc".to_string(),
+                farm_address: "raydium-sol-usdc".to_string(),
                 protocol: Protocol::Raydium,
-                name: "SOL-USDC LP".to_string(),
-                token_a: "SOL".to_string(),
-                token_b: "USDC".to_string(),
-                apy: rng.gen_range(12.0..25.0),
-                tvl: rng.gen_range(20_000_000.0..80_000_000.0),
-                rewards_token: vec!["RAY".to_string()],
+                lp_token: "SOL-USDC LP".to_string(),
+                reward_tokens: vec!["RAY".to_string()],
+                tvl_usd: rng.random_range(20_000_000.0..80_000_000.0),
+                base_apy: rng.random_range(8.0..12.0),
+                reward_apy: rng.random_range(4.0..13.0),
+                total_apy: rng.random_range(12.0..25.0),
+                deposit_fee: 0.0,
+                withdrawal_fee: 0.0,
+                lock_period: None,
                 risk_score: 45,
             },
             YieldFarm {
-                id: "raydium-ray-sol".to_string(),
+                farm_address: "raydium-ray-sol".to_string(),
                 protocol: Protocol::Raydium,
-                name: "RAY-SOL LP".to_string(),
-                token_a: "RAY".to_string(),
-                token_b: "SOL".to_string(),
-                apy: rng.gen_range(25.0..45.0),
-                tvl: rng.gen_range(8_000_000.0..30_000_000.0),
-                rewards_token: vec!["RAY".to_string()],
+                lp_token: "RAY-SOL LP".to_string(),
+                reward_tokens: vec!["RAY".to_string()],
+                tvl_usd: rng.random_range(8_000_000.0..30_000_000.0),
+                base_apy: rng.random_range(15.0..25.0),
+                reward_apy: rng.random_range(10.0..20.0),
+                total_apy: rng.random_range(25.0..45.0),
+                deposit_fee: 0.0,
+                withdrawal_fee: 0.0,
+                lock_period: None,
                 risk_score: 60,
             },
             YieldFarm {
-                id: "orca-sol-usdc".to_string(),
+                farm_address: "orca-sol-usdc".to_string(),
                 protocol: Protocol::Orca,
-                name: "SOL-USDC Whirlpool".to_string(),
-                token_a: "SOL".to_string(),
-                token_b: "USDC".to_string(),
-                apy: rng.gen_range(15.0..28.0),
-                tvl: rng.gen_range(18_000_000.0..70_000_000.0),
-                rewards_token: vec!["ORCA".to_string()],
+                lp_token: "SOL-USDC Whirlpool".to_string(),
+                reward_tokens: vec!["ORCA".to_string()],
+                tvl_usd: rng.random_range(18_000_000.0..70_000_000.0),
+                base_apy: rng.random_range(10.0..15.0),
+                reward_apy: rng.random_range(5.0..13.0),
+                total_apy: rng.random_range(15.0..28.0),
+                deposit_fee: 0.0,
+                withdrawal_fee: 0.0,
+                lock_period: None,
                 risk_score: 40,
             },
             YieldFarm {
-                id: "orca-orca-usdc".to_string(),
+                farm_address: "orca-orca-usdc".to_string(),
                 protocol: Protocol::Orca,
-                name: "ORCA-USDC Whirlpool".to_string(),
-                token_a: "ORCA".to_string(),
-                token_b: "USDC".to_string(),
-                apy: rng.gen_range(30.0..55.0),
-                tvl: rng.gen_range(5_000_000.0..25_000_000.0),
-                rewards_token: vec!["ORCA".to_string()],
+                lp_token: "ORCA-USDC Whirlpool".to_string(),
+                reward_tokens: vec!["ORCA".to_string()],
+                tvl_usd: rng.random_range(5_000_000.0..25_000_000.0),
+                base_apy: rng.random_range(20.0..30.0),
+                reward_apy: rng.random_range(10.0..25.0),
+                total_apy: rng.random_range(30.0..55.0),
+                deposit_fee: 0.0,
+                withdrawal_fee: 0.0,
+                lock_period: None,
                 risk_score: 70,
             },
         ]
@@ -115,7 +127,7 @@ impl YieldFarmingAdapter {
 
     fn generate_mock_positions(&self, _wallet: &str) -> Vec<DeFiPosition> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let timestamp = chrono::Utc::now().timestamp();
 
         vec![
@@ -124,13 +136,13 @@ impl YieldFarmingAdapter {
                 protocol: Protocol::Raydium,
                 position_type: PositionType::Farming,
                 asset: "SOL-USDC LP".to_string(),
-                amount: rng.gen_range(500.0..5000.0),
-                value_usd: rng.gen_range(3000.0..30000.0),
-                apy: rng.gen_range(15.0..25.0),
+                amount: rng.random_range(500.0..5000.0),
+                value_usd: rng.random_range(3000.0..30000.0),
+                apy: rng.random_range(15.0..25.0),
                 rewards: vec![Reward {
                     token: "RAY".to_string(),
-                    amount: rng.gen_range(5.0..50.0),
-                    value_usd: rng.gen_range(10.0..100.0),
+                    amount: rng.random_range(5.0..50.0),
+                    value_usd: rng.random_range(10.0..100.0),
                 }],
                 health_factor: None,
                 created_at: timestamp,
@@ -141,13 +153,13 @@ impl YieldFarmingAdapter {
                 protocol: Protocol::Orca,
                 position_type: PositionType::Farming,
                 asset: "SOL-USDC Whirlpool".to_string(),
-                amount: rng.gen_range(300.0..3000.0),
-                value_usd: rng.gen_range(2000.0..20000.0),
-                apy: rng.gen_range(18.0..28.0),
+                amount: rng.random_range(300.0..3000.0),
+                value_usd: rng.random_range(2000.0..20000.0),
+                apy: rng.random_range(18.0..28.0),
                 rewards: vec![Reward {
                     token: "ORCA".to_string(),
-                    amount: rng.gen_range(8.0..80.0),
-                    value_usd: rng.gen_range(15.0..150.0),
+                    amount: rng.random_range(8.0..80.0),
+                    value_usd: rng.random_range(15.0..150.0),
                 }],
                 health_factor: None,
                 created_at: timestamp,

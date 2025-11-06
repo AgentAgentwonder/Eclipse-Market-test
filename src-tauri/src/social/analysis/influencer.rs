@@ -70,7 +70,8 @@ impl InfluencerEngine {
         for row in rows {
             let data: String = row.try_get("post_data")?;
             let score: f32 = row.try_get("score")?;
-            let post: SocialPost = serde_json::from_str(&data)?;
+            let post: SocialPost = serde_json::from_str(&data)
+                .map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
 
             let entry = influencer_data
                 .entry(post.author.clone())

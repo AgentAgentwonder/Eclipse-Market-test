@@ -156,6 +156,8 @@ impl TopCoinsCache {
                     price_change_7d,
                     sparkline: Self::generate_sparkline(item.price),
                     market_cap_category: determine_market_cap_category(item.market_cap),
+                    liquidity: item.liquidity,
+                    circulating_supply: item.circulating_supply,
                 }
             })
             .collect();
@@ -244,9 +246,9 @@ impl TopCoinsCache {
             .map(|idx| {
                 let (name, symbol, address, base_price, base_cap) =
                     base_coins[idx % base_coins.len()];
-                let price = base_price * (1.0 + rng.gen_range(-0.1..0.1));
-                let market_cap = base_cap * (1.0 + rng.gen_range(-0.1..0.1));
-                let price_change_24h = rng.gen_range(-15.0..20.0);
+                let price = base_price * (1.0 + rng.random_range(-0.1..0.1));
+                let market_cap = base_cap * (1.0 + rng.random_range(-0.1..0.1));
+                let price_change_24h = rng.random_range(-15.0..20.0);
                 TopCoin {
                     rank: (idx + 1) as i32,
                     address: address.to_string(),
@@ -255,11 +257,13 @@ impl TopCoinsCache {
                     logo_uri: None,
                     price,
                     market_cap,
-                    volume_24h: rng.gen_range(5_000_000.0..800_000_000.0),
+                    volume_24h: rng.random_range(5_000_000.0..800_000_000.0),
                     price_change_24h,
-                    price_change_7d: rng.gen_range(-30.0..40.0),
+                    price_change_7d: rng.random_range(-30.0..40.0),
                     sparkline: Self::generate_sparkline(price),
                     market_cap_category: determine_market_cap_category(market_cap),
+                    liquidity: Some(rng.random_range(500_000.0..10_000_000.0)),
+                    circulating_supply: Some(rng.random_range(1_000_000.0..500_000_000.0)),
                 }
             })
             .collect()
@@ -271,7 +275,7 @@ impl TopCoinsCache {
         let mut sparkline = Vec::with_capacity(24);
         let mut price = base_price;
         for _ in 0..24 {
-            price *= 1.0 + rng.gen_range(-0.03..0.03);
+            price *= 1.0 + rng.random_range(-0.03..0.03);
             sparkline.push((price * 100.0).round() / 100.0);
         }
         sparkline
@@ -329,7 +333,7 @@ fn generate_sparkline(price: f64, change_24h: f64) -> Vec<f64> {
     for i in 0..points {
         let progress = i as f64 / (points - 1) as f64;
         let trend = start_price + (price - start_price) * progress;
-        let noise = rng.gen_range(-2.0..2.0);
+        let noise = rng.random_range(-2.0..2.0);
         let volatility = (price * 0.02).max(0.0001);
         sparkline.push((trend + noise * volatility).max(0.0));
     }
@@ -452,18 +456,18 @@ fn generate_mock_top_coins(limit: usize, offset: usize) -> Vec<TopCoin> {
         let mc_multiplier = 1.0 - (idx as f64 * 0.008);
         let market_cap = base_mc * mc_multiplier;
         let price = if market_cap > 1_000_000_000.0 {
-            rng.gen_range(50.0..200.0)
+            rng.random_range(50.0..200.0)
         } else if market_cap > 100_000_000.0 {
-            rng.gen_range(1.0..50.0)
+            rng.random_range(1.0..50.0)
         } else if market_cap > 10_000_000.0 {
-            rng.gen_range(0.1..1.0)
+            rng.random_range(0.1..1.0)
         } else {
-            rng.gen_range(0.001..0.1)
+            rng.random_range(0.001..0.1)
         };
 
-        let volume_24h = market_cap * rng.gen_range(0.05..0.3);
-        let change_24h = rng.gen_range(-20.0..20.0);
-        let change_7d = rng.gen_range(-40.0..40.0);
+        let volume_24h = market_cap * rng.random_range(0.05..0.3);
+        let change_24h = rng.random_range(-20.0..20.0);
+        let change_7d = rng.random_range(-40.0..40.0);
 
         coins.push(TopCoin {
             rank: (idx + 1) as i32,
@@ -486,8 +490,8 @@ fn generate_mock_top_coins(limit: usize, offset: usize) -> Vec<TopCoin> {
             price_change_7d: change_7d,
             sparkline: generate_sparkline(price, change_24h),
             market_cap_category: determine_market_cap_category(market_cap),
-            liquidity: Some(rng.gen_range(500_000.0..10_000_000.0)),
-            circulating_supply: Some(rng.gen_range(1_000_000.0..500_000_000.0)),
+            liquidity: Some(rng.random_range(500_000.0..10_000_000.0)),
+            circulating_supply: Some(rng.random_range(1_000_000.0..500_000_000.0)),
         });
     }
 
