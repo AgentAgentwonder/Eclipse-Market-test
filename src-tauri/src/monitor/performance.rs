@@ -77,13 +77,13 @@ impl PerformanceMonitor {
         let disk_read = system
             .disks()
             .iter()
-            .map(|d| d.total_read_bytes())
+            .map(|d| d.total_space())
             .sum::<u64>() as f64
             / 1024.0;
         let disk_write = system
             .disks()
             .iter()
-            .map(|d| d.total_written_bytes())
+            .map(|d| d.available_space())
             .sum::<u64>() as f64
             / 1024.0;
 
