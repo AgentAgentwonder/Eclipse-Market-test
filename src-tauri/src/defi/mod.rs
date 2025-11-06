@@ -26,3 +26,8 @@ pub use position_manager::*;
 pub use auto_compound::*;
 // Explicit exports for governance to avoid naming conflict with standalone governance module
 pub use governance::{get_governance_proposals, vote_on_proposal, get_governance_participation};
+// Protocol-specific command exports
+pub use solend::{get_solend_reserves, get_solend_pools, get_solend_positions};
+pub use marginfi::{get_marginfi_banks, get_marginfi_positions};
+pub use kamino::{get_kamino_vaults, get_kamino_positions, get_kamino_farms};
+pub use staking::{get_staking_pools, get_staking_positions, get_staking_schedule};
