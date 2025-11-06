@@ -44,7 +44,6 @@ impl LocalMatcher {
         user_profile: &TraderProfile,
         user_reputation: Option<&WalletReputation>,
     ) -> Vec<TraderMatch> {
-        let mut rng = rand::thread_rng();
         let mut matches = Vec::new();
 
         for offer in offers {
@@ -60,13 +59,13 @@ impl LocalMatcher {
                 }
             }
 
-            let compatibility_score = rng.random_range(0.6..0.95);
+            let compatibility_score = rand::random_range(0.6..0.95);
             let reputation_delta = if let Some(rep) = user_reputation {
                 rep.trust_score - offer.reputation_required.unwrap_or(0.0)
             } else {
                 0.0
             };
-            let geographic_score = rng.random_range(0.7..0.98);
+            let geographic_score = rand::random_range(0.7..0.98);
 
             let payment_match_score = offer
                 .payment_methods
@@ -85,16 +84,16 @@ impl LocalMatcher {
                 counterparty_profile: TraderProfile {
                     address: offer.creator.clone(),
                     username: Some(format!("Trader-{}", &offer.creator[..6])),
-                    reputation_score: 60.0 + rng.random_range(-10.0..10.0),
-                    total_trades: rng.random_range(5..200),
-                    successful_trades: rng.random_range(5..200),
-                    cancelled_trades: rng.random_range(0..20),
-                    disputed_trades: rng.random_range(0..10),
-                    avg_completion_time: rng.random_range(5..120) as i64,
+                    reputation_score: 60.0 + rand::random_range(-10.0..10.0),
+                    total_trades: rand::random_range(5..200),
+                    successful_trades: rand::random_range(5..200),
+                    cancelled_trades: rand::random_range(0..20),
+                    disputed_trades: rand::random_range(0..10),
+                    avg_completion_time: rand::random_range(5..120) as i64,
                     first_trade_at: Some(DateTime::<Utc>::default()),
                     last_trade_at: Some(Utc::now()),
                     verified: rng.random_bool(0.6),
-                    verification_level: rng.random_range(0..3),
+                    verification_level: rand::random_range(0..3),
                 },
             });
         }

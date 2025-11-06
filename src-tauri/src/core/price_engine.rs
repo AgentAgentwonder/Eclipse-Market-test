@@ -7,7 +7,6 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use bytes::Bytes;
 use crossbeam::queue::SegQueue;
 use parking_lot::{Mutex, RwLock};
-use rand::Rng;
 use serde::{Deserialize, Serialize};
 use sysinfo::{CpuExt, CpuRefreshKind, RefreshKind, System, SystemExt};
 use tauri::{AppHandle, Emitter, Manager};
@@ -320,12 +319,11 @@ impl PriceEngine {
         info!("running performance test with {} updates", num_updates);
         self.reset_stats();
 
-        let mut rng = rand::thread_rng();
         for i in 0..num_updates {
             let symbol = format!("SYM{}", i % 64);
-            let price = 100.0 + rng.random_range(-5.0..5.0);
-            let volume = rng.random_range(1_000.0..100_000.0);
-            let change_24h = rng.random_range(-10.0..10.0);
+            let price = 100.0 + rand::random_range(-5.0..5.0);
+            let volume = rand::random_range(1_000.0..100_000.0);
+            let change_24h = rand::random_range(-10.0..10.0);
 
             let update = PriceUpdate::new(symbol, price, volume, change_24h);
             self.process_update(update);

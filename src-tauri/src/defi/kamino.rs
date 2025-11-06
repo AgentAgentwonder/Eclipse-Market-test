@@ -71,7 +71,6 @@ impl KaminoAdapter {
 
     fn generate_mock_vaults(&self) -> Vec<KaminoVault> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         vec![
             KaminoVault {
@@ -80,10 +79,10 @@ impl KaminoAdapter {
                 token_a: "SOL".to_string(),
                 token_b: "USDC".to_string(),
                 strategy: "Concentrated Liquidity".to_string(),
-                tvl: rng.random_range(15_000_000.0..50_000_000.0),
-                apy: rng.random_range(15.0..35.0),
-                fee_apr: rng.random_range(8.0..20.0),
-                reward_apr: rng.random_range(5.0..15.0),
+                tvl: rand::random_range(15_000_000.0..50_000_000.0),
+                apy: rand::random_range(15.0..35.0),
+                fee_apr: rand::random_range(8.0..20.0),
+                reward_apr: rand::random_range(5.0..15.0),
                 auto_compound: true,
             },
             KaminoVault {
@@ -92,10 +91,10 @@ impl KaminoAdapter {
                 token_a: "ETH".to_string(),
                 token_b: "USDC".to_string(),
                 strategy: "Concentrated Liquidity".to_string(),
-                tvl: rng.random_range(10_000_000.0..40_000_000.0),
-                apy: rng.random_range(12.0..30.0),
-                fee_apr: rng.random_range(7.0..18.0),
-                reward_apr: rng.random_range(4.0..12.0),
+                tvl: rand::random_range(10_000_000.0..40_000_000.0),
+                apy: rand::random_range(12.0..30.0),
+                fee_apr: rand::random_range(7.0..18.0),
+                reward_apr: rand::random_range(4.0..12.0),
                 auto_compound: true,
             },
             KaminoVault {
@@ -104,10 +103,10 @@ impl KaminoAdapter {
                 token_a: "BTC".to_string(),
                 token_b: "USDC".to_string(),
                 strategy: "Concentrated Liquidity".to_string(),
-                tvl: rng.random_range(8_000_000.0..35_000_000.0),
-                apy: rng.random_range(10.0..28.0),
-                fee_apr: rng.random_range(6.0..16.0),
-                reward_apr: rng.random_range(3.0..10.0),
+                tvl: rand::random_range(8_000_000.0..35_000_000.0),
+                apy: rand::random_range(10.0..28.0),
+                fee_apr: rand::random_range(6.0..16.0),
+                reward_apr: rand::random_range(3.0..10.0),
                 auto_compound: true,
             },
         ]
@@ -115,7 +114,6 @@ impl KaminoAdapter {
 
     fn generate_mock_user_positions(&self, _wallet: &str) -> Vec<DeFiPosition> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
         let timestamp = chrono::Utc::now().timestamp();
 
         vec![DeFiPosition {
@@ -123,13 +121,13 @@ impl KaminoAdapter {
             protocol: Protocol::Kamino,
             position_type: PositionType::LiquidityPool,
             asset: "SOL-USDC".to_string(),
-            amount: rng.random_range(1000.0..10000.0),
-            value_usd: rng.random_range(5000.0..50000.0),
-            apy: rng.random_range(18.0..32.0),
+            amount: rand::random_range(1000.0..10000.0),
+            value_usd: rand::random_range(5000.0..50000.0),
+            apy: rand::random_range(18.0..32.0),
             rewards: vec![Reward {
                 token: "KMNO".to_string(),
-                amount: rng.random_range(10.0..100.0),
-                value_usd: rng.random_range(50.0..500.0),
+                amount: rand::random_range(10.0..100.0),
+                value_usd: rand::random_range(50.0..500.0),
             }],
             health_factor: None,
             created_at: timestamp,

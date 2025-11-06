@@ -159,7 +159,6 @@ impl HistoricalDataFetcher {
 
     fn generate_mock_data(&self, request: &FetchRequest) -> Vec<HistoricalDataPoint> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
 
         let interval_seconds = match request.interval.as_str() {
             "1m" => 60,
@@ -176,15 +175,15 @@ impl HistoricalDataFetcher {
         let mut price = 100.0;
 
         while current_time <= request.end_time {
-            let change = rng.random_range(-0.02..0.02);
+            let change = rand::random_range(-0.02..0.02);
             price *= 1.0 + change;
             price = price.max(0.01); // Ensure positive
 
             let volatility = price * 0.005;
-            let high = price + rng.random_range(0.0..volatility);
-            let low = price - rng.random_range(0.0..volatility);
-            let close = price + rng.random_range(-volatility..volatility);
-            let volume = rng.random_range(10000.0..100000.0);
+            let high = price + rand::random_range(0.0..volatility);
+            let low = price - rand::random_range(0.0..volatility);
+            let close = price + rand::random_range(-volatility..volatility);
+            let volume = rand::random_range(10000.0..100000.0);
 
             data.push(HistoricalDataPoint {
                 timestamp: current_time,
@@ -235,7 +234,6 @@ impl HistoricalDataFetcher {
         end_time: i64,
     ) -> Vec<OrderBookSnapshot> {
         use rand::Rng;
-        let mut rng = rand::thread_rng();
         let mut snapshots = Vec::new();
 
         let mut current_time = start_time;
@@ -243,7 +241,7 @@ impl HistoricalDataFetcher {
         let mut mid_price = 100.0;
 
         while current_time <= end_time {
-            mid_price *= 1.0 + rng.random_range(-0.001..0.001);
+            mid_price *= 1.0 + rand::random_range(-0.001..0.001);
 
             let mut bids = Vec::new();
             let mut asks = Vec::new();
@@ -251,14 +249,14 @@ impl HistoricalDataFetcher {
             // Generate bid side (below mid price)
             for i in 0..20 {
                 let price = mid_price * (1.0 - (i as f64 * 0.001));
-                let quantity = rng.random_range(100.0..1000.0);
+                let quantity = rand::random_range(100.0..1000.0);
                 bids.push((price, quantity));
             }
 
             // Generate ask side (above mid price)
             for i in 0..20 {
                 let price = mid_price * (1.0 + (i as f64 * 0.001));
-                let quantity = rng.random_range(100.0..1000.0);
+                let quantity = rand::random_range(100.0..1000.0);
                 asks.push((price, quantity));
             }
 

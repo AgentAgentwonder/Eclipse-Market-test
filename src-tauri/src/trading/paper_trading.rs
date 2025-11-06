@@ -733,8 +733,6 @@ impl PaperTradingManager {
     }
 
     fn calculate_slippage(&self, order_value: f64) -> f64 {
-        let mut rng = rand::thread_rng();
-
         let base_slippage = if order_value < self.slippage_config.small_order_threshold {
             self.slippage_config.small_slippage
         } else if order_value < self.slippage_config.medium_order_threshold {
@@ -745,7 +743,7 @@ impl PaperTradingManager {
 
         let variance_range = self.slippage_config.randomness_factor;
         let variance = if variance_range > 0.0 {
-            rng.random_range(-variance_range..variance_range)
+            rand::random_range(-variance_range..variance_range)
         } else {
             0.0
         };

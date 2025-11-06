@@ -1,5 +1,4 @@
 use crate::websocket::types::BackoffConfig;
-use rand::Rng;
 use std::time::Duration;
 
 pub struct ExponentialBackoff {
@@ -39,7 +38,7 @@ impl ExponentialBackoff {
 
         // Add jitter: ±20%
         let jitter_range = delay.as_millis() as f64 * 0.2;
-        let jitter = rand::thread_rng().random_range(-jitter_range..=jitter_range);
+        let jitter = rand::random_range(-jitter_range..=jitter_range);
         let jittered_ms = (delay.as_millis() as f64 + jitter).max(0.0) as u64;
 
         Some(Duration::from_millis(jittered_ms))

@@ -95,9 +95,6 @@ async fn fetch_birdeye_price(token: &str, api_key: &str) -> Result<CoinPrice, St
 
 // Mock data generator for development
 fn generate_mock_price(symbol: &str) -> CoinPrice {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
-
     let base_price = match symbol {
         "SOL" => 100.0,
         "BONK" => 0.000023,
@@ -109,34 +106,32 @@ fn generate_mock_price(symbol: &str) -> CoinPrice {
         address: "mock".to_string(),
         symbol: symbol.to_string(),
         name: format!("{} Token", symbol),
-        price: base_price * (1.0 + rng.random_range(-0.05..0.05)),
-        price_change_24h: rng.random_range(-20.0..20.0),
-        volume_24h: rng.random_range(100000.0..10000000.0),
-        market_cap: rng.random_range(1000000.0..100000000.0),
-        liquidity: Some(rng.random_range(50000.0..5000000.0)),
+        price: base_price * (1.0 + rand::random_range(-0.05..0.05)),
+        price_change_24h: rand::random_range(-20.0..20.0),
+        volume_24h: rand::random_range(100000.0..10000000.0),
+        market_cap: rand::random_range(1000000.0..100000000.0),
+        liquidity: Some(rand::random_range(50000.0..5000000.0)),
     }
 }
 
 fn generate_mock_history(hours: i64) -> Vec<PricePoint> {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
     let mut history = Vec::new();
     let mut price = 100.0;
 
     let now = chrono::Utc::now().timestamp();
 
     for i in (0..hours).rev() {
-        let change = rng.random_range(-2.0..2.0);
+        let change = rand::random_range(-2.0..2.0);
         price += change;
-        let volatility = rng.random_range(0.5..2.0);
+        let volatility = rand::random_range(0.5..2.0);
 
         history.push(PricePoint {
             timestamp: now - (i * 3600),
             open: price,
             high: price + volatility,
             low: price - volatility,
-            close: price + rng.random_range(-1.0..1.0),
-            volume: rng.random_range(10000.0..100000.0),
+            close: price + rand::random_range(-1.0..1.0),
+            volume: rand::random_range(10000.0..100000.0),
         });
     }
 

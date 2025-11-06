@@ -177,8 +177,7 @@ impl TokenManager {
     }
 
     fn generate_mock_signature() -> String {
-        use rand_core::RngCore;
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let mut bytes = [0u8; 64];
         rng.fill_bytes(&mut bytes);
         bs58::encode(bytes).into_string()

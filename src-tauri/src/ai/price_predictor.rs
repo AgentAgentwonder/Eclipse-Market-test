@@ -39,10 +39,7 @@ impl PricePredictor {
         let prediction_timestamp = Utc::now();
         let target_timestamp = prediction_timestamp + chrono::Duration::hours(target_hours);
 
-        use rand::Rng;
-        let mut rng = rand::thread_rng();
-
-        let predicted_price = current_price * (1.0 + rng.random_range(-0.1..0.1));
+        let predicted_price = current_price * (1.0 + rand::random_range(-0.1..0.1));
         let confidence_range = current_price * 0.05;
 
         Ok(PricePrediction {
