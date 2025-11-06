@@ -227,7 +227,11 @@ impl TrayManager {
         Ok(())
     }
 
-    fn register_shortcut(&self, app_handle: &AppHandle) -> Result<(), String> {
+    fn register_shortcut(&self, _app_handle: &AppHandle) -> Result<(), String> {
+        // TODO: Tauri v2 requires tauri-plugin-global-shortcut plugin
+        // Add to Cargo.toml: tauri-plugin-global-shortcut = "2"
+        // Then uncomment this code:
+        /*
         let mut registered = self.shortcut.write();
         if let Some(existing) = registered.clone() {
             if let Err(err) = app_handle.global_shortcut().unregister(existing.as_str()) {
@@ -251,6 +255,7 @@ impl TrayManager {
                 .map_err(|e| format!("Failed to register tray restore shortcut: {e}"))?;
             registered.replace(shortcut);
         }
+        */
 
         Ok(())
     }
