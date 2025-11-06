@@ -437,16 +437,21 @@ impl TrayManager {
         self.settings.read().show_notifications
     }
 
-    pub fn notify_minimized(&self, app_handle: &AppHandle) {
+    pub fn notify_minimized(&self, _app_handle: &AppHandle) {
         if !self.should_show_notifications() {
             return;
         }
 
+        // TODO: Tauri v2 requires tauri-plugin-notification plugin
+        // Add to Cargo.toml: tauri-plugin-notification = "2"
+        // Then uncomment this code:
+        /*
         let _ = app_handle.notification()
             .builder()
             .title("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
             .show();
+        */
     }
 }
 
