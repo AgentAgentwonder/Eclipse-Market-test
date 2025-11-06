@@ -7,7 +7,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::thread;
-use sysinfo::CpuExt;
+// sysinfo 0.30+ removed Ext traits - methods are now directly on types
 use tauri::{AppHandle, Manager};
 use uuid::Uuid;
 
