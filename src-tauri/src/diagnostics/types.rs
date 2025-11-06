@@ -51,6 +51,7 @@ pub enum RepairStatus {
 pub enum HealthLevel {
     Excellent,
     Good,
+    Warning,
     Degraded,
     Critical,
     Unknown,
@@ -61,6 +62,7 @@ impl HealthLevel {
         match self {
             HealthLevel::Excellent => 0,
             HealthLevel::Good => -5,
+            HealthLevel::Warning => -8,
             HealthLevel::Degraded => -15,
             HealthLevel::Critical => -35,
             HealthLevel::Unknown => -10,
