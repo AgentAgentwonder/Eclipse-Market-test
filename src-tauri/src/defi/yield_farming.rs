@@ -1,6 +1,21 @@
 use crate::defi::types::*;
 use serde::{Deserialize, Serialize};
 
+// Custom YieldFarm structure for farming adapter (different from types::YieldFarm)
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct YieldFarm {
+    pub id: String,
+    pub protocol: Protocol,
+    pub name: String,
+    pub token_a: String,
+    pub token_b: String,
+    pub apy: f64,
+    pub tvl: f64,
+    pub rewards_token: Vec<String>,
+    pub risk_score: u8,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct FarmingOpportunity {
