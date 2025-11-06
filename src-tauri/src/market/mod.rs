@@ -13,6 +13,7 @@ pub use holders::*;
 pub use new_coins_scanner_clean::{
     CreatorInfo, LiquidityInfo, NewCoin, NewCoinsScanner, NewCoinsScannerError, SafetyAnalysis,
     SafetyChecks, SafetyReport, SharedNewCoinsScanner, start_new_coins_scanner,
+    get_new_coins, get_coin_safety_report, scan_for_new_coins,
 };
 pub use polymarket_adapter::*;
 pub use predictions::*;
