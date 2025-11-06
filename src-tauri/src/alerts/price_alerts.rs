@@ -4,7 +4,7 @@ use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
-use sysinfo::CpuExt;
+// sysinfo 0.30+ removed Ext traits - methods are now directly on types
 use tauri::{AppHandle, Emitter, Manager, State};
 use tokio::sync::RwLock;
 
