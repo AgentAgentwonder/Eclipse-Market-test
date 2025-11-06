@@ -227,7 +227,7 @@ impl PortfolioSimulator {
         let total_return_percent = (total_return / initial_capital) * 100.0;
 
         // Calculate max drawdown
-        let mut max_drawdown = 0.0;
+        let mut max_drawdown = 0.0_f64;
         let mut peak = initial_capital;
 
         for snapshot in &self.snapshots {

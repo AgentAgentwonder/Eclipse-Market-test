@@ -247,7 +247,8 @@ impl Keystore {
 
         let mut new_key = Zeroizing::new(vec![0u8; 32]);
         OsRng.fill_bytes(&mut new_key);
-        let new_key_b64 = BASE64_ENGINE.encode(new_key.as_ref());
+        let new_key_slice: &[u8] = new_key.as_ref();
+        let new_key_b64 = BASE64_ENGINE.encode(new_key_slice);
 
         let mut guard = self.lock_document()?;
         let mut updated_entries = HashMap::new();
@@ -322,7 +323,8 @@ impl Keystore {
             Err(keyring::Error::NoEntry) => {
                 let mut key = Zeroizing::new(vec![0u8; 32]);
                 OsRng.fill_bytes(&mut key);
-                let encoded = BASE64_ENGINE.encode(key.as_ref());
+                let key_slice: &[u8] = key.as_ref();
+                let encoded = BASE64_ENGINE.encode(key_slice);
                 entry.set_password(&encoded)?;
                 Ok(key)
             }
