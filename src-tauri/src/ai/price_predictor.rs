@@ -42,7 +42,7 @@ impl PricePredictor {
         use rand::Rng;
         let mut rng = rand::thread_rng();
 
-        let predicted_price = current_price * (1.0 + rng.random_range(-0.1..0.1));
+        let predicted_price = current_price * (1.0 + rng.gen_range(-0.1..0.1));
         let confidence_range = current_price * 0.05;
 
         Ok(PricePrediction {

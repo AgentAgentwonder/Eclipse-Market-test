@@ -176,15 +176,15 @@ impl HistoricalDataFetcher {
         let mut price = 100.0;
 
         while current_time <= request.end_time {
-            let change = rng.random_range(-0.02..0.02);
+            let change = rng.gen_range(-0.02..0.02);
             price *= 1.0 + change;
             price = price.max(0.01); // Ensure positive
 
             let volatility = price * 0.005;
-            let high = price + rng.random_range(0.0..volatility);
-            let low = price - rng.random_range(0.0..volatility);
-            let close = price + rng.random_range(-volatility..volatility);
-            let volume = rng.random_range(10000.0..100000.0);
+            let high = price + rng.gen_range(0.0..volatility);
+            let low = price - rng.gen_range(0.0..volatility);
+            let close = price + rng.gen_range(-volatility..volatility);
+            let volume = rng.gen_range(10000.0..100000.0);
 
             data.push(HistoricalDataPoint {
                 timestamp: current_time,
@@ -243,7 +243,7 @@ impl HistoricalDataFetcher {
         let mut mid_price = 100.0;
 
         while current_time <= end_time {
-            mid_price *= 1.0 + rng.random_range(-0.001..0.001);
+            mid_price *= 1.0 + rng.gen_range(-0.001..0.001);
 
             let mut bids = Vec::new();
             let mut asks = Vec::new();
@@ -251,14 +251,14 @@ impl HistoricalDataFetcher {
             // Generate bid side (below mid price)
             for i in 0..20 {
                 let price = mid_price * (1.0 - (i as f64 * 0.001));
-                let quantity = rng.random_range(100.0..1000.0);
+                let quantity = rng.gen_range(100.0..1000.0);
                 bids.push((price, quantity));
             }
 
             // Generate ask side (above mid price)
             for i in 0..20 {
                 let price = mid_price * (1.0 + (i as f64 * 0.001));
-                let quantity = rng.random_range(100.0..1000.0);
+                let quantity = rng.gen_range(100.0..1000.0);
                 asks.push((price, quantity));
             }
 
