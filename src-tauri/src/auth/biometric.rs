@@ -233,19 +233,18 @@ fn windows_available() -> Result<bool, BiometricError> {
         UserConsentVerifier, UserConsentVerifierAvailability,
     };
 
-    let future = UserConsentVerifier::CheckAvailabilityAsync()
+    let async_op = UserConsentVerifier::CheckAvailabilityAsync()
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 
-    tauri::async_runtime::block_on(async move {
-        let availability = future
-            .into_future()
-            .await
-            .map_err(|err| BiometricError::Failed(err.to_string()))?;
-        Ok(matches!(
-            availability,
-            UserConsentVerifierAvailability::Available
-        ))
-    })
+    // Use blocking get() method instead of async await
+    let availability = async_op
+        .get()
+        .map_err(|err| BiometricError::Failed(err.to_string()))?;
+    
+    Ok(matches!(
+        availability,
+        UserConsentVerifierAvailability::Available
+    ))
 }
 
 #[cfg(target_os = "windows")]
@@ -255,12 +254,12 @@ async fn windows_verify() -> Result<(), BiometricError> {
         Security::Credentials::UI::{UserConsentVerificationResult, UserConsentVerifier},
     };
 
-    let future = UserConsentVerifier::RequestVerificationAsync(&HSTRING::from(PLATFORM_REASON))
+    let async_op = UserConsentVerifier::RequestVerificationAsync(&HSTRING::from(PLATFORM_REASON))
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 
-    let result = future
-        .into_future()
-        .await
+    // Use blocking get() method instead of async await
+    let result = async_op
+        .get()
         .map_err(|err| BiometricError::Failed(err.to_string()))?;
 
     match result {
@@ -274,11 +273,15 @@ async fn windows_verify() -> Result<(), BiometricError> {
         UserConsentVerificationResult::DisabledByPolicy => Err(BiometricError::Unavailable(
             "Windows Hello is disabled by policy".into(),
         )),
-        UserConsentVerificationResult::NotConfigured => Err(BiometricError::Unavailable(
-            "Windows Hello is not configured".into(),
+        // Updated enum variants for windows crate 0.58
+        UserConsentVerificationResult::NotConfiguredForUser => Err(BiometricError::Unavailable(
+            "Windows Hello is not configured for this user".into(),
         )),
-        UserConsentVerificationResult::Rejected => Err(BiometricError::Denied(
-            "Biometric verification rejected".into(),
+        UserConsentVerificationResult::Canceled => Err(BiometricError::Denied(
+            "Biometric verification was canceled".into(),
+        )),
+        UserConsentVerificationResult::RetriesExhausted => Err(BiometricError::Failed(
+            "Too many failed biometric attempts".into(),
         )),
         _ => Err(BiometricError::Failed(
             "Unhandled Windows Hello state".into(),
