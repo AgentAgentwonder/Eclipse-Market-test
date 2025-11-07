@@ -178,6 +178,7 @@ use wallet::performance::{PerformanceDatabase, SharedPerformanceDatabase};
 use wallet::phantom::{hydrate_wallet_state, WalletState};
 use webhooks::{SharedWebhookManager, WebhookManager};
 use websocket::WebSocketManager;
+use updater::{SharedUpdaterState, UpdaterState};
 
 async fn warm_cache_on_startup(
     _app_handle: tauri::AppHandle,
