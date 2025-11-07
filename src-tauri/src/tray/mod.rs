@@ -424,7 +424,8 @@ impl TrayManager {
         }
 
         self.apply_icon_style(app_handle)?;
-        self.refresh_tray_menu(app_handle)?
+        self.refresh_tray_menu(app_handle)?;
+        Ok(())
     }
 
     pub fn should_minimize_to_tray(&self) -> bool {
