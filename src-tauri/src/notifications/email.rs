@@ -552,7 +552,8 @@ impl EmailManager {
 }
 
 fn email_db_path(app: &AppHandle) -> Result<PathBuf, EmailError> {
-    let app_dir = app
+    let app_handle = app.clone();
+    let app_dir = app_handle
         .path()
         .app_data_dir()
         .map_err(|e| EmailError::Internal(format!("Unable to resolve app data directory: {}", e)))?;
