@@ -108,7 +108,7 @@ impl PerformanceMonitor {
             .sum::<u64>() as f64
             / 1024.0;
 
-        let process = system.process(std::process::id() as i32);
+        let process = system.process(sysinfo::Pid::from(std::process::id() as u32));
 
         let (process_cpu_usage, process_memory) = if let Some(process) = process {
             (process.cpu_usage(), process.memory() as f64 / 1024.0)
