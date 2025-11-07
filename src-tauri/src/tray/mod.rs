@@ -229,27 +229,30 @@ impl TrayManager {
     }
 
     fn register_shortcut(&self, app_handle: &AppHandle) -> Result<(), String> {
-        let mut shortcuts = app_handle.global_shortcut();
+        use tauri_plugin_global_shortcut::{Code, Shortcut, ShortcutState};
+
         let mut registered = self.shortcut.write();
         if let Some(existing) = registered.clone() {
-            if let Err(err) = shortcuts.unregister(existing.as_str()) {
+            if let Err(err) = app_handle.global_shortcut().unregister(&existing) {
                 eprintln!("Failed to unregister previous tray shortcut: {err}");
             }
             registered.take();
         }
 
-        let shortcut = self.settings.read().restore_shortcut.clone();
-        if let Some(shortcut) = shortcut {
-            shortcuts
-                .register(shortcut.as_str(), |app, _accelerator| {
-                    if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.unminimize();
-                        let _ = window.set_focus();
-                    }
-                })
-                .map_err(|e| format!("Failed to register tray restore shortcut: {e}"))?;
-            registered.replace(shortcut);
+        let shortcut_str = self.settings.read().restore_shortcut.clone();
+        if let Some(shortcut_str) = shortcut_str {
+            let shortcut = Shortcut::new(&shortcut_str)
+                .map_err(|e| format!("Failed to parse shortcut: {e}"))?;
+
+            app_handle.global_shortcut().register(shortcut, move || {
+                if let Some(window) = app_handle.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                }
+            })
+            .map_err(|e| format!("Failed to register tray restore shortcut: {e}"))?;
+            registered.replace(shortcut_str);
         }
 
         Ok(())
