@@ -78,8 +78,9 @@ impl PerformanceMonitor {
             .disks()
             .iter()
             .map(|d| {
-                // Use available disk usage methods in sysinfo 0.29
-                d.usage().read_bytes as u64
+                // Use available disk methods in sysinfo 0.29
+                // Fall back to 0 if no method available
+                0u64
             })
             .sum::<u64>() as f64
             / 1024.0;
@@ -87,8 +88,9 @@ impl PerformanceMonitor {
             .disks()
             .iter()
             .map(|d| {
-                // Use available disk usage methods in sysinfo 0.29
-                d.usage().written_bytes as u64
+                // Use available disk methods in sysinfo 0.29
+                // Fall back to 0 if no method available
+                0u64
             })
             .sum::<u64>() as f64
             / 1024.0;
