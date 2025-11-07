@@ -440,9 +440,11 @@ impl TrayManager {
             return;
         }
 
-        if let Err(err) = Notification::new("Eclipse Market Pro")
+        if let Err(err) = app_handle.notification()
+            .builder()
+            .title("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
-            .show(app_handle)
+            .show()
         {
             eprintln!("Failed to show tray minimize notification: {err}");
         }
