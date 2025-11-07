@@ -85,11 +85,12 @@ impl ErrorRecoveryManager {
         let key = format!("{}:{}", error_code, recovery_type);
         let mut attempts = self.attempts.write();
 
-        // Get the current attempt count before modifying the hashmap
-        let current_attempts = attempts
-            .get(&key)
-            .map(|attempt| attempt.attempts + 1)
-            .unwrap_or(1);
+        let current_attempts = {
+            attempts
+                .get(&key)
+                .map(|attempt| attempt.attempts + 1)
+                .unwrap_or(1)
+        };
 
         attempts.insert(
             key,

@@ -384,38 +384,25 @@ impl MultisigDatabase {
         wallet_id: &str,
         status_filter: Option<String>,
     ) -> Result<Vec<MultisigProposal>> {
-        let query = if let Some(status) = status_filter {
-            format!(
-                r#"
-                SELECT id, wallet_id, transaction_data, status, created_by, created_at, description, executed_at, tx_signature
-                FROM multisig_proposals
-                WHERE wallet_id = ?1 AND status = ?2
-                ORDER BY created_at DESC
-                "#
-            )
-        } else {
-            r#"
-            SELECT id, wallet_id, transaction_data, status, created_by, created_at, description, executed_at, tx_signature
-            FROM multisig_proposals
-            WHERE wallet_id = ?1
-            ORDER BY created_at DESC
-            "#
-            .to_string()
-        };
-
-        let mut query_builder = sqlx::query(&query).bind(wallet_id);
-
-        if let Some(status) = status_filter {
+        let query_builder = if let Some(ref status) = status_filter {
             let status_filter_query = r#"
                 SELECT id, wallet_id, transaction_data, status, created_by, created_at, description, executed_at, tx_signature
                 FROM multisig_proposals
                 WHERE wallet_id = ?1 AND status = ?2
                 ORDER BY created_at DESC
             "#;
-            query_builder = sqlx::query(status_filter_query)
+            sqlx::query(status_filter_query)
                 .bind(wallet_id)
-                .bind(status);
-        }
+                .bind(status)
+        } else {
+            let query = r#"
+            SELECT id, wallet_id, transaction_data, status, created_by, created_at, description, executed_at, tx_signature
+            FROM multisig_proposals
+            WHERE wallet_id = ?1
+            ORDER BY created_at DESC
+            "#;
+            sqlx::query(query).bind(wallet_id)
+        };
 
         let rows = query_builder.fetch_all(&self.pool).await?;
 
