@@ -311,7 +311,7 @@ impl SmartAlertManager {
             "SELECT id, name, description, rule_json, enabled, symbol, owner_id, team_id, shared_with, tags, created_at, updated_at FROM smart_alerts WHERE id = ?1",
         )
         .bind(id)
-        .fetch_optional(&*self.pool)
+        .fetch_optional(&self.pool)
         .await?;
 
         let row = row.ok_or_else(|| SmartAlertError::NotFound(id.to_string()))?;
