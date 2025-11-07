@@ -1,7 +1,7 @@
 use crate::errors::AppError;
 use crate::security::keystore::Keystore;
 use chrono::Utc;
-use rand_core::RngCore;
+use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Mutex;
