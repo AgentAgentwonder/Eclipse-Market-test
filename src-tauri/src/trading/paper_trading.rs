@@ -1141,8 +1141,8 @@ pub async fn update_paper_position_prices(symbol: String, price: f64) -> Result<
     manager.update_position_prices(&symbol, price).await
 }
 
-pub fn register_paper_trading_state(app: &tauri::App) {
-    let handle = app.handle();
+pub fn register_paper_trading_state(app: &AppHandle) {
+    let handle = app.clone();
     tauri::async_runtime::spawn(async move {
         if let Err(e) = init_paper_trading(&handle).await {
             eprintln!("Failed to initialize paper trading module: {e}");
