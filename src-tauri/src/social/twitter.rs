@@ -196,7 +196,7 @@ impl TwitterClient {
             .retrieve_secret(KEY_TWITTER_BEARER)
             .map_err(|_| TwitterError::TokenNotConfigured)?;
 
-        String::from_utf8(data)
+        String::from_utf8(data.as_ref().clone())
             .map_err(|e| TwitterError::Parse(format!("Invalid UTF-8 in bearer token: {}", e)))
     }
 
