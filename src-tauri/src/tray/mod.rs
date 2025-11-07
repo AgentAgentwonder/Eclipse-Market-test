@@ -233,8 +233,15 @@ impl TrayManager {
         use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
 
         let mut registered = self.shortcut.write();
-        if let Some(existing) = registered.clone() {
-            if let Err(err) = app_handle.global_shortcut().unregister(&existing) {
+        if let Some(existing_str) = registered.clone() {
+            // Parse existing shortcut string to unregister it
+            let existing_shortcut = if existing_str.contains("CmdOrControl") && existing_str.contains("Shift") && existing_str.contains("M") {
+                Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM)
+            } else {
+                return Err(format!("Unsupported shortcut format: {}", existing_str));
+            };
+
+            if let Err(err) = app_handle.global_shortcut().unregister(existing_shortcut) {
                 eprintln!("Failed to unregister previous tray shortcut: {err}");
             }
             registered.take();
@@ -250,13 +257,7 @@ impl TrayManager {
                 return Err(format!("Unsupported shortcut format: {}", shortcut_str));
             };
 
-            app_handle.global_shortcut().register(shortcut, move || {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
-                }
-            })
+            app_handle.global_shortcut().register(shortcut)
             .map_err(|e| format!("Failed to register tray restore shortcut: {e}"))?;
             registered.replace(shortcut_str);
         }
