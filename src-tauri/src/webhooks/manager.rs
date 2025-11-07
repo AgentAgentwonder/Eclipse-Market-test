@@ -286,7 +286,7 @@ impl WebhookManager {
             },
             attempt: row.try_get("attempt")?,
             response_code: row.try_get("response_code")?,
-            response_time_ms: row.try_get::<Option<String>, _>("response_time_ms")?,
+            response_time_ms: row.try_get::<Option<u128>, _>("response_time_ms")?,
             error: row.try_get("error")?,
             payload_preview: row.try_get("payload_preview")?,
             triggered_at: DateTime::parse_from_rfc3339(&row.try_get::<String, _>("triggered_at")?)
