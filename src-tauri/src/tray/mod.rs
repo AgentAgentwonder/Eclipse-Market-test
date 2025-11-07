@@ -468,8 +468,7 @@ pub fn attach_window_listeners(window: &tauri::WebviewWindow, tray_manager: Shar
         }
         WindowEvent::Destroyed => {
             if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
-                let mut shortcuts = handle_clone.global_shortcut();
-                if let Err(err) = shortcuts.unregister(shortcut.as_str()) {
+                if let Err(err) = handle_clone.global_shortcut().unregister(&shortcut) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }
