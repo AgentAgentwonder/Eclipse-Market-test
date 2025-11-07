@@ -626,7 +626,7 @@ pub fn run() {
             let app_handle = app.handle();
             let cache_manager_handle = shared_cache_manager.clone();
             tauri::async_runtime::spawn(async move {
-                if let Err(err) = warm_cache_on_startup(app_handle, cache_manager_handle).await {
+                if let Err(err) = warm_cache_on_startup(app_handle.clone(), cache_manager_handle).await {
                     eprintln!("Failed to warm cache on startup: {err}");
                 }
             });
