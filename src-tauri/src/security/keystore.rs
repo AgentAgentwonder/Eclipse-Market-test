@@ -14,7 +14,7 @@ use argon2::{password_hash::SaltString, Algorithm, Argon2, Params, Version};
 use base64::{engine::general_purpose::STANDARD as BASE64_ENGINE, Engine};
 use chrono::{DateTime, Utc};
 use keyring::Entry;
-use rand_core::RngCore;
+use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use zeroize::{Zeroize, Zeroizing};
