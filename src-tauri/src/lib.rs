@@ -232,7 +232,7 @@ async fn warm_cache_on_startup(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_notification::Builder::new().build())
+        .plugin(tauri_plugin_notification::Builder::new("notification").build())
         .manage(WalletState::new())
         .manage(HardwareWalletState::new())
         .manage(LedgerState::new())
@@ -392,10 +392,10 @@ pub fn run() {
                 }
             });
 
-            trading::register_trading_state(app);
-            trading::register_paper_trading_state(app);
-            trading::register_auto_trading_state(app);
-            trading::register_optimizer_state(app);
+            trading::register_trading_state(&app.handle());
+            trading::register_paper_trading_state(&app.handle());
+            trading::register_auto_trading_state(&app.handle());
+            trading::register_optimizer_state(&app.handle());
 
             // Initialize safety engine
             let default_policy = trading::safety::policy::SafetyPolicy::default();

@@ -101,7 +101,7 @@ pub struct SharedAccess {
     pub granted_at: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum Permission {
     View,

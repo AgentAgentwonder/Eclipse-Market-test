@@ -62,7 +62,7 @@ pub async fn scan_wallets_for_smart_money() -> Result<Vec<SmartMoneyClassificati
     let pool = detector.pool();
 
     let activities = sqlx::query("SELECT DISTINCT wallet_address FROM wallet_activities")
-        .fetch_all(pool)
+        .fetch_all(&pool)
         .await
         .map_err(|e| format!("Failed to fetch wallets: {e}"))?;
 

@@ -233,8 +233,15 @@ impl TrayManager {
         use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
 
         let mut registered = self.shortcut.write();
-        if let Some(existing) = registered.clone() {
-            if let Err(err) = app_handle.global_shortcut().unregister(&existing) {
+        if let Some(existing_str) = registered.clone() {
+            // Parse existing shortcut string to unregister it
+            let existing_shortcut = if existing_str.contains("CmdOrControl") && existing_str.contains("Shift") && existing_str.contains("M") {
+                Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM)
+            } else {
+                return Err(format!("Unsupported shortcut format: {}", existing_str));
+            };
+
+            if let Err(err) = app_handle.global_shortcut().unregister(existing_shortcut) {
                 eprintln!("Failed to unregister previous tray shortcut: {err}");
             }
             registered.take();
@@ -250,13 +257,7 @@ impl TrayManager {
                 return Err(format!("Unsupported shortcut format: {}", shortcut_str));
             };
 
-            app_handle.global_shortcut().register(shortcut, move || {
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.unminimize();
-                    let _ = window.set_focus();
-                }
-            })
+            app_handle.global_shortcut().register(shortcut)
             .map_err(|e| format!("Failed to register tray restore shortcut: {e}"))?;
             registered.replace(shortcut_str);
         }
@@ -476,8 +477,18 @@ pub fn attach_window_listeners(window: &tauri::WebviewWindow, tray_manager: Shar
             }
         }
         WindowEvent::Destroyed => {
-            if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
-                if let Err(err) = handle_clone.global_shortcut().unregister(&shortcut) {
+            if let Some(shortcut_str) = tray_manager_clone.shortcut.read().clone() {
+                use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
+
+                // Parse shortcut string to unregister it
+                let shortcut = if shortcut_str.contains("CmdOrControl") && shortcut_str.contains("Shift") && shortcut_str.contains("M") {
+                    Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM)
+                } else {
+                    eprintln!("Failed to unregister tray shortcut on destroy: unsupported format");
+                    return;
+                };
+
+                if let Err(err) = handle_clone.global_shortcut().unregister(shortcut) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }

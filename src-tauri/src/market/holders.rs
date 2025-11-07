@@ -4,7 +4,7 @@ use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 use tokio::sync::RwLock;
 
 const HOLDERS_DB_FILE: &str = "holders.db";
