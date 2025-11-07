@@ -172,10 +172,9 @@ pub fn hydrate_wallet_state(app: &AppHandle) -> Result<(), PhantomError> {
 }
 
 fn session_path(app: &AppHandle) -> Result<PathBuf, PhantomError> {
-    let mut path = app
-        .path()
-        .app_data_dir()
-        .map_err(|_| PhantomError::storage("Unable to resolve app data directory"))?;
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        PhantomError::storage(format!("Unable to resolve app data directory: {err}"))
+    })?;
     if !path.exists() {
         fs::create_dir_all(&path).map_err(|err| {
             PhantomError::storage(format!("Failed to create app data directory: {err}"))
