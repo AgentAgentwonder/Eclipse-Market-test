@@ -269,18 +269,18 @@ impl P2PDatabase {
         active_only: bool,
     ) -> Result<Vec<P2POffer>> {
         let mut query = String::from("SELECT * FROM p2p_offers WHERE 1=1");
-        let mut conditions = Vec::new();
+        let mut conditions = Vec::<String>::new();
 
         if active_only {
-            conditions.push("is_active = 1");
+            conditions.push("is_active = 1".to_string());
         }
 
         if let Some(otype) = offer_type {
-            conditions.push(&format!("offer_type = '{}'", otype));
+            conditions.push(format!("offer_type = '{}'", otype));
         }
 
         if let Some(token) = token_address {
-            conditions.push(&format!("token_address = '{}'", token));
+            conditions.push(format!("token_address = '{}'", token));
         }
 
         if !conditions.is_empty() {

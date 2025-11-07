@@ -259,7 +259,7 @@ impl JournalDatabase {
 
         if let Some(search_query) = &filters.search_query {
             let search_pattern = format!("%{}%", search_query);
-            prepared_query = prepared_query.bind(&search_pattern).bind(&search_pattern);
+            prepared_query = prepared_query.bind(search_pattern.clone()).bind(search_pattern);
         }
 
         prepared_query = prepared_query.bind(limit).bind(offset);
@@ -320,7 +320,7 @@ impl JournalDatabase {
 
         if let Some(search_query) = &filters.search_query {
             let search_pattern = format!("%{}%", search_query);
-            prepared_query = prepared_query.bind(&search_pattern).bind(&search_pattern);
+            prepared_query = prepared_query.bind(search_pattern.clone()).bind(search_pattern);
         }
 
         let row = prepared_query.fetch_one(&self.pool).await?;

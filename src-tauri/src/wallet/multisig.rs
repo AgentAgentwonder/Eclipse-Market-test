@@ -406,16 +406,15 @@ impl MultisigDatabase {
         let mut query_builder = sqlx::query(&query).bind(wallet_id);
 
         if let Some(status) = status_filter {
-            query_builder = sqlx::query(&format!(
-                r#"
+            let status_filter_query = r#"
                 SELECT id, wallet_id, transaction_data, status, created_by, created_at, description, executed_at, tx_signature
                 FROM multisig_proposals
                 WHERE wallet_id = ?1 AND status = ?2
                 ORDER BY created_at DESC
-                "#
-            ))
-            .bind(wallet_id)
-            .bind(status);
+            "#;
+            query_builder = sqlx::query(status_filter_query)
+                .bind(wallet_id)
+                .bind(status);
         }
 
         let rows = query_builder.fetch_all(&self.pool).await?;

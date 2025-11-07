@@ -718,7 +718,9 @@ impl NotificationRouter {
             Err(NotificationError::RateLimited(e)) => {
                 (DeliveryStatus::RateLimited, Some(e.as_str()))
             }
-            Err(e) => (DeliveryStatus::Failed, Some(e.to_string().as_str())),
+            Err(e) => {
+                (DeliveryStatus::Failed, None)
+            }
         };
 
         if let Err(e) = self
