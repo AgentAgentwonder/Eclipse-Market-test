@@ -189,7 +189,7 @@ impl EmailManager {
             )
             "#,
         )
-        .execute(&*self.pool)
+        .execute(&self.pool)
         .await?;
 
         sqlx::query(
@@ -198,7 +198,7 @@ impl EmailManager {
             CREATE INDEX IF NOT EXISTS idx_email_sent_at ON email_deliveries(sent_at);
             "#,
         )
-        .execute(&*self.pool)
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -395,7 +395,7 @@ impl EmailManager {
         .bind(&now)
         .bind(retry_count)
         .bind(delivery_time_ms)
-        .execute(&*self.pool)
+        .execute(&self.pool)
         .await?;
 
         Ok(EmailDeliveryRecord {
