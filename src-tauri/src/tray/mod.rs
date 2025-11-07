@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
+    notification::Notification,
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Emitter, Manager, WebviewWindow, WindowEvent,
 };
@@ -228,9 +229,10 @@ impl TrayManager {
     }
 
     fn register_shortcut(&self, app_handle: &AppHandle) -> Result<(), String> {
+        let mut shortcuts = app_handle.global_shortcut();
         let mut registered = self.shortcut.write();
         if let Some(existing) = registered.clone() {
-            if let Err(err) = app_handle.global_shortcut().unregister(existing.as_str()) {
+            if let Err(err) = shortcuts.unregister(existing.as_str()) {
                 eprintln!("Failed to unregister previous tray shortcut: {err}");
             }
             registered.take();
@@ -238,11 +240,9 @@ impl TrayManager {
 
         let shortcut = self.settings.read().restore_shortcut.clone();
         if let Some(shortcut) = shortcut {
-            let app_clone = app_handle.clone();
-            app_handle
-                .global_shortcut()
-                .register(shortcut.as_str(), move || {
-                    if let Some(window) = app_clone.get_webview_window("main") {
+            shortcuts
+                .register(shortcut.as_str(), |app, _accelerator| {
+                    if let Some(window) = app.get_webview_window("main") {
                         let _ = window.show();
                         let _ = window.unminimize();
                         let _ = window.set_focus();
@@ -437,11 +437,12 @@ impl TrayManager {
             return;
         }
 
-        let _ = app_handle.notification()
-            .builder()
-            .title("Eclipse Market Pro")
+        if let Err(err) = Notification::new("Eclipse Market Pro")
             .body("Application minimized to system tray. Press CmdOrControl+Shift+M to restore.")
-            .show();
+            .show(app_handle)
+        {
+            eprintln!("Failed to show tray minimize notification: {err}");
+        }
     }
 }
 
@@ -464,7 +465,8 @@ pub fn attach_window_listeners(window: &tauri::WebviewWindow, tray_manager: Shar
         }
         WindowEvent::Destroyed => {
             if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
-                if let Err(err) = handle_clone.global_shortcut().unregister(shortcut.as_str()) {
+                let mut shortcuts = handle_clone.global_shortcut();
+                if let Err(err) = shortcuts.unregister(shortcut.as_str()) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }
