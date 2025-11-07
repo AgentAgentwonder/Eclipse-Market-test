@@ -87,7 +87,7 @@ impl ErrorRecoveryManager {
 
         // Get the current attempt count before modifying the hashmap
         let current_attempts = attempts
-            .get(error_code)
+            .get(&key)
             .map(|attempt| attempt.attempts + 1)
             .unwrap_or(1);
 
