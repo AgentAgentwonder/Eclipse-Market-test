@@ -373,7 +373,7 @@ pub fn run() {
             app.manage(launchpad_state);
 
             // Initialize collaborative rooms state
-            let collab_websocket = collab::websocket::CollabWebSocketManager::new(app.handle());
+            let collab_websocket = collab::websocket::CollabWebSocketManager::new(app.handle().clone());
             let collab_state = CollabState::new(collab_websocket);
             app.manage(collab_state);
 
