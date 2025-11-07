@@ -482,7 +482,8 @@ pub async fn init_wallet_monitor(app_handle: &AppHandle) -> Result<(), String> {
         return Ok(());
     }
 
-    let app_dir = app_handle
+    let app = app_handle.clone();
+    let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|e| format!("Unable to resolve app data directory: {}", e))?;
