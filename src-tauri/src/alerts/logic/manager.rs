@@ -297,7 +297,7 @@ impl SmartAlertManager {
             sql_query = sql_query.bind(value);
         }
 
-        let rows = sql_query.fetch_all(&*self.pool).await?;
+        let rows = sql_query.fetch_all(&self.pool).await?;
         let mut rules = Vec::new();
         for row in rows {
             rules.push(self.row_to_rule(row)?);
