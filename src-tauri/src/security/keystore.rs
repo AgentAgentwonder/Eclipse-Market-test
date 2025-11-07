@@ -7,7 +7,7 @@ use std::{
 
 use aes_gcm::aead::generic_array::GenericArray;
 use aes_gcm::{
-    aead::{Aead, KeyInit, OsRng},
+    aead::{Aead, KeyInit},
     Aes256Gcm,
 };
 use argon2::{password_hash::SaltString, Algorithm, Argon2, Params, Version};
