@@ -142,7 +142,7 @@ impl SmartAlertManager {
             )
             "#,
         )
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         sqlx::query(
@@ -152,7 +152,7 @@ impl SmartAlertManager {
             CREATE INDEX IF NOT EXISTS idx_smart_alerts_enabled ON smart_alerts(enabled);
             "#,
         )
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         Ok(())
@@ -245,7 +245,7 @@ impl SmartAlertManager {
     pub async fn delete_rule(&self, id: &str) -> Result<(), SmartAlertError> {
         let result = sqlx::query("DELETE FROM smart_alerts WHERE id = ?1")
             .bind(id)
-            .execute(&self.pool)
+            .execute(&*self.pool)
             .await?;
 
         if result.rows_affected() == 0 {
@@ -385,7 +385,7 @@ impl SmartAlertManager {
         .bind(&tags_json)
         .bind(&rule.created_at)
         .bind(&rule.updated_at)
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         Ok(())
