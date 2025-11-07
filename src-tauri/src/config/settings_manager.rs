@@ -106,7 +106,8 @@ impl SettingsManager {
     }
 
     fn profiles_path(&self) -> Result<PathBuf, SettingsError> {
-        let mut path = self.app_handle.path().app_data_dir().map_err(|e| {
+        let app_handle = self.app_handle.clone();
+        let mut path = app_handle.path().app_data_dir().map_err(|e| {
             SettingsError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 format!("App data directory not found: {}", e),
