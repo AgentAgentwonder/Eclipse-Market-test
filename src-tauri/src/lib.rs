@@ -261,7 +261,7 @@ pub fn run() {
                 eprintln!("Failed to hydrate 2FA manager: {e}");
             }
 
-            let ws_manager = WebSocketManager::new(app.handle());
+            let ws_manager = WebSocketManager::new(app.handle().clone());
 
             let multi_wallet_manager = MultiWalletManager::initialize(&keystore).map_err(|e| {
                 eprintln!("Failed to initialize multi-wallet manager: {e}");
