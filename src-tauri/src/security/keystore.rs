@@ -359,7 +359,8 @@ fn persist_document(path: &PathBuf, document: &KeystoreDocument) -> Result<(), K
 }
 
 fn keystore_path(app: &AppHandle) -> Result<PathBuf, KeystoreError> {
-    let mut path = app
+    let app_handle = app.clone();
+    let mut path = app_handle
         .path()
         .app_data_dir()
         .map_err(|_| KeystoreError::Internal)?;
