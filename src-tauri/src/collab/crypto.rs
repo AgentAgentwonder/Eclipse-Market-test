@@ -4,7 +4,7 @@ use aes_gcm::{
 };
 use anyhow::{Context, Result};
 use base64::{engine::general_purpose, Engine as _};
-use rand::{RngCore, rngs::OsRng};
+use rand_core::{OsRng, RngCore};
 
 const NONCE_SIZE: usize = 12;
 
