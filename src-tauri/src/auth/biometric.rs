@@ -116,7 +116,8 @@ pub fn verify_fallback(password: String) -> Result<(), BiometricError> {
 }
 
 fn store_token() -> Result<(), BiometricError> {
-    let token_bytes: [u8; 32] = rand::random();
+    let mut token_bytes = [0u8; 32];
+    OsRng.fill_bytes(&mut token_bytes);
     let token = general_purpose::STANDARD.encode(token_bytes);
     write_entry(BIOMETRIC_TOKEN_KEY, &token)
 }
