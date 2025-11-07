@@ -309,7 +309,7 @@ pub fn run() {
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize academy engine: {e}");
-                Box::new(anyhow::anyhow!(e)) as Box<dyn Error + Send + Sync>
+                e as Box<dyn Error + Send + Sync>
             })?;
 
             let shared_academy_engine: academy::SharedAcademyEngine =

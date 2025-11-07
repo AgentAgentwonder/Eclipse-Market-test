@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use rand::{seq::SliceRandom, Rng};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct TraderMatch {
     pub offer: P2POffer,
     pub compatibility_score: f64,
@@ -92,7 +92,7 @@ impl LocalMatcher {
                     avg_completion_time: rand::random_range(5..120) as i64,
                     first_trade_at: Some(DateTime::<Utc>::default()),
                     last_trade_at: Some(Utc::now()),
-                    verified: rng.random_bool(0.6),
+                    verified: rand::random::<f64>() < 0.6,
                     verification_level: rand::random_range(0..3),
                 },
             });

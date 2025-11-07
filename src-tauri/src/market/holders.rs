@@ -590,7 +590,7 @@ impl HolderAnalyzer {
 
         Ok(VerificationStatus {
             verified,
-            verified_on_solana_explorer: verified && rng.gen_bool(0.8),
+            verified_on_solana_explorer: verified && (rand::random::<f64>() < 0.8),
             audit_status: if has_audit {
                 "Audited".to_string()
             } else {

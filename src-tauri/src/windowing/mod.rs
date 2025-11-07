@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Window, WindowBuilder, WebviewUrl};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Window, WebviewUrl, WebviewWindowBuilder};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitorInfo {
@@ -96,7 +96,7 @@ pub async fn create_floating_window(
 ) -> Result<String, String> {
     let url = format!("/floating/{}", options.panel_id);
 
-    let window = WindowBuilder::new(&app, &options.window_id, WebviewUrl::App(url.into()))
+    let window = WebviewWindowBuilder::new(&app, &options.window_id, WebviewUrl::App(url.into()))
         .title(&options.title)
         .inner_size(options.width as f64, options.height as f64)
         .position(options.x as f64, options.y as f64)
