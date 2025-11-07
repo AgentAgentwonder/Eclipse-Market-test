@@ -231,8 +231,8 @@ async fn warm_cache_on_startup(
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_global_shortcut::init())
-        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_notification::Builder::new().build())
         .manage(WalletState::new())
         .manage(HardwareWalletState::new())
         .manage(LedgerState::new())
@@ -261,7 +261,7 @@ pub fn run() {
                 eprintln!("Failed to hydrate 2FA manager: {e}");
             }
 
-            let ws_manager = WebSocketManager::new(app.handle());
+            let ws_manager = WebSocketManager::new(app.handle().clone());
 
             let multi_wallet_manager = MultiWalletManager::initialize(&keystore).map_err(|e| {
                 eprintln!("Failed to initialize multi-wallet manager: {e}");
@@ -373,7 +373,7 @@ pub fn run() {
             app.manage(launchpad_state);
 
             // Initialize collaborative rooms state
-            let collab_websocket = collab::websocket::CollabWebSocketManager::new(app.handle());
+            let collab_websocket = collab::websocket::CollabWebSocketManager::new(app.handle().clone());
             let collab_state = CollabState::new(collab_websocket);
             app.manage(collab_state);
 
@@ -626,7 +626,7 @@ pub fn run() {
             let app_handle = app.handle();
             let cache_manager_handle = shared_cache_manager.clone();
             tauri::async_runtime::spawn(async move {
-                if let Err(err) = warm_cache_on_startup(app_handle, cache_manager_handle).await {
+                if let Err(err) = warm_cache_on_startup(app_handle.clone(), cache_manager_handle).await {
                     eprintln!("Failed to warm cache on startup: {err}");
                 }
             });

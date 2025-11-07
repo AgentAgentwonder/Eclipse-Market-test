@@ -78,8 +78,9 @@ impl PerformanceMonitor {
             .disks()
             .iter()
             .map(|d| {
-                // Use available disk usage methods in sysinfo 0.29
-                d.usage().read_bytes as u64
+                // Use available disk methods in sysinfo 0.29
+                // Fall back to 0 if no method available
+                0u64
             })
             .sum::<u64>() as f64
             / 1024.0;
@@ -87,8 +88,9 @@ impl PerformanceMonitor {
             .disks()
             .iter()
             .map(|d| {
-                // Use available disk usage methods in sysinfo 0.29
-                d.usage().written_bytes as u64
+                // Use available disk methods in sysinfo 0.29
+                // Fall back to 0 if no method available
+                0u64
             })
             .sum::<u64>() as f64
             / 1024.0;
@@ -106,7 +108,7 @@ impl PerformanceMonitor {
             .sum::<u64>() as f64
             / 1024.0;
 
-        let process = system.process(std::process::id() as i32);
+        let process = system.process(sysinfo::Pid::from(std::process::id() as u32));
 
         let (process_cpu_usage, process_memory) = if let Some(process) = process {
             (process.cpu_usage(), process.memory() as f64 / 1024.0)

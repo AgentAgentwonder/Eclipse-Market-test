@@ -113,8 +113,8 @@ pub async fn acknowledge_order(order_id: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to acknowledge order: {}", e))
 }
 
-pub fn register_trading_state(app: &tauri::App) {
-    let handle = app.handle();
+pub fn register_trading_state(app: &AppHandle) {
+    let handle = app.clone();
     tauri::async_runtime::spawn(async move {
         if let Err(e) = init_trading(&handle).await {
             eprintln!("Failed to initialize trading module: {}", e);
