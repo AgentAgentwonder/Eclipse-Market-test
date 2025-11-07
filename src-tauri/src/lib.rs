@@ -311,8 +311,9 @@ pub fn run() {
                 academy::AcademyEngine::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize academy engine: {e}");
-                Box::new(e) as Box<dyn Error + Send + Sync>
+                let msg = format!("Failed to initialize academy engine: {}", e);
+                eprintln!("{}", msg);
+                msg
             })?;
 
             let shared_academy_engine: academy::SharedAcademyEngine =
@@ -393,10 +394,10 @@ pub fn run() {
                 }
             });
 
-            trading::register_trading_state(app.app_handle());
-            trading::register_paper_trading_state(app.app_handle());
-            trading::register_auto_trading_state(app.app_handle());
-            trading::register_optimizer_state(app.app_handle());
+            trading::register_trading_state(&app);
+            trading::register_paper_trading_state(&app);
+            trading::register_auto_trading_state(&app);
+            trading::register_optimizer_state(&app);
 
             // Initialize safety engine
             let default_policy = trading::safety::policy::SafetyPolicy::default();

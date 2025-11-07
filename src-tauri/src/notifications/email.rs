@@ -268,10 +268,10 @@ impl EmailManager {
         };
 
         // Build multipart message
-        let mut multipart = MultiPart::alternative();
+        let mut multipart_builder = MultiPart::alternative();
 
         if let Some(text) = text_body {
-            multipart = multipart.singlepart(
+            multipart_builder = multipart_builder.singlepart(
                 SinglePart::builder()
                     .header(header::ContentType::TEXT_PLAIN)
                     .body(text),
@@ -288,14 +288,14 @@ impl EmailManager {
                 );
             }
 
-            multipart = multipart.singlepart(
+            multipart_builder = multipart_builder.singlepart(
                 SinglePart::builder()
                     .header(header::ContentType::TEXT_HTML)
                     .body(html_with_unsubscribe),
             );
         }
 
-        let message = message_builder.multipart(multipart)?;
+        let message = message_builder.multipart(multipart_builder.build())?;
 
         // Send with retry logic
         let mailer = self.build_mailer(config)?;
