@@ -175,7 +175,7 @@ fn session_path(app: &AppHandle) -> Result<PathBuf, PhantomError> {
     let mut path = app
         .path()
         .app_data_dir()
-        .or_else(|| PhantomError::storage("Unable to resolve app data directory"))?;
+        .map_err(|_| PhantomError::storage("Unable to resolve app data directory"))?;
     if !path.exists() {
         fs::create_dir_all(&path).map_err(|err| {
             PhantomError::storage(format!("Failed to create app data directory: {err}"))

@@ -123,7 +123,7 @@ impl ThemeEngine {
     pub fn initialize(app: &AppHandle) -> Result<Self, String> {
         let presets = Self::load_builtin_presets();
         let storage_path = Self::resolve_storage_path(app)?;
-        let settings = Self::load_settings(&storage_path).unwrap_or_else(Self::default_settings);
+        let settings = Self::load_settings(&storage_path).unwrap_or_else(|_| Self::default_settings());
 
         let cache = Self::hydrate_cache(&presets, &settings);
 

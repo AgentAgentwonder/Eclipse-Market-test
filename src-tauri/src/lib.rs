@@ -177,6 +177,7 @@ use wallet::operations::WalletOperationsManager;
 use wallet::performance::{PerformanceDatabase, SharedPerformanceDatabase};
 use wallet::phantom::{hydrate_wallet_state, WalletState};
 use webhooks::{SharedWebhookManager, WebhookManager};
+use updater::{SharedUpdaterState, UpdaterState};
 
 async fn warm_cache_on_startup(
     _app_handle: tauri::AppHandle,
@@ -232,7 +233,7 @@ async fn warm_cache_on_startup(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_notification::Builder::new("notification").build())
+        .plugin(tauri_plugin_notification::init())
         .manage(WalletState::new())
         .manage(HardwareWalletState::new())
         .manage(LedgerState::new())
@@ -261,7 +262,7 @@ pub fn run() {
                 eprintln!("Failed to hydrate 2FA manager: {e}");
             }
 
-            let ws_manager = WebSocketManager::new(app.handle().clone());
+            let ws_manager = core::websocket_manager::WebSocketManager::new(app.handle().clone());
 
             let multi_wallet_manager = MultiWalletManager::initialize(&keystore).map_err(|e| {
                 eprintln!("Failed to initialize multi-wallet manager: {e}");
@@ -311,7 +312,7 @@ pub fn run() {
             })
             .map_err(|e| {
                 eprintln!("Failed to initialize academy engine: {e}");
-                e as Box<dyn Error + Send + Sync>
+                Box::new(e) as Box<dyn Error + Send + Sync>
             })?;
 
             let shared_academy_engine: academy::SharedAcademyEngine =
@@ -392,10 +393,10 @@ pub fn run() {
                 }
             });
 
-            trading::register_trading_state(&app.handle());
-            trading::register_paper_trading_state(&app.handle());
-            trading::register_auto_trading_state(&app.handle());
-            trading::register_optimizer_state(&app.handle());
+            trading::register_trading_state(app.app_handle());
+            trading::register_paper_trading_state(app.app_handle());
+            trading::register_auto_trading_state(app.app_handle());
+            trading::register_optimizer_state(app.app_handle());
 
             // Initialize safety engine
             let default_policy = trading::safety::policy::SafetyPolicy::default();
