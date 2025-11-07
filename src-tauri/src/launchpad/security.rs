@@ -25,7 +25,8 @@ impl LaunchpadKeyManager {
     pub fn create_ephemeral_key(&self, app: &AppHandle) -> Result<KeyDescriptor, AppError> {
         use rand::RngCore;
         let mut key = vec![0u8; 64];
-        rand::rngs::OsRng.fill_bytes(&mut key);
+        let mut rng = rand::rngs::OsRng;
+        rng.fill_bytes(&mut key);
 
         let key_id = Uuid::new_v4().to_string();
         let keystore: tauri::State<Keystore> = app.try_state::<Keystore>().unwrap();

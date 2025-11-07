@@ -369,7 +369,22 @@ impl ReputationEngine {
             None => {
                 // Initialize new wallet reputation
                 self.initialize_wallet_reputation(address).await?;
-                self.get_wallet_reputation(address).await
+                // Return newly initialized reputation
+                Ok(WalletReputation {
+                    address: address.to_string(),
+                    trust_score: 50.0, // Default neutral score
+                    reputation_level: ReputationLevel::Neutral,
+                    vouches_received: 0,
+                    vouches_given: 0,
+                    is_blacklisted: false,
+                    blacklist_reason: None,
+                    first_seen: Utc::now(),
+                    last_updated: Utc::now(),
+                    transaction_count: 0,
+                    total_volume: 0.0,
+                    age_days: 0,
+                    risk_flags: vec![],
+                })
             }
         }
     }

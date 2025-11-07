@@ -1,10 +1,10 @@
 use aes_gcm::{
-    aead::{Aead, KeyInit, OsRng},
+    aead::{Aead, KeyInit},
     Aes256Gcm, Nonce,
 };
 use anyhow::{Context, Result};
 use base64::{engine::general_purpose, Engine as _};
-use rand::RngCore;
+use rand::{RngCore, rngs::OsRng};
 
 const NONCE_SIZE: usize = 12;
 
@@ -32,7 +32,7 @@ impl RoomEncryption {
         let ciphertext = self
             .cipher
             .encrypt(nonce, plaintext.as_bytes())
-            .context("Encryption failed")?;
+            .map_err(|e| anyhow::anyhow!("Encryption failed: {}", e))?;
 
         let mut result = nonce_bytes.to_vec();
         result.extend_from_slice(&ciphertext);
@@ -55,9 +55,9 @@ impl RoomEncryption {
         let plaintext = self
             .cipher
             .decrypt(nonce, encrypted)
-            .context("Decryption failed")?;
+            .map_err(|e| anyhow::anyhow!("Decryption failed: {}", e))?;
 
-        String::from_utf8(plaintext).context("UTF-8 decode failed")
+        String::from_utf8(plaintext).map_err(|e| anyhow::anyhow!("UTF-8 decode failed: {}", e))
     }
 }
 
@@ -72,7 +72,7 @@ pub fn hash_password(password: &str) -> Result<String> {
 
     let password_hash = argon2
         .hash_password(password.as_bytes(), &salt)
-        .context("Password hashing failed")?
+        .map_err(|e| anyhow::anyhow!("Password hashing failed: {}", e))?
         .to_string();
 
     Ok(password_hash)
@@ -84,7 +84,7 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool> {
         Argon2,
     };
 
-    let parsed_hash = PasswordHash::new(hash).context("Invalid password hash")?;
+    let parsed_hash = PasswordHash::new(hash).map_err(|e| anyhow::anyhow!("Invalid password hash: {}", e))?;
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok())

@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Emitter, Manager, WindowEvent,
+    AppHandle, Emitter, Manager, WebviewWindow, WindowEvent,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -447,7 +447,7 @@ impl TrayManager {
 
 pub type SharedTrayManager = Arc<TrayManager>;
 
-pub fn attach_window_listeners(window: &tauri::Window, tray_manager: SharedTrayManager) {
+pub fn attach_window_listeners(window: &tauri::WebviewWindow, tray_manager: SharedTrayManager) {
     let app_handle = window.app_handle();
     let handle_clone = app_handle.clone();
     let tray_manager_clone = tray_manager.clone();

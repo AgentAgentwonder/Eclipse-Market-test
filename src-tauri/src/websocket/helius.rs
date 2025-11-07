@@ -234,6 +234,7 @@ impl HeliusStream {
     }
 
     pub async fn subscribe(
+        &self,
         connection: StreamConnection,
         addresses: Vec<String>,
     ) -> anyhow::Result<()> {
@@ -249,6 +250,7 @@ impl HeliusStream {
     }
 
     pub async fn unsubscribe(
+        &self,
         connection: StreamConnection,
         addresses: Vec<String>,
     ) -> anyhow::Result<()> {
