@@ -7,14 +7,14 @@ use std::{
 
 use aes_gcm::aead::generic_array::GenericArray;
 use aes_gcm::{
-    aead::{Aead, KeyInit, OsRng},
+    aead::{Aead, KeyInit},
     Aes256Gcm,
 };
 use argon2::{password_hash::SaltString, Algorithm, Argon2, Params, Version};
 use base64::{engine::general_purpose::STANDARD as BASE64_ENGINE, Engine};
 use chrono::{DateTime, Utc};
 use keyring::Entry;
-use rand_core::RngCore;
+use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use zeroize::{Zeroize, Zeroizing};
@@ -359,7 +359,8 @@ fn persist_document(path: &PathBuf, document: &KeystoreDocument) -> Result<(), K
 }
 
 fn keystore_path(app: &AppHandle) -> Result<PathBuf, KeystoreError> {
-    let mut path = app
+    let app_handle = app.clone();
+    let mut path = app_handle
         .path()
         .app_data_dir()
         .map_err(|_| KeystoreError::Internal)?;

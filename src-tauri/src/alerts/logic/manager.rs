@@ -142,7 +142,7 @@ impl SmartAlertManager {
             )
             "#,
         )
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         sqlx::query(
@@ -152,7 +152,7 @@ impl SmartAlertManager {
             CREATE INDEX IF NOT EXISTS idx_smart_alerts_enabled ON smart_alerts(enabled);
             "#,
         )
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         Ok(())
@@ -245,7 +245,7 @@ impl SmartAlertManager {
     pub async fn delete_rule(&self, id: &str) -> Result<(), SmartAlertError> {
         let result = sqlx::query("DELETE FROM smart_alerts WHERE id = ?1")
             .bind(id)
-            .execute(&self.pool)
+            .execute(&*self.pool)
             .await?;
 
         if result.rows_affected() == 0 {
@@ -297,7 +297,7 @@ impl SmartAlertManager {
             sql_query = sql_query.bind(value);
         }
 
-        let rows = sql_query.fetch_all(&self.pool).await?;
+        let rows = sql_query.fetch_all(&*self.pool).await?;
         let mut rules = Vec::new();
         for row in rows {
             rules.push(self.row_to_rule(row)?);
@@ -311,7 +311,7 @@ impl SmartAlertManager {
             "SELECT id, name, description, rule_json, enabled, symbol, owner_id, team_id, shared_with, tags, created_at, updated_at FROM smart_alerts WHERE id = ?1",
         )
         .bind(id)
-        .fetch_optional(&self.pool)
+        .fetch_optional(&*self.pool)
         .await?;
 
         let row = row.ok_or_else(|| SmartAlertError::NotFound(id.to_string()))?;
@@ -385,7 +385,7 @@ impl SmartAlertManager {
         .bind(&tags_json)
         .bind(&rule.created_at)
         .bind(&rule.updated_at)
-        .execute(&self.pool)
+        .execute(&*self.pool)
         .await?;
 
         Ok(())
@@ -417,7 +417,8 @@ impl SmartAlertManager {
 }
 
 fn smart_alerts_db_path(app: &AppHandle) -> Result<PathBuf, SmartAlertError> {
-    let mut app_data_dir = app.path().app_data_dir().map_err(|err| {
+    let app_handle = app.clone();
+    let mut app_data_dir = app_handle.path().app_data_dir().map_err(|err| {
         SmartAlertError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 

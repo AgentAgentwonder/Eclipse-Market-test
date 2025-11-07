@@ -77,13 +77,19 @@ impl PerformanceMonitor {
         let disk_read = system
             .disks()
             .iter()
-            .map(|d| d.total_read_bytes())
+            .map(|d| {
+                // Use available disk usage methods in sysinfo 0.29
+                d.usage().read_bytes as u64
+            })
             .sum::<u64>() as f64
             / 1024.0;
         let disk_write = system
             .disks()
             .iter()
-            .map(|d| d.total_written_bytes())
+            .map(|d| {
+                // Use available disk usage methods in sysinfo 0.29
+                d.usage().written_bytes as u64
+            })
             .sum::<u64>() as f64
             / 1024.0;
 
