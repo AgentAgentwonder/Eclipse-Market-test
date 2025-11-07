@@ -477,8 +477,18 @@ pub fn attach_window_listeners(window: &tauri::WebviewWindow, tray_manager: Shar
             }
         }
         WindowEvent::Destroyed => {
-            if let Some(shortcut) = tray_manager_clone.shortcut.read().clone() {
-                if let Err(err) = handle_clone.global_shortcut().unregister(&shortcut) {
+            if let Some(shortcut_str) = tray_manager_clone.shortcut.read().clone() {
+                use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
+
+                // Parse shortcut string to unregister it
+                let shortcut = if shortcut_str.contains("CmdOrControl") && shortcut_str.contains("Shift") && shortcut_str.contains("M") {
+                    Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM)
+                } else {
+                    eprintln!("Failed to unregister tray shortcut on destroy: unsupported format");
+                    return;
+                };
+
+                if let Err(err) = handle_clone.global_shortcut().unregister(shortcut) {
                     eprintln!("Failed to unregister tray shortcut on destroy: {err}");
                 }
             }
