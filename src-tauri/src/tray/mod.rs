@@ -6,10 +6,10 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
-    notification::Notification,
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
     AppHandle, Emitter, Manager, WebviewWindow, WindowEvent,
 };
+use tauri_plugin_notification::NotificationExt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
