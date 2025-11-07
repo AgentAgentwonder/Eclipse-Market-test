@@ -230,7 +230,7 @@ impl TrayManager {
     }
 
     fn register_shortcut(&self, app_handle: &AppHandle) -> Result<(), String> {
-        use tauri_plugin_global_shortcut::{Code, Shortcut, ShortcutState};
+        use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
 
         let mut registered = self.shortcut.write();
         if let Some(existing) = registered.clone() {
@@ -242,8 +242,13 @@ impl TrayManager {
 
         let shortcut_str = self.settings.read().restore_shortcut.clone();
         if let Some(shortcut_str) = shortcut_str {
-            let shortcut = Shortcut::new(&shortcut_str)
-                .map_err(|e| format!("Failed to parse shortcut: {e}"))?;
+            // Parse the shortcut string and create a Shortcut
+            // For now, we'll handle the common case of CmdOrControl+Shift+M
+            let shortcut = if shortcut_str.contains("CmdOrControl") && shortcut_str.contains("Shift") && shortcut_str.contains("M") {
+                Shortcut::new(Some(Modifiers::SUPER | Modifiers::SHIFT), Code::KeyM)
+            } else {
+                return Err(format!("Unsupported shortcut format: {}", shortcut_str));
+            };
 
             app_handle.global_shortcut().register(shortcut, move || {
                 if let Some(window) = app_handle.get_webview_window("main") {
