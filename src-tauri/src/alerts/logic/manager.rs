@@ -417,7 +417,8 @@ impl SmartAlertManager {
 }
 
 fn smart_alerts_db_path(app: &AppHandle) -> Result<PathBuf, SmartAlertError> {
-    let mut app_data_dir = app.path().app_data_dir().map_err(|err| {
+    let app_handle = app.clone();
+    let mut app_data_dir = app_handle.path().app_data_dir().map_err(|err| {
         SmartAlertError::Internal(format!("Unable to resolve app data directory: {err}"))
     })?;
 
