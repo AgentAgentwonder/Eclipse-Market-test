@@ -412,38 +412,38 @@ impl EmailManager {
         let total_sent = sqlx::query_scalar::<_, i64>(
             "SELECT COUNT(*) FROM email_deliveries WHERE status = 'sent'",
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?;
 
         let total_failed = sqlx::query_scalar::<_, i64>(
             "SELECT COUNT(*) FROM email_deliveries WHERE status = 'failed'",
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?;
 
         let total_pending = sqlx::query_scalar::<_, i64>(
             "SELECT COUNT(*) FROM email_deliveries WHERE status IN ('pending', 'retrying')",
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?;
 
         let avg_delivery = sqlx::query_scalar::<_, Option<f64>>(
             "SELECT AVG(delivery_time_ms) FROM email_deliveries WHERE status = 'sent' AND delivery_time_ms IS NOT NULL"
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?
         .unwrap_or(0.0);
 
         let last_24h_sent = sqlx::query_scalar::<_, i64>(
             "SELECT COUNT(*) FROM email_deliveries WHERE status = 'sent' AND datetime(sent_at) > datetime('now', '-1 day')"
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?;
 
         let last_24h_failed = sqlx::query_scalar::<_, i64>(
             "SELECT COUNT(*) FROM email_deliveries WHERE status = 'failed' AND datetime(sent_at) > datetime('now', '-1 day')"
         )
-        .fetch_one(&self.pool)
+        .fetch_one(&*self.pool)
         .await?;
 
         Ok(EmailStats {
