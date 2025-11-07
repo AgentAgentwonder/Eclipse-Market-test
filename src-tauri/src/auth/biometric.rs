@@ -7,6 +7,7 @@ use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+use rand_core::RngCore;
 use base64::{engine::general_purpose, Engine as _};
 use keyring::{Entry, Error as KeyringError};
 use serde::{Deserialize, Serialize};
