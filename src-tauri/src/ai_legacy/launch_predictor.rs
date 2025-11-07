@@ -93,7 +93,8 @@ pub type SharedLaunchPredictor = Arc<RwLock<LaunchPredictor>>;
 
 impl LaunchPredictor {
     pub async fn new(app: &AppHandle) -> Result<Self, sqlx::Error> {
-        let mut db_path = app.path().app_data_dir().map_err(|_| {
+        let app_handle = app.clone();
+        let mut db_path = app_handle.path().app_data_dir().map_err(|_| {
             sqlx::Error::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "App data dir not found",
