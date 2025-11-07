@@ -7,7 +7,7 @@ use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::Arc;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Listener, Manager};
 use tokio::sync::{broadcast, OnceCell, RwLock};
 use tokio::time::{interval, Duration};
 use uuid::Uuid;
