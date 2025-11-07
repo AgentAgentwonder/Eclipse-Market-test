@@ -232,7 +232,7 @@ async fn warm_cache_on_startup(
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_notification::Builder::new().build())
+        .plugin(tauri_plugin_notification::Builder::new("notification").build())
         .manage(WalletState::new())
         .manage(HardwareWalletState::new())
         .manage(LedgerState::new())
