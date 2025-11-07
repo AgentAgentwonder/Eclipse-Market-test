@@ -469,7 +469,7 @@ impl EmailManager {
             "#,
         )
         .bind(limit)
-        .fetch_all(&self.pool)
+        .fetch_all(&*self.pool)
         .await?;
 
         let mut records = Vec::new();
