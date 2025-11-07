@@ -7,9 +7,10 @@ use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Emitter, Manager, WebviewWindow, WindowEvent,
+    AppHandle, Emitter, Listener, Manager, WebviewWindow, WindowEvent,
 };
 use tauri_plugin_notification::NotificationExt;
+use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
