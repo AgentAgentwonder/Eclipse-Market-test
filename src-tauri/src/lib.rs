@@ -394,10 +394,10 @@ pub fn run() {
                 }
             });
 
-            trading::register_trading_state(app.app_handle());
-            trading::register_paper_trading_state(app.app_handle());
-            trading::register_auto_trading_state(app.app_handle());
-            trading::register_optimizer_state(app.app_handle());
+            trading::register_trading_state(&app);
+            trading::register_paper_trading_state(&app);
+            trading::register_auto_trading_state(&app);
+            trading::register_optimizer_state(&app);
 
             // Initialize safety engine
             let default_policy = trading::safety::policy::SafetyPolicy::default();
