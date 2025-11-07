@@ -358,7 +358,9 @@ impl EmailManager {
                 lettre::transport::smtp::client::TlsParameters::new(config.server.clone())?,
             ));
         } else if config.use_starttls {
-            transport = transport.starttls_required(true);
+            transport = transport.tls(lettre::transport::smtp::client::Tls::Required(
+                lettre::transport::smtp::client::TlsParameters::new(config.server.clone())?
+            ));
         }
 
         Ok(transport.build())
