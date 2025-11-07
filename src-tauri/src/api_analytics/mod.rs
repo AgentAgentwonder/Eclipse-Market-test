@@ -409,7 +409,7 @@ pub fn initialize_usage_tracker(app: &AppHandle) -> Result<Arc<Mutex<ApiUsageTra
     let mut data_path = app
         .path()
         .app_data_dir()
-        .ok_or_else(|| "Unable to resolve app data directory".to_string())?;
+        .map_err(|_| "Unable to resolve app data directory".to_string())?;
 
     data_path.push("api_usage.json");
 
