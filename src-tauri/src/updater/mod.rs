@@ -94,8 +94,7 @@ impl UpdaterState {
             .map_err(|e| format!("Failed to serialize settings: {}", e))?;
 
         fs::write(&settings_path, json)
-            .map_err(|e| format!("Failed to write settings: {}", e))?
-            .into();
+            .map_err(|e| format!("Failed to write settings: {}", e))?;
 
         Ok(())
     }
