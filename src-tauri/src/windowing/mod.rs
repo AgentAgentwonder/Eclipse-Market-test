@@ -61,6 +61,7 @@ pub async fn get_monitors(app: tauri::AppHandle) -> Result<Vec<MonitorInfo>, Str
                 id: format!("monitor-{}", idx),
                 name: monitor
                     .name()
+                    .cloned()
                     .unwrap_or_else(|| format!("Monitor {}", idx + 1)),
                 width: size.width,
                 height: size.height,
