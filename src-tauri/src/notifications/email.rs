@@ -1,7 +1,7 @@
-use chrono::{DateTime, Utc};
-use lettre::message::{header, Attachment, MultiPart, SinglePart};
+use chrono::Utc;
+use lettre::message::{header, MultiPart, SinglePart};
 use lettre::transport::smtp::authentication::Credentials;
-use lettre::{Address, Message, SmtpTransport, Transport};
+use lettre::{Message, SmtpTransport, Transport};
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Row, Sqlite, SqlitePool};
 use std::path::PathBuf;
@@ -267,15 +267,14 @@ impl EmailManager {
             (req.html_body.clone(), req.text_body.clone())
         };
 
-        // Build multipart message
-        let mut multipart_builder = MultiPart::alternative();
+        // Build multipart message with text and/or HTML parts
+        let mut multipart = MultiPart::alternative().build();
 
         if let Some(text) = text_body {
-            multipart_builder = multipart_builder.singlepart(
-                SinglePart::builder()
-                    .header(header::ContentType::TEXT_PLAIN)
-                    .body(text),
-            );
+            let text_part = SinglePart::builder()
+                .header(header::ContentType::TEXT_PLAIN)
+                .body(text);
+            multipart = multipart.singlepart(text_part);
         }
 
         if let Some(html) = html_body {
@@ -288,14 +287,13 @@ impl EmailManager {
                 );
             }
 
-            multipart_builder = multipart_builder.singlepart(
-                SinglePart::builder()
-                    .header(header::ContentType::TEXT_HTML)
-                    .body(html_with_unsubscribe),
-            );
+            let html_part = SinglePart::builder()
+                .header(header::ContentType::TEXT_HTML)
+                .body(html_with_unsubscribe);
+            multipart = multipart.singlepart(html_part);
         }
 
-        let message = message_builder.multipart(multipart_builder.build())?;
+        let message = message_builder.multipart(multipart)?;
 
         // Send with retry logic
         let mailer = self.build_mailer(config)?;
