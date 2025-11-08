@@ -64,7 +64,7 @@ pub struct WebhookDeliveryLog {
     pub status: DeliveryStatus,
     pub attempt: u32,
     pub response_code: Option<u16>,
-    pub response_time_ms: Option<i64>,
+    pub response_time_ms: Option<u64>,
     pub error: Option<String>,
     pub payload_preview: Option<String>,
     pub triggered_at: DateTime<Utc>,
@@ -87,7 +87,7 @@ pub struct WebhookTestResult {
     pub message: String,
     pub response_code: Option<u16>,
     pub response_body: Option<String>,
-    pub latency_ms: Option<i64>,
+    pub latency_ms: Option<u64>,
 }
 
 #[derive(Debug, thiserror::Error)]

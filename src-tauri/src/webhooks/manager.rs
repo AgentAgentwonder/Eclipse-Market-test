@@ -286,7 +286,7 @@ impl WebhookManager {
             },
             attempt: row.try_get("attempt")?,
             response_code: row.try_get("response_code")?,
-            response_time_ms: row.try_get::<Option<i64>, _>("response_time_ms")?,
+            response_time_ms: row.try_get::<Option<i64>, _>("response_time_ms")?.map(|v| v as u64),
             error: row.try_get("error")?,
             payload_preview: row.try_get("payload_preview")?,
             triggered_at: DateTime::parse_from_rfc3339(&row.try_get::<String, _>("triggered_at")?)
@@ -464,7 +464,7 @@ impl WebhookManager {
                     DeliveryStatus::Sent,
                     attempt,
                     Some(status.as_u16()),
-                    Some(latency as i64),
+                    Some(latency as u64),
                     None,
                     Some(&payload_preview),
                     Utc::now(),
@@ -478,7 +478,7 @@ impl WebhookManager {
                 message: "Webhook delivered successfully".to_string(),
                 response_code: Some(status.as_u16()),
                 response_body: text.clone(),
-                latency_ms: Some(latency as i64),
+                latency_ms: Some(latency as u64),
             })
         } else {
             let error_message = format!("Webhook failed with status {}", status);
@@ -506,7 +506,7 @@ impl WebhookManager {
         status: DeliveryStatus,
         attempt: u32,
         response_code: Option<u16>,
-        response_time_ms: Option<i64>,
+        response_time_ms: Option<u64>,
         error: Option<&str>,
         payload_preview: Option<&str>,
         triggered_at: DateTime<Utc>,
@@ -539,7 +539,7 @@ impl WebhookManager {
         })
         .bind(attempt as i64)
         .bind(response_code.map(|code| code as i64))
-        .bind(response_time_ms)
+        .bind(response_time_ms.map(|v| v as i64))
         .bind(error)
         .bind(payload_preview)
         .bind(triggered_at.to_rfc3339())
