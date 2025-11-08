@@ -652,10 +652,9 @@ impl HolderAnalyzer {
 }
 
 fn holder_db_path(app: &AppHandle) -> Result<PathBuf, HolderError> {
-    let mut path = app
-        .path()
-        .app_data_dir()
-        .map_err(|_| HolderError::Internal("Unable to resolve app data directory".to_string()))?;
+    let mut path = app.path().app_data_dir().map_err(|err| {
+        HolderError::Internal(format!("Unable to resolve app data directory: {err}"))
+    })?;
 
     std::fs::create_dir_all(&path).map_err(|e| {
         HolderError::Internal(format!("Failed to create app data directory: {}", e))
