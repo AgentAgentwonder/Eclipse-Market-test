@@ -83,16 +83,15 @@ impl WalletMonitor {
         let event_handler = self
             .app_handle
             .listen("transaction_update", move |event| {
-                if let Some(payload) = event.payload() {
-                    if let Ok(stream_event) = serde_json::from_str::<StreamEvent>(payload) {
-                        if let StreamEvent::TransactionUpdate(tx) = stream_event {
-                            let monitor_clone = monitor.clone();
-                            tauri::async_runtime::spawn(async move {
-                                if let Err(err) = monitor_clone.process_transaction(tx).await {
-                                    eprintln!("Failed to process wallet transaction: {err}");
-                                }
-                            });
-                        }
+                let payload = event.payload();
+                if let Ok(stream_event) = serde_json::from_str::<StreamEvent>(payload) {
+                    if let StreamEvent::TransactionUpdate(tx) = stream_event {
+                        let monitor_clone = monitor.clone();
+                        tauri::async_runtime::spawn(async move {
+                            if let Err(err) = monitor_clone.process_transaction(tx).await {
+                                eprintln!("Failed to process wallet transaction: {err}");
+                            }
+                        });
                     }
                 }
             });

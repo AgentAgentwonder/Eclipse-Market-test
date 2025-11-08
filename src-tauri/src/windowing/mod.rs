@@ -97,7 +97,7 @@ pub async fn create_floating_window(
     let url = format!("/floating/{}", options.panel_id);
 
     let window = WebviewWindowBuilder::new(&app, &options.window_id, WebviewUrl::App(url.into()))
-        .title(&options.title)
+        .title(options.title.clone())
         .inner_size(options.width as f64, options.height as f64)
         .position(options.x as f64, options.y as f64)
         .resizable(true)

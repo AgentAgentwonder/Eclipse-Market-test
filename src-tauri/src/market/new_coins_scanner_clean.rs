@@ -206,22 +206,22 @@ impl NewCoinsScanner {
 
             let mint_revoked = base_safety >= &50;
             let freeze_revoked = base_safety >= &60;
-            let liquidity = if is_spam {
+            let liquidity = if *is_spam {
                 rand::random_range(500.0..1500.0)
             } else {
                 rand::random_range(5000.0..50000.0)
             };
-            let holder_count = if is_spam {
+            let holder_count = if *is_spam {
                 rand::random_range(5..50)
             } else {
                 rand::random_range(100..1000)
             };
-            let top_holder_percent = if is_spam {
+            let top_holder_percent = if *is_spam {
                 rand::random_range(60.0..95.0)
             } else {
                 rand::random_range(5.0..25.0)
             };
-            let creator_reputation = if is_spam {
+            let creator_reputation = if *is_spam {
                 rand::random_range(0.0..0.3)
             } else {
                 rand::random_range(0.6..0.95)

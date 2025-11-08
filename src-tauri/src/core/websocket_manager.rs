@@ -546,7 +546,7 @@ impl WebSocketManager {
                                 let delta = PriceDelta {
                                     symbol: symbol.clone(),
                                     price: Some(price.price),
-                                    change: price.price_change_24h,
+                                    change: Some(price.price_change_24h),
                                     volume: Some(price.volume_24h),
                                     ts: chrono::Utc::now().timestamp(),
                                     snapshot: true,
