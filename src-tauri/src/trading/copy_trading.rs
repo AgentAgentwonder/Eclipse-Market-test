@@ -961,10 +961,11 @@ pub async fn init_copy_trading(app_handle: &AppHandle) -> Result<(), String> {
     let manager = Arc::new(CopyTradeManager::new(shared_db.clone(), app_handle.clone()));
     manager.initialize_monitored_wallets().await?;
 
-    let handle = app_handle.clone();
+    let handle_for_task = app_handle.clone();
+    let manager_for_task = manager.clone();
     tauri::async_runtime::spawn(async move {
-        CopyTradeManager::start_monitoring(manager.clone()).await;
-        let _ = handle.emit(
+        CopyTradeManager::start_monitoring(manager_for_task).await;
+        let _ = handle_for_task.emit(
             "copy_trading_monitor_stopped",
             "Copy trading monitor stopped",
         );
