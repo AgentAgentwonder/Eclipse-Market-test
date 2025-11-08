@@ -126,12 +126,13 @@ impl Keystore {
             .map_err(|_| KeystoreError::Encryption)?;
 
         let now = Utc::now();
-        // Get the created_at from existing secret before modifying the hashmap
-        let created_at = guard
-            .secrets
-            .get(key)
-            .map(|existing| existing.created_at)
-            .unwrap_or(now);
+        let created_at = {
+            guard
+                .secrets
+                .get(key)
+                .map(|existing| existing.created_at)
+                .unwrap_or(now)
+        };
 
         guard.secrets.insert(
             key.to_string(),

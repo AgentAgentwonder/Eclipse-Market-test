@@ -456,30 +456,37 @@ pub async fn address_book_update_contact(
     operations: State<'_, WalletOperationsManager>,
     keystore: State<'_, Keystore>,
 ) -> Result<AddressBookContact, String> {
-    let mut book = operations.address_book.lock().map_err(|e| e.to_string())?;
+    let updated_contact = {
+        let mut book = operations.address_book.lock().map_err(|e| e.to_string())?;
 
-    let contact = book
-        .contacts
-        .get_mut(&request.contact_id)
-        .ok_or_else(|| "Contact not found".to_string())?;
+        let now = Utc::now();
+        let updated = {
+            let contact = book
+                .contacts
+                .get_mut(&request.contact_id)
+                .ok_or_else(|| "Contact not found".to_string())?;
 
-    if let Some(label) = request.label {
-        contact.label = label;
-    }
-    if let Some(nickname) = request.nickname {
-        contact.nickname = nickname;
-    }
-    if let Some(notes) = request.notes {
-        contact.notes = notes;
-    }
-    if let Some(tags) = request.tags {
-        contact.tags = tags;
-    }
+            if let Some(label) = request.label {
+                contact.label = label;
+            }
+            if let Some(nickname) = request.nickname {
+                contact.nickname = nickname;
+            }
+            if let Some(notes) = request.notes {
+                contact.notes = notes;
+            }
+            if let Some(tags) = request.tags {
+                contact.tags = tags;
+            }
 
-    contact.updated_at = Utc::now();
-    book.last_updated = Utc::now();
+            contact.updated_at = now;
+            contact.clone()
+        };
 
-    let updated_contact = contact.clone();
+        book.last_updated = now;
+        updated
+    };
+
     operations
         .persist_address_book(&keystore)
         .map_err(|e| e.to_string())?;
