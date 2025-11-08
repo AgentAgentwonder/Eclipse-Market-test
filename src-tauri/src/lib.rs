@@ -394,8 +394,8 @@ pub fn run() {
                 }
             });
 
-            trading::register_trading_state(&app);
-            trading::register_paper_trading_state(&app);
+            trading::register_trading_state(&app.handle());
+            trading::register_paper_trading_state(&app.handle());
             trading::register_auto_trading_state(&app);
             trading::register_optimizer_state(&app);
 
