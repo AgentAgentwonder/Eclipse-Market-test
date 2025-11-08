@@ -311,9 +311,11 @@ pub fn run() {
                 academy::AcademyEngine::new(&app.handle()).await
             })
             .map_err(|e| {
-                let msg = format!("Failed to initialize academy engine: {}", e);
-                eprintln!("{}", msg);
-                msg
+                eprintln!("Failed to initialize academy engine: {}", e);
+                Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    e.to_string(),
+                )) as Box<dyn Error>
             })?;
 
             let shared_academy_engine: academy::SharedAcademyEngine =
@@ -357,7 +359,7 @@ pub fn run() {
             let usage_tracker =
                 api_analytics::initialize_usage_tracker(&app.handle()).map_err(|e| {
                     eprintln!("Failed to initialize API usage tracker: {e}");
-                    Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
+                    Box::new(std::io::Error::new(std::io::ErrorKind::Other, e.clone())) as Box<dyn Error>
                 })?;
             app.manage(usage_tracker);
 
@@ -417,10 +419,10 @@ pub fn run() {
             let mut multisig_db_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             std::fs::create_dir_all(&multisig_db_path)
-                .map_err(|e| format!("Failed to create app data directory: {e}"))?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             multisig_db_path.push("multisig.db");
 
@@ -429,7 +431,7 @@ pub fn run() {
             ))
             .map_err(|e| {
                 eprintln!("Failed to initialize multisig database: {e}");
-                format!("Failed to initialize multisig database: {e}")
+                Box::new(e) as Box<dyn Error>
             })?;
 
             let multisig_state: SharedMultisigDatabase = Arc::new(RwLock::new(multisig_db));
@@ -439,10 +441,10 @@ pub fn run() {
             let mut performance_db_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             std::fs::create_dir_all(&performance_db_path)
-                .map_err(|e| format!("Failed to create app data directory: {e}"))?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             performance_db_path.push("performance.db");
 
@@ -461,7 +463,7 @@ pub fn run() {
             let mut journal_db_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             journal_db_path.push("journal.db");
 
@@ -597,7 +599,7 @@ pub fn run() {
             let app_data_dir = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             let indicator_manager = IndicatorManager::new(app_data_dir.clone());
             let indicator_state: SharedIndicatorManager = Arc::new(RwLock::new(indicator_manager));
@@ -657,10 +659,10 @@ pub fn run() {
             let mut social_data_dir = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
             social_data_dir.push("social");
             std::fs::create_dir_all(&social_data_dir)
-                .map_err(|e| format!("Failed to create social data directory: {e}"))?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             let social_cache = tauri::async_runtime::block_on(async {
                 social::SocialCache::new(social_data_dir).await
@@ -698,7 +700,7 @@ pub fn run() {
             let mut event_store_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             event_store_path.push("events.db");
 
@@ -715,7 +717,7 @@ pub fn run() {
             let mut compression_db_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             compression_db_path.push("events.db");
 
@@ -987,10 +989,10 @@ pub fn run() {
             let mut mobile_data_dir = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
             mobile_data_dir.push("mobile");
             std::fs::create_dir_all(&mobile_data_dir)
-                .map_err(|e| format!("Failed to create mobile directory: {e}"))?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             let mut mobile_auth_manager = MobileAuthManager::new(mobile_data_dir.clone());
             tauri::async_runtime::block_on(mobile_auth_manager.load()).map_err(|e| {
@@ -1030,24 +1032,24 @@ pub fn run() {
             let mut features_db_path = app
                 .path()
                 .app_data_dir()
-                .map_err(|_| "Unable to resolve app data directory".to_string())?;
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             features_db_path.push("features.db");
 
             let features_pool = tauri::async_runtime::block_on(async {
                 let pool = sqlx::SqlitePool::connect(&format!("sqlite:{}", features_db_path.display()))
                     .await
-                    .map_err(|e| format!("Failed to connect to features database: {e}"))?;
+                    .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
                 // Run migrations
                 sqlx::migrate!("./migrations")
                     .run(&pool)
                     .await
-                    .map_err(|e| format!("Failed to run migrations: {e}"))?;
+                    .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
-                Ok::<_, String>(pool)
+                Ok::<_, Box<dyn Error>>(pool)
             })
-            .map_err(|e: String| {
+            .map_err(|e| {
                 eprintln!("Failed to initialize features database: {e}");
                 e
             })?;
