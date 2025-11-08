@@ -340,7 +340,6 @@ pub fn run() {
             let api_health_state: SharedApiHealthMonitor =
                 Arc::new(RwLock::new(api_health_monitor));
 
-            app.manage(keystore);
             app.manage(multi_wallet_manager);
             app.manage(wallet_operations_manager);
             app.manage(session_manager);
@@ -408,7 +407,7 @@ pub fn run() {
             app.manage(safety_state.clone());
 
             // Initialize wallet monitor
-            let monitor_handle = app.handle();
+            let monitor_handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = insiders::init_wallet_monitor(&monitor_handle).await {
                     eprintln!("Failed to initialize wallet monitor: {err}");
@@ -431,7 +430,10 @@ pub fn run() {
             ))
             .map_err(|e| {
                 eprintln!("Failed to initialize multisig database: {e}");
-                Box::new(e) as Box<dyn Error>
+                Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    e.to_string(),
+                )) as Box<dyn Error>
             })?;
 
             let multisig_state: SharedMultisigDatabase = Arc::new(RwLock::new(multisig_db));
@@ -491,7 +493,7 @@ pub fn run() {
                 Arc::new(RwLock::new(backup_scheduler));
             app.manage(backup_scheduler_state.clone());
 
-            let automation_handle = app.handle();
+            let automation_handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = bots::init_dca(&automation_handle).await {
                     eprintln!("Failed to initialize DCA bots: {err}");
@@ -627,7 +629,7 @@ pub fn run() {
             app.manage(shared_cache_manager.clone());
 
             // Start background cache warming
-            let app_handle = app.handle();
+            let app_handle = app.handle().clone();
             let cache_manager_handle = shared_cache_manager.clone();
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = warm_cache_on_startup(app_handle.clone(), cache_manager_handle).await {
@@ -783,6 +785,7 @@ pub fn run() {
 
             let shared_ai_assistant: ai_legacy::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
             app.manage(shared_ai_assistant.clone());
+            app.manage(keystore);
 
             // Initialize launch predictor
             let launch_predictor =
@@ -872,7 +875,7 @@ pub fn run() {
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.hide();
                     }
-                    let app_handle = app.handle();
+                    let app_handle = app.handle().clone();
                     let delay = auto_settings.delay_seconds;
                     tauri::async_runtime::spawn(async move {
                         use tokio::time::{sleep, Duration};
