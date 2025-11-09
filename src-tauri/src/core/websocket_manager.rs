@@ -41,7 +41,7 @@ pub struct WebSocketManager {
 }
 
 #[derive(Debug, Clone)]
-struct FallbackState {
+pub struct FallbackState {
     pub active: bool,
     pub last_success: Option<Instant>,
     pub interval: Duration,
@@ -49,7 +49,7 @@ struct FallbackState {
 }
 
 #[derive(Debug, Clone)]
-struct StreamStatisticsInternal {
+pub struct StreamStatisticsInternal {
     pub messages_received: u64,
     pub messages_sent: u64,
     pub bytes_received: u64,
