@@ -12,7 +12,7 @@ import {
   Gauge,
   FlaskConical,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface CacheStatistics {
   totalHits: number;

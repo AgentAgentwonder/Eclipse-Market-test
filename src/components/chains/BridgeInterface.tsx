@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { ArrowDownUp, Loader2, Clock, DollarSign, Info } from 'lucide-react';
 import type { ChainConfig } from './ChainSelector';
 
