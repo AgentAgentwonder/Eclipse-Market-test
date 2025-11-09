@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { RecordTradeRequest, Trade } from '../types/performance';
 
 export function useTradeRecording() {

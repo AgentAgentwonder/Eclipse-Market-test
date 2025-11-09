@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useVoiceStore } from '../store/voiceStore';
 import { voiceCommandService } from '../utils/voiceCommandService';
 import { VoiceIntent } from '../types/voice';

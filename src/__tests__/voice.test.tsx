@@ -5,7 +5,7 @@ import { useVoiceStore } from '../store/voiceStore';
 import { voiceCommandService } from '../utils/voiceCommandService';
 
 // Mock Tauri invoke
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn().mockResolvedValue(true),
 }));
 
@@ -313,7 +313,7 @@ describe('Voice Trading', () => {
     });
 
     it('should handle command execution errors', async () => {
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockRejectedValueOnce(new Error('Network error'));
 
       const intent = {

@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { useAlertStore } from '../store/alertStore';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 
 describe('Watchlist Store', () => {
   beforeEach(() => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     vi.clearAllMocks();
   });
 
@@ -20,7 +20,7 @@ describe('Watchlist Store', () => {
   });
 
   it('should create a watchlist', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockWatchlist = {
       id: 'test-id',
       name: 'Test Watchlist',
@@ -40,7 +40,7 @@ describe('Watchlist Store', () => {
   });
 
   it('should add item to watchlist', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockWatchlist = {
       id: 'test-id',
       name: 'Test Watchlist',
@@ -74,7 +74,7 @@ describe('Watchlist Store', () => {
   });
 
   it('should reorder items in watchlist', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockWatchlist = {
       id: 'test-id',
       name: 'Test Watchlist',
@@ -114,7 +114,7 @@ describe('Watchlist Store', () => {
 
 describe('Alert Store', () => {
   beforeEach(() => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     vi.clearAllMocks();
   });
 
@@ -126,7 +126,7 @@ describe('Alert Store', () => {
   });
 
   it('should create a price alert', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockAlert = {
       id: 'alert-id',
       name: 'SOL Price Alert',
@@ -178,7 +178,7 @@ describe('Alert Store', () => {
   });
 
   it('should test alert conditions', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockTestResult = {
       alertId: 'alert-id',
       wouldTrigger: true,
@@ -202,7 +202,7 @@ describe('Alert Store', () => {
   });
 
   it('should update alert state', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     const mockAlert = {
       id: 'alert-id',
       name: 'SOL Price Alert',
@@ -239,7 +239,7 @@ describe('Alert Store', () => {
 
 describe('Watchlist and Alert Integration', () => {
   it('should handle max watchlist limit', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     invoke.mockRejectedValueOnce(new Error('maximum watchlists reached: 10'));
 
     const store = useWatchlistStore.getState();
@@ -247,7 +247,7 @@ describe('Watchlist and Alert Integration', () => {
   });
 
   it('should prevent duplicate items in watchlist', async () => {
-    const { invoke } = require('@tauri-apps/api/tauri');
+    const { invoke } = require('@tauri-apps/api/core');
     invoke.mockRejectedValueOnce(new Error('duplicate item'));
 
     const store = useWatchlistStore.getState();

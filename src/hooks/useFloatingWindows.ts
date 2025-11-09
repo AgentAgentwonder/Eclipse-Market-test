@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { FloatingWindowState } from '../types/workspace';
 import { useWorkspaceStore } from '../store/workspaceStore';
 

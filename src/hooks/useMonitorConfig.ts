@@ -31,7 +31,7 @@ export const useMonitorConfig = () => {
 
       if (typeof window !== 'undefined' && '__TAURI__' in window) {
         try {
-          const { invoke } = await import('@tauri-apps/api/tauri');
+          const { invoke } = await import('@tauri-apps/api/core');
           const monitorsData = await invoke<any[]>('get_monitors');
 
           if (monitorsData && monitorsData.length > 0) {

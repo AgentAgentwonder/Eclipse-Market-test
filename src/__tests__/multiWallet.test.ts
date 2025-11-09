@@ -6,9 +6,9 @@ import type {
   AddWalletRequest,
   CreateGroupRequest,
 } from '../store/walletStore';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 

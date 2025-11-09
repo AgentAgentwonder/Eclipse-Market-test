@@ -1,7 +1,7 @@
 import { useWallet as useAdapterWallet } from '@solana/wallet-adapter-react';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import { useCallback, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 import { useWalletStore } from '../store/walletStore';
 

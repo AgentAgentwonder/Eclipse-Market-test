@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Tauri invoke
 const mockInvoke = vi.fn();
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: mockInvoke,
 }));
 
@@ -16,7 +16,7 @@ describe('Key Lifecycle Management', () => {
       const mockResponse = 'Key rotation scheduled for helius. Next rotation due in 90 days.';
       mockInvoke.mockResolvedValue(mockResponse);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('rotate_api_key', { service: 'helius' });
 
       expect(result).toBe(mockResponse);
@@ -26,7 +26,7 @@ describe('Key Lifecycle Management', () => {
     it('should fail to rotate default keys', async () => {
       mockInvoke.mockRejectedValue('Cannot rotate default keys. Please add a custom key first.');
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
 
       await expect(invoke('rotate_api_key', { service: 'birdeye' })).rejects.toMatch(
         /Cannot rotate default keys/
@@ -40,7 +40,7 @@ describe('Key Lifecycle Management', () => {
       ];
       mockInvoke.mockResolvedValue(mockReminders);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('check_rotation_reminders');
 
       expect(result).toEqual(mockReminders);
@@ -59,7 +59,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue(mockExport);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('export_api_keys', { password: 'test-password' });
 
       expect(result).toHaveProperty('version');
@@ -79,7 +79,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue('API keys imported successfully');
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('import_api_keys', {
         password: 'test-password',
         exportData: mockImportData,
@@ -91,7 +91,7 @@ describe('Key Lifecycle Management', () => {
     it('should fail to import with wrong password', async () => {
       mockInvoke.mockRejectedValue('Failed to import keys: Decryption error');
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const mockImportData = {
         version: 1,
         salt: 'mock-salt-base64',
@@ -113,7 +113,7 @@ describe('Key Lifecycle Management', () => {
     it('should record API usage', async () => {
       mockInvoke.mockResolvedValue(null);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       await invoke('record_api_usage', {
         service: 'helius',
         endpoint: '/v0/addresses/balance',
@@ -161,7 +161,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue(mockAnalytics);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('get_api_analytics', { days: 30 });
 
       expect(result).toHaveProperty('services');
@@ -192,7 +192,7 @@ describe('Key Lifecycle Management', () => {
       ];
       mockInvoke.mockResolvedValue(mockLimits);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('get_fair_use_status');
 
       expect(result).toBeInstanceOf(Array);
@@ -223,7 +223,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue(mockAnalytics);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('get_api_analytics', { days: 7 });
 
       expect(result.alerts).toHaveLength(2);
@@ -266,7 +266,7 @@ describe('Key Lifecycle Management', () => {
         solanaRpc: mockStatus,
       });
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('get_api_status');
 
       expect(result.helius.rotationHistory).toHaveLength(2);
@@ -287,7 +287,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue(mockExport);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('export_api_keys', { password: 'test-password' });
 
       // Verify export contains all required encryption components
@@ -329,7 +329,7 @@ describe('Key Lifecycle Management', () => {
       };
       mockInvoke.mockResolvedValue(mockAnalytics);
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       const result = await invoke('get_api_analytics', { days: 30 });
 
       expect(result.services.helius.estimatedCost).toBe(1.0);

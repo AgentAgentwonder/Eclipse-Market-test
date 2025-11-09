@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import {
   UserRiskProfile,
   PortfolioRecommendation,
@@ -8,7 +8,7 @@ import {
   Position,
 } from '../types/portfolio';
 
-vi.mock('@tauri-apps/api/tauri');
+vi.mock('@tauri-apps/api/core');
 
 describe('AI Portfolio Advisor', () => {
   const mockPositions: Position[] = [
