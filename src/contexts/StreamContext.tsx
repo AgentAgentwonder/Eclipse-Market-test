@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { ConnectionStatus, useStreamStatus } from '../hooks/useWebSocketStream';
 
 const PRICE_STORAGE_KEY = 'stream.price.subscriptions';

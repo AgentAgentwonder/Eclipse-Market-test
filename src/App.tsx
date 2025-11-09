@@ -29,7 +29,6 @@ import {
   Clock,
   Wrench,
   Terminal,
-  Rocket,
   Handshake,
   Vote,
 } from 'lucide-react';
@@ -37,7 +36,7 @@ import {
 import { ShortcutCheatSheet } from './components/common/ShortcutCheatSheet';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useCommandStore } from './store/commandStore';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { PhantomConnect } from './components/wallet/PhantomConnect';
 import { WalletSwitcher } from './components/wallet/WalletSwitcher';
 import { AddWalletModal } from './components/wallet/AddWalletModal';
