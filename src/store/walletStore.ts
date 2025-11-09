@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 export type WalletStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 

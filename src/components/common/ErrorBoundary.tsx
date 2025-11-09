@@ -1,6 +1,6 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import * as Sentry from '@sentry/react';
-import { relaunch } from '@tauri-apps/api/process';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { AlertCircle, RotateCcw, Send } from 'lucide-react';
 import { useDiagnosticsStore } from '../../store/diagnosticsStore';
 

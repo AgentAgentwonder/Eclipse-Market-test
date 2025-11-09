@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-import { checkUpdate, installUpdate, onUpdaterEvent } from '@tauri-apps/api/updater';
-import { relaunch } from '@tauri-apps/api/process';
+import { check, Update } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 
 export type UpdateSchedule = 'daily' | 'weekly' | 'never';
 
@@ -36,6 +36,7 @@ export interface RollbackInfo {
 
 interface UpdateState {
   availableUpdate: UpdateInfo | null;
+  updateInstance: Update | null;
   settings: UpdateSettings | null;
   downloadProgress: UpdateProgress | null;
   rollbackInfo: RollbackInfo | null;
@@ -59,6 +60,7 @@ interface UpdateState {
 
 export const useUpdateStore = create<UpdateState>((set, get) => ({
   availableUpdate: null,
+  updateInstance: null,
   settings: null,
   downloadProgress: null,
   rollbackInfo: null,
@@ -72,26 +74,27 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
   checkForUpdates: async () => {
     set({ isCheckingForUpdates: true, error: null });
     try {
-      const { shouldUpdate, manifest } = await checkUpdate();
-      if (shouldUpdate && manifest) {
+      const update = await check();
+      if (update) {
         const settings = get().settings;
         const dismissedVersion = settings?.dismissedVersion;
 
-        if (dismissedVersion && dismissedVersion === manifest.version) {
+        if (dismissedVersion && dismissedVersion === update.version) {
           set({ isCheckingForUpdates: false });
           return;
         }
 
         const updateInfo: UpdateInfo = {
-          version: manifest.version,
-          currentVersion: '1.0.0', // Will be updated from package.json
-          date: manifest.date || '',
-          body: manifest.body || '',
+          version: update.version,
+          currentVersion: update.currentVersion,
+          date: update.date || '',
+          body: update.body || '',
           downloadUrl: '',
         };
 
         set({
           availableUpdate: updateInfo,
+          updateInstance: update,
           showUpdateModal: true,
           isCheckingForUpdates: false,
         });
@@ -119,7 +122,24 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
   downloadAndInstall: async () => {
     set({ isDownloading: true, error: null });
     try {
-      await installUpdate();
+      const updateInstance = get().updateInstance;
+      if (!updateInstance) {
+        throw new Error('No update available to install');
+      }
+
+      await updateInstance.downloadAndInstall(event => {
+        if (event.event === 'Progress') {
+          const progress = (event.data.chunkLength / 100) * 100; // Simple progress calculation
+          set({
+            downloadProgress: {
+              downloaded: Math.min(progress, 100),
+              total: 100,
+              percentage: Math.min(progress, 100),
+            },
+          });
+        }
+      });
+
       set({ isDownloading: false, isInstalling: true });
 
       // Relaunch app after a short delay
@@ -200,30 +220,6 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
 
     listen('rollback-completed', () => {
       set({ isInstalling: false });
-    });
-
-    onUpdaterEvent(status => {
-      if (status.status === 'PENDING') {
-        set({
-          isDownloading: true,
-          downloadProgress: { downloaded: 0, total: 100, percentage: 5 },
-        });
-      } else if (status.status === 'DONE') {
-        set({
-          isDownloading: false,
-          isInstalling: true,
-          downloadProgress: { downloaded: 100, total: 100, percentage: 100 },
-        });
-      } else if (status.status === 'ERROR') {
-        set({
-          error: status.error || 'Update failed',
-          isDownloading: false,
-          isInstalling: false,
-          downloadProgress: null,
-        });
-      } else if (status.status === 'UPTODATE') {
-        set({ isDownloading: false, downloadProgress: null });
-      }
     });
 
     set({ listenersRegistered: true });

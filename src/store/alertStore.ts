@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { EnhancedAlertNotification } from '../types/alertNotifications';
 
 export type AlertConditionType = 'above' | 'below' | 'percent_change' | 'volume_spike';
