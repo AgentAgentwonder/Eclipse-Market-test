@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import type { DrawingObject, DrawingTemplate, DrawingTool, DrawingStyle } from '../types/drawings';
 import { DEFAULT_DRAWING_STYLE } from '../types/drawings';
 
