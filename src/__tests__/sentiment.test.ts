@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 import type { TokenSentiment, SocialPost, SentimentAlert } from '../types/sentiment';
 
-vi.mock('@tauri-apps/api', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 
