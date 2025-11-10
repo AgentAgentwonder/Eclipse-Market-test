@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { X, Check, Plus, Trash2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

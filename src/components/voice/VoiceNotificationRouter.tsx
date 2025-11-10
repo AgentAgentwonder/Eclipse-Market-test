@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useVoiceStore } from '../../store/voiceStore';
 
 interface VoiceNotificationRouterProps {

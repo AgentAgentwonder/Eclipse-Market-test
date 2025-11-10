@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { AlertTriangle, ArrowRight, Clock, ExternalLink } from 'lucide-react';
 import type { BridgeProvider } from '../../types/wallet';
 

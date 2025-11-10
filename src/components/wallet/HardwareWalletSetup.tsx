@@ -9,7 +9,7 @@ import {
   Loader2,
   Fingerprint,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useWalletStore, HardwareWalletDevice, DeviceType } from '../../store/walletStore';
 
 type SetupStep = 'select' | 'connect' | 'detect' | 'firmware' | 'test' | 'complete';

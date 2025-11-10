@@ -3,7 +3,7 @@ import { Clock, TrendingUp } from 'lucide-react';
 import { SwapForm } from '../SwapForm';
 import { useJupiter } from '../../hooks/useJupiter';
 import { useWallet } from '../../hooks/useWallet';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import type { SwapHistoryEntry } from '../../types/wallet';
 
 interface SwapViewProps {
