@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { BehavioralAnalytics, JournalFilters } from '../../types/journal';
 import { Activity, Clock, TrendingUp, Brain, ArrowRight } from 'lucide-react';
 

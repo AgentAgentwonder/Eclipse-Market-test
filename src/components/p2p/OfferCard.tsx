@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { ShoppingBag, TrendingUp, TrendingDown, Clock, Shield, AlertCircle } from 'lucide-react';
 import { P2POffer, TraderProfile } from '../../types/p2p';
 

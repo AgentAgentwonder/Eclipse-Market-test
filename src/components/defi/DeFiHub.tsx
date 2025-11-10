@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { motion } from 'framer-motion';
 import { TrendingUp, AlertTriangle, PieChart, RefreshCw } from 'lucide-react';
 import { PortfolioSummary, RiskMetrics } from '../../types/defi';

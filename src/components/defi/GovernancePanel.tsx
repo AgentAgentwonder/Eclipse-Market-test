@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Gavel, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { GovernanceProposal } from '../../types/defi';
 

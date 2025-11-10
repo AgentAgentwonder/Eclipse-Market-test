@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { AlertCircle, Info, Lightbulb } from 'lucide-react';
 import { useTradingSettingsStore } from '../../store/tradingSettingsStore';
 import { useOrderFormSuggestionStore } from '../../store/orderFormSuggestionStore';

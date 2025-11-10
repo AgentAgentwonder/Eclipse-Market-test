@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { TrendingUp, Droplet, AlertCircle } from 'lucide-react';
 import { YieldFarm, FarmingOpportunity, DeFiPosition } from '../../types/defi';
 

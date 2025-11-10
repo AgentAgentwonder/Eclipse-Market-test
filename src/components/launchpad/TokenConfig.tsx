@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { AlertTriangle, CheckCircle2, Loader2, ShieldCheck, Zap } from 'lucide-react';
 
 interface TokenMetadata {
