@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { TraySettings } from '../pages/Settings/TraySettings';

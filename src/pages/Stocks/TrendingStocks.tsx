@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Activity, RefreshCw, AlertCircle } from 'lucide-react';
 import type { TrendingStock } from '../../types/stocks';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { motion } from 'framer-motion';
 import { Zap, AlertTriangle, Shield, Eye, Clock, Users, Droplet, RefreshCw } from 'lucide-react';
 import { QuickTradeButton } from '../../components/trading/QuickTradeButton';

@@ -11,7 +11,7 @@ import {
   XCircle,
   Loader2,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import {
   LineChart,
   Line,

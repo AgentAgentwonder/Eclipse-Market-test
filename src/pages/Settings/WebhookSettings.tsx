@@ -13,7 +13,7 @@ import {
   ChevronUp,
   Copy,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import type { WebhookConfig, WebhookDeliveryLog, WebhookTestResult } from '../../types/webhooks';
 
 const WebhookSettings = () => {

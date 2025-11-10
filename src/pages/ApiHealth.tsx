@@ -10,7 +10,7 @@ import {
   BarChart3,
   RefreshCw,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import {
   LineChart,
   Line,

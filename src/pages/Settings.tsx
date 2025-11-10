@@ -23,7 +23,7 @@ import {
   Activity,
   Mic,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { BIOMETRIC_STATUS_EVENT } from '../constants/events';
 import HardwareWalletManager from '../components/wallet/HardwareWalletManager';
 import { useWalletStore } from '../store/walletStore';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { WalletActivityFeed } from '../components/insiders/WalletActivityFeed';
 import { SmartMoneyDashboard } from '../components/insiders/SmartMoneyDashboard';
 import { WhaleAlertsPanel } from '../components/insiders/WhaleAlertsPanel';

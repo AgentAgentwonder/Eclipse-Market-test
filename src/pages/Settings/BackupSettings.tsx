@@ -14,7 +14,7 @@ import {
   Calendar,
   Trash2,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface BackupMetadata {
   filename: string;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
 import type { TopMover } from '../../types/stocks';
 
