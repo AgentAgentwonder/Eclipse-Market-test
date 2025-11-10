@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Window as WindowIcon, X, Pin, PinOff, Move, Minimize as MinimizeIcon } from 'lucide-react';
+import { Square as WindowIcon, X, Pin, PinOff, Move, Minimize as MinimizeIcon } from 'lucide-react';
 import { useFloatingWindows } from '../../hooks/useFloatingWindows';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 

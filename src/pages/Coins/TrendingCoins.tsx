@@ -691,6 +691,7 @@ export function TrendingCoinsExplorer({ searchQuery, onSelectCoin }: TrendingCoi
                 <div className="text-center text-gray-500 text-sm">
                   Chart visualization coming soon
                 </div>
+              </div>
 
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
