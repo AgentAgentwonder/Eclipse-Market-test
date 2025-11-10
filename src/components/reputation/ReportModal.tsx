@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 import { X, AlertTriangle, Flag, FileText, Link as LinkIcon } from 'lucide-react';
 
 interface ReportModalProps {

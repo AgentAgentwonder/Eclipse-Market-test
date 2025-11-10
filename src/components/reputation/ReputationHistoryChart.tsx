@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 import { Chart } from 'react-chartjs-2';
 import {
   Chart as ChartJS,

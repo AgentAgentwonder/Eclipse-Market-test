@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { AlertTriangle, RefreshCcw, ShieldAlert } from 'lucide-react';
 import { RiskHistory, RiskScore } from '../../types/risk';
 import { RiskScoreBadge } from './RiskScoreBadge';

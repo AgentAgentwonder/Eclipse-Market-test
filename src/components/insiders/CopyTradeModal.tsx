@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { X, Copy, CheckCircle, AlertCircle, Loader2, Settings2 } from 'lucide-react';
 import { WalletActivity } from '../../types/insiders';
 import { useWalletStore } from '../../store/walletStore';

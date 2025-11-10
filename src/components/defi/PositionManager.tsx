@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Sparkles, CheckCircle2 } from 'lucide-react';
 import { AutoCompoundSettings, DeFiPosition } from '../../types/defi';
 

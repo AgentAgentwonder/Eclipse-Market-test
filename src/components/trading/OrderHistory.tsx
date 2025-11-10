@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import type { Order, OrderStatus, OrderType } from '../../types/trading';
 
