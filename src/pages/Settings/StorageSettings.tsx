@@ -8,7 +8,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface CompressionStats {
   total_uncompressed_bytes: number;

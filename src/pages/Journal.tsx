@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Plus, BarChart3, Brain, TrendingUp, Search, Filter } from 'lucide-react';
 import { JournalEntry, JournalFilters, WeeklyReport, JournalStats } from '../types/journal';
 import { JournalEntryCard } from '../components/journal/JournalEntryCard';

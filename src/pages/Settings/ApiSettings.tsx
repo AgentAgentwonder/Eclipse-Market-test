@@ -21,7 +21,7 @@ import {
   Bell,
   Gauge,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface ServiceStatus {
   configured: boolean;

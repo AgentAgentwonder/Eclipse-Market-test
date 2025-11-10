@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, TrendingUp, Zap, BarChart3 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { TrendingCoins } from './Coins/TrendingCoins';
 import { NewCoins } from './Coins/NewCoins';
 import { TopMarketCap } from './Coins/TopMarketCap';

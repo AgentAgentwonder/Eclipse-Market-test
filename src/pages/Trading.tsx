@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { AlertCircle } from 'lucide-react';
 import { OrderBook } from '../components/OrderBook';
 import { SwapForm } from '../components/SwapForm';

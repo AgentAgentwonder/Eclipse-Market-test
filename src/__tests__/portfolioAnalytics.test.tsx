@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import PortfolioAnalytics from '../pages/PortfolioAnalytics';
 import { invoke } from '@tauri-apps/api/core';
@@ -251,13 +252,17 @@ describe('Portfolio Analytics', () => {
   });
 
   it('handles export report', async () => {
+    const originalCreateElement = document.createElement.bind(document);
     const mockCreateElement = vi.spyOn(document, 'createElement');
     const mockClick = vi.fn();
-    mockCreateElement.mockReturnValue({
-      click: mockClick,
-      setAttribute: vi.fn(),
-      style: {},
-    } as any);
+
+    mockCreateElement.mockImplementation((tagName: string) => {
+      const element = originalCreateElement(tagName);
+      if (tagName === 'a') {
+        (element as HTMLAnchorElement).click = mockClick as any;
+      }
+      return element;
+    });
 
     render(<PortfolioAnalytics />);
 
@@ -271,6 +276,8 @@ describe('Portfolio Analytics', () => {
     await waitFor(() => {
       expect(mockClick).toHaveBeenCalled();
     });
+
+    mockCreateElement.mockRestore();
   });
 
   it('displays risk metrics correctly', async () => {

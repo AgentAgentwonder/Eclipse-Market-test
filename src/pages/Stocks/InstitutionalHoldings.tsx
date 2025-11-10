@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Building2, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import type { InstitutionalHolding } from '../../types/stocks';
 

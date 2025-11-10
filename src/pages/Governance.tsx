@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { motion } from 'framer-motion';
 import { Vote, Users, TrendingUp, Clock, AlertCircle, ChevronRight, Shield } from 'lucide-react';
 import { GovernanceSummary, DAOMembership, GovernanceProposal } from '../types/governance';

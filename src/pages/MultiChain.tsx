@@ -5,7 +5,7 @@ import { ChainSelector } from '../components/chains/ChainSelector';
 import { BridgeInterface } from '../components/chains/BridgeInterface';
 import { CrossChainPortfolioSummary } from '../components/chains/CrossChainPortfolioSummary';
 import { useWalletStore } from '../store/walletStore';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface BridgeTransaction {
   id: string;

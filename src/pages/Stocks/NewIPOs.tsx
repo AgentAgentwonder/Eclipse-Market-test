@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Calendar, TrendingUp, RefreshCw } from 'lucide-react';
 import type { NewIPO } from '../../types/stocks';
 

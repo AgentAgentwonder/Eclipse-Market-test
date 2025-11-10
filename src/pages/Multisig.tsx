@@ -4,7 +4,7 @@ import { Users, FileText, AlertTriangle } from 'lucide-react';
 import MultisigDashboard from '../components/wallet/MultisigDashboard';
 import ProposalManager from '../components/wallet/ProposalManager';
 import { useWalletStore } from '../store/walletStore';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 interface MultisigWallet {
   id: string;

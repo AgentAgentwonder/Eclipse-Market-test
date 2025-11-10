@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Download, Filter, Search, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ActivityLog {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { QuickTradeButton } from '../../components/trading/QuickTradeButton';
 import { Sparkline } from '../../components/coins/Sparkline';
 import { formatCurrencyAbbrev, normalizeSparkline } from './utils';

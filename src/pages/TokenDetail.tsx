@@ -13,7 +13,7 @@ import {
   Info,
   Activity,
 } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { HolderDistributionChart } from '../components/holders/HolderDistributionChart';
 import { HolderTrendsChart } from '../components/holders/HolderTrendsChart';
 import { TopHoldersTable } from '../components/holders/TopHoldersTable';
