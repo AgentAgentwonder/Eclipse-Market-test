@@ -13,7 +13,7 @@
  * @author Eclipse Market Pro Team
  */
 
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useLogger } from '../utils/logger';
 
 export interface TradingSignal {

@@ -1,6 +1,6 @@
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import Solana from '@ledgerhq/hw-app-solana';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 
 export interface LedgerDevice {
