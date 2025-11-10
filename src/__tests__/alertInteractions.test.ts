@@ -3,7 +3,7 @@ import { useAlertStore } from '../store/alertStore';
 import { useAddressLabelStore } from '../store/addressLabelStore';
 import { EnhancedAlertNotification } from '../types/alertNotifications';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 

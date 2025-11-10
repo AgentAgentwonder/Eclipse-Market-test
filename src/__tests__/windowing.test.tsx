@@ -4,7 +4,7 @@ import { useFloatingWindows } from '../hooks/useFloatingWindows';
 import { useMonitors } from '../hooks/useMonitors';
 import { useWorkspaceStore } from '../store/workspaceStore';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 
@@ -21,7 +21,7 @@ describe('Windowing Features', () => {
 
   describe('useMonitors', () => {
     it('should fetch monitors on mount', async () => {
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue([
         {
           id: 'monitor-0',
@@ -49,7 +49,7 @@ describe('Windowing Features', () => {
     });
 
     it('should handle multiple monitors', async () => {
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue([
         {
           id: 'monitor-0',
@@ -84,7 +84,7 @@ describe('Windowing Features', () => {
     });
 
     it('should fallback to default monitor on error', async () => {
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockRejectedValue(new Error('Failed to get monitors'));
 
       const { result } = renderHook(() => useMonitors());
@@ -128,7 +128,7 @@ describe('Windowing Features', () => {
         currentMonitorConfig: null,
       });
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue('floating-panel-1-123456');
 
       const { result } = renderHook(() => useFloatingWindows());
@@ -197,7 +197,7 @@ describe('Windowing Features', () => {
         currentMonitorConfig: null,
       });
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useFloatingWindows());
@@ -211,9 +211,9 @@ describe('Windowing Features', () => {
       });
 
       expect(result.current.floatingWindows).toHaveLength(0);
-    });
+      });
 
-    it('should set window always on top', async () => {
+      it('should set window always on top', async () => {
       const testWorkspace = {
         id: 'ws-1',
         name: 'Test Workspace',
@@ -244,7 +244,7 @@ describe('Windowing Features', () => {
         currentMonitorConfig: null,
       });
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useFloatingWindows());
@@ -259,9 +259,9 @@ describe('Windowing Features', () => {
       });
 
       expect(result.current.floatingWindows[0].alwaysOnTop).toBe(true);
-    });
+      });
 
-    it('should snap window to edge', async () => {
+      it('should snap window to edge', async () => {
       const testWorkspace = {
         id: 'ws-1',
         name: 'Test Workspace',
@@ -291,7 +291,7 @@ describe('Windowing Features', () => {
         currentMonitorConfig: null,
       });
 
-      const { invoke } = await import('@tauri-apps/api/tauri');
+      const { invoke } = await import('@tauri-apps/api/core');
       vi.mocked(invoke).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useFloatingWindows());
@@ -307,7 +307,7 @@ describe('Windowing Features', () => {
       });
 
       expect(result.current.floatingWindows[0].snappedEdge).toBe('left');
-    });
+      });
   });
 
   describe('Split Pane Behavior', () => {

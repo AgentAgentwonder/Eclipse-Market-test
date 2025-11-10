@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 import { useState, useCallback } from 'react';
 
 export type SwapMode = 'exact_in' | 'exact_out';

@@ -2,9 +2,9 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { DeFiHub } from '../components/defi/DeFiHub';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
-vi.mock('@tauri-apps/api/tauri');
+vi.mock('@tauri-apps/api/core');
 
 const mockPortfolioSummary = {
   totalValueUsd: 50000,

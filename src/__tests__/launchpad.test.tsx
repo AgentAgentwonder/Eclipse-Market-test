@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import TokenConfig from '../components/launchpad/TokenConfig';
 import LaunchpadStudio from '../components/launchpad/LaunchpadStudio';
 
-vi.mock('@tauri-apps/api/tauri');
+vi.mock('@tauri-apps/api/core');
 
 describe('Launchpad', () => {
   beforeEach(() => {

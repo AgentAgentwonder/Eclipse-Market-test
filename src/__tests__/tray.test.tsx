@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { TraySettings } from '../pages/Settings/TraySettings';
 import { StartupSettings } from '../pages/Settings/StartupSettings';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import Governance from '../pages/Governance';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useWalletStore } from '../store/walletStore';
 
-vi.mock('@tauri-apps/api/tauri');
+vi.mock('@tauri-apps/api/core');
 
 const mockSummary = {
   totalDaos: 2,

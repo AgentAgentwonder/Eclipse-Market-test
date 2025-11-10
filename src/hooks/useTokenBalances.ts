@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 import type { TokenBalance } from '../types/wallet';
 
 export function useTokenBalances(address: string | null) {

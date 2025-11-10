@@ -2,11 +2,11 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { LaunchPredictorPanel } from '../components/launchPredictor/LaunchPredictorPanel';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock('@tauri-apps/api/tauri', () => ({
+vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn(),
 }));
 
-const { invoke } = await import('@tauri-apps/api/tauri');
+const { invoke } = await import('@tauri-apps/api/core');
 
 describe('LaunchPredictorPanel', () => {
   beforeEach(() => {

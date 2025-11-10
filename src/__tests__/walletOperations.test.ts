@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import type {
   TokenBalance,
   TransactionFeeEstimate,
@@ -8,7 +8,7 @@ import type {
   SwapHistoryEntry,
 } from '../types/wallet';
 
-vi.mock('@tauri-apps/api/tauri');
+vi.mock('@tauri-apps/api/core');
 
 describe('Wallet Operations', () => {
   beforeEach(() => {
