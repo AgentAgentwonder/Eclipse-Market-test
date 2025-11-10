@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { MobileDashboard } from './components/MobileDashboard';
 import { BiometricLogin } from './screens/BiometricLogin';
 import { DeviceRegistration } from './screens/DeviceRegistration';
