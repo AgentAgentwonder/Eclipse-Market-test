@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { PieChart, Wallet, Coins, TrendingUp } from 'lucide-react';
 
 interface ChainBalance {

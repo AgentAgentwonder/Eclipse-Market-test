@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 
 export function RiskIndicator() {
   const [riskScore, setRiskScore] = useState<number | null>(null);

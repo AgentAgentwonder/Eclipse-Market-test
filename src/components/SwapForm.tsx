@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { ArrowDown, AlertCircle, ArrowRight, Loader2, Settings } from 'lucide-react';
 import type { QuoteInput, QuoteResult, SwapInput } from '../hooks/useJupiter';
 import type { useJupiter } from '../hooks/useJupiter';
