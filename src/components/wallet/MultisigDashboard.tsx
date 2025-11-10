@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Users, Plus, AlertCircle, RefreshCw, FileText, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import MultisigWizard from './MultisigWizard';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { PerformanceScore } from '../../types/performance';
 import { PerformanceScoreBadge } from './PerformanceScoreBadge';
 import { TrendingUp, TrendingDown, Activity, ChevronRight } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { Copy, Download, Share2, QrCode, AlertCircle } from 'lucide-react';
 import type { SolanaPayQR, QRCodeData } from '../../types/wallet';
 

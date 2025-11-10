@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useWallet as useAdapterWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
