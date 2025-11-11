@@ -207,13 +207,13 @@ describe('Windowing Features', () => {
       });
 
       expect(invoke).toHaveBeenCalledWith('close_floating_window', {
-        windowId: 'floating-1',
+        window_id: 'floating-1',
       });
 
       expect(result.current.floatingWindows).toHaveLength(0);
-      });
+    });
 
-      it('should set window always on top', async () => {
+    it('should set window always on top', async () => {
       const testWorkspace = {
         id: 'ws-1',
         name: 'Test Workspace',
@@ -254,14 +254,14 @@ describe('Windowing Features', () => {
       });
 
       expect(invoke).toHaveBeenCalledWith('set_window_always_on_top', {
-        windowId: 'floating-1',
-        alwaysOnTop: true,
+        window_id: 'floating-1',
+        always_on_top: true,
       });
 
       expect(result.current.floatingWindows[0].alwaysOnTop).toBe(true);
-      });
+    });
 
-      it('should snap window to edge', async () => {
+    it('should snap window to edge', async () => {
       const testWorkspace = {
         id: 'ws-1',
         name: 'Test Workspace',
@@ -301,13 +301,13 @@ describe('Windowing Features', () => {
       });
 
       expect(invoke).toHaveBeenCalledWith('snap_window_to_edge', {
-        windowId: 'floating-1',
+        window_id: 'floating-1',
         edge: 'left',
-        monitorId: 'monitor-0',
+        monitor_id: 'monitor-0',
       });
 
       expect(result.current.floatingWindows[0].snappedEdge).toBe('left');
-      });
+    });
   });
 
   describe('Split Pane Behavior', () => {

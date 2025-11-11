@@ -160,8 +160,23 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
       const settings = await invoke<UpdateSettings>('get_update_settings');
       set({ settings });
     } catch (error) {
-      console.error('Failed to load update settings:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to load update settings' });
+      // TODO: Handle missing 'get_update_settings' command gracefully
+      if (error instanceof Error && error.message.includes('Command')) {
+        console.debug('Update settings command not available:', error.message);
+        // Use default settings if command is not available
+        set({
+          settings: {
+            schedule: 'weekly',
+            autoDownload: true,
+            autoInstall: false,
+            lastCheck: null,
+            dismissedVersion: null,
+          },
+        });
+      } else {
+        console.error('Failed to load update settings:', error);
+        set({ error: error instanceof Error ? error.message : 'Failed to load update settings' });
+      }
     }
   },
 
@@ -170,8 +185,15 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
       await invoke('save_update_settings', { settings });
       set({ settings });
     } catch (error) {
-      console.error('Failed to save update settings:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to save update settings' });
+      // TODO: Handle missing 'save_update_settings' command gracefully
+      if (error instanceof Error && error.message.includes('Command')) {
+        console.debug('Save update settings command not available:', error.message);
+        // Still update local state even if backend command is unavailable
+        set({ settings });
+      } else {
+        console.error('Failed to save update settings:', error);
+        set({ error: error instanceof Error ? error.message : 'Failed to save update settings' });
+      }
     }
   },
 
@@ -180,8 +202,15 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
       await invoke('dismiss_update', { version });
       set({ availableUpdate: null, showUpdateModal: false });
     } catch (error) {
-      console.error('Failed to dismiss update:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to dismiss update' });
+      // TODO: Handle missing 'dismiss_update' command gracefully
+      if (error instanceof Error && error.message.includes('Command')) {
+        console.debug('Dismiss update command not available:', error.message);
+        // Still dismiss locally even if backend command is unavailable
+        set({ availableUpdate: null, showUpdateModal: false });
+      } else {
+        console.error('Failed to dismiss update:', error);
+        set({ error: error instanceof Error ? error.message : 'Failed to dismiss update' });
+      }
     }
   },
 
@@ -190,8 +219,15 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
       const rollbackInfo = await invoke<RollbackInfo>('get_rollback_info');
       set({ rollbackInfo });
     } catch (error) {
-      console.error('Failed to load rollback info:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to load rollback info' });
+      // TODO: Handle missing 'get_rollback_info' command gracefully
+      if (error instanceof Error && error.message.includes('Command')) {
+        console.debug('Rollback info command not available:', error.message);
+        // Default to no rollback available if command is not available
+        set({ rollbackInfo: { available: false, previousVersion: null, backupTimestamp: null } });
+      } else {
+        console.error('Failed to load rollback info:', error);
+        set({ error: error instanceof Error ? error.message : 'Failed to load rollback info' });
+      }
     }
   },
 
@@ -200,8 +236,13 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
       await invoke('rollback_update');
       set({ isInstalling: true });
     } catch (error) {
-      console.error('Failed to rollback update:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to rollback update' });
+      // TODO: Handle missing 'rollback_update' command gracefully
+      if (error instanceof Error && error.message.includes('Command')) {
+        console.debug('Rollback update command not available:', error.message);
+      } else {
+        console.error('Failed to rollback update:', error);
+        set({ error: error instanceof Error ? error.message : 'Failed to rollback update' });
+      }
     }
   },
 

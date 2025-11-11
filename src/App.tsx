@@ -214,8 +214,11 @@ function App() {
     loadSettings();
 
     // Check for updates on startup (after a delay)
+    // TODO: Only check for updates if the updater command is available
     setTimeout(() => {
-      checkForUpdates().catch(console.error);
+      checkForUpdates().catch(error => {
+        console.error('Failed to check for updates:', error);
+      });
     }, 5000);
   }, [setupEventListeners, loadSettings, checkForUpdates]);
 
@@ -223,9 +226,15 @@ function App() {
     const hydrate = async () => {
       try {
         const status = await invoke<BiometricStatus>('biometric_get_status');
-        setLockVisible(Boolean(status.enrolled));
+        setLockVisible(Boolean(status?.enrolled));
       } catch (error) {
-        console.error('Failed to hydrate biometric status', error);
+        // TODO: Handle missing 'biometric_get_status' command gracefully
+        // If command is not available, just skip biometric lock initialization
+        if (error instanceof Error && error.message.includes('Command')) {
+          console.debug('Biometric status command not available:', error.message);
+        } else {
+          console.error('Failed to hydrate biometric status', error);
+        }
         setLockVisible(false);
       } finally {
         setInitializingLock(false);
@@ -500,11 +509,16 @@ function App() {
       if (document.visibilityState !== 'visible') return;
       try {
         const status = await invoke<BiometricStatus>('biometric_get_status');
-        if (status.enrolled) {
+        if (status?.enrolled) {
           setLockVisible(true);
         }
       } catch (error) {
-        console.error('Failed to refresh biometric status on resume', error);
+        // TODO: Handle missing 'biometric_get_status' command gracefully
+        if (error instanceof Error && error.message.includes('Command')) {
+          console.debug('Biometric status command not available:', error.message);
+        } else {
+          console.error('Failed to refresh biometric status on resume', error);
+        }
       }
     };
 
