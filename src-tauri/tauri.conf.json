@@ -6,6 +6,7 @@
   "beforeDevCommand": "npm run dev",
   "beforeBuildCommand": "npm run build",
   "devUrl": "http://localhost:1420",
+  "frontendDist": "../dist",
   "active": true,
   "category": "Finance",
   "icon": [
@@ -17,7 +18,7 @@
   ],
   "targets": "all",
   "security": {
-    "csp": null,
+    "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http://localhost:1420 https: wss:; frame-ancestors 'none';",
     "capabilities": [
       "default",
       "main:default"
@@ -25,18 +26,32 @@
   },
   "trayIcon": {
     "iconPath": "icons/icon.png",
-    "iconAsTemplate": true
+    "iconAsTemplate": true,
+    "tooltip": "Eclipse Market Pro"
   },
   "windows": [
     {
+      "label": "main",
       "fullscreen": false,
       "resizable": true,
       "title": "Eclipse Market Pro",
       "width": 1400,
-      "height": 900
+      "height": 900,
+      "minWidth": 800,
+      "minHeight": 600,
+      "visible": true,
+      "decorations": true,
+      "shadow": true,
+      "skipTaskbar": false
     }
   ],
   "plugins": {
+    "global-shortcut": {
+      "active": true
+    },
+    "notification": {
+      "active": true
+    },
     "updater": {
       "active": true,
       "endpoints": [
@@ -45,5 +60,58 @@
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDFEQ0ZFQUE5MjQ3QjQxODIKUldRMDhIanJ1SVMxM0xqdUtIaDdHaUN5M1NiQVFhOWJuRGNVRktnWVExM3VhRkdwUWZhUlVNUmkK"
     }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "identifier": "com.eclipse.market.pro",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "Copyright © 2024 Eclipse Market Pro. All rights reserved.",
+    "category": "Finance",
+    "shortDescription": "Professional Multi-Chain Crypto Trading Platform",
+    "longDescription": "Eclipse Market Pro is a cross-platform trading desktop application for professional cryptocurrency traders, featuring real-time market analysis, AI-powered insights, paper trading, and advanced portfolio management on Solana and multi-chain networks.",
+    "deb": {
+      "depends": [],
+      "useBootstrapper": false,
+      "lintian-overrides": []
+    },
+    "appimage": {
+      "bundleMediaFramework": false
+    },
+    "dmg": {
+      "background": null,
+      "windowX": 200,
+      "windowY": 200,
+      "windowWidth": 540,
+      "windowHeight": 380,
+      "iconWidth": 128,
+      "iconHeight": 128,
+      "folderX": 300,
+      "folderY": 320
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13.6",
+      "exceptionDomain": "com.eclipse.market.pro",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null
+    },
+    "windows": [
+      {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "signingIdentity": null,
+        "timestampUrl": ""
+      }
+    ]
   }
 }
