@@ -137,7 +137,7 @@ use auth::two_factor::TwoFactorManager;
 use auto_start::{AutoStartManager, SharedAutoStartManager};
 use bridges::{BridgeManager, SharedBridgeManager};
 use chains::{ChainManager, SharedChainManager};
-use chrono::Timelike;
+use chrono::{Timelike, Utc};
 use collab::state::CollabState;
 use config::settings_manager::{SettingsManager, SharedSettingsManager};
 use core::cache_manager::{CacheType, SharedCacheManager};
@@ -178,6 +178,27 @@ use wallet::performance::{PerformanceDatabase, SharedPerformanceDatabase};
 use wallet::phantom::{hydrate_wallet_state, WalletState};
 use webhooks::{SharedWebhookManager, WebhookManager};
 use updater::{SharedUpdaterState, UpdaterState};
+
+macro_rules! startup_log {
+    ($($arg:tt)*) => {{
+        let now = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S%.3fZ");
+        eprintln!("[startup][{}] {}", now, format_args!($($arg)*));
+    }};
+}
+
+macro_rules! startup_error {
+    ($($arg:tt)*) => {{
+        let now = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S%.3fZ");
+        eprintln!("[startup][{}][ERROR] {}", now, format_args!($($arg)*));
+    }};
+}
+
+macro_rules! manage_state {
+    ($app:expr, $value:expr, $name:expr) => {{
+        $app.manage($value);
+        startup_log!("Managed state: {}", $name);
+    }};
+}
 
 async fn warm_cache_on_startup(
     _app_handle: tauri::AppHandle,
@@ -231,186 +252,241 @@ async fn warm_cache_on_startup(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_notification::init())
-        .manage(WalletState::new())
-        .manage(HardwareWalletState::new())
-        .manage(LedgerState::new())
-        .setup(|app| {
+    startup_log!("run() invoked");
+    let builder = tauri::Builder::default();
+    startup_log!("Base Tauri builder created");
+
+    let builder =
+        builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
+    startup_log!("Global shortcut plugin registered");
+
+    let builder = builder.plugin(tauri_plugin_notification::init());
+    startup_log!("Notification plugin registered");
+
+    let builder = builder.manage(WalletState::new());
+    startup_log!("Wallet state registered");
+
+    let builder = builder.manage(HardwareWalletState::new());
+    startup_log!("Hardware wallet state registered");
+
+    let builder = builder.manage(LedgerState::new());
+    startup_log!("Ledger state registered");
+
+    let builder = builder.setup(|app| {
+            startup_log!("setup() closure entered");
             if let Err(e) = hydrate_wallet_state(&app.handle()) {
-                eprintln!("Failed to hydrate wallet state: {e}");
+                startup_error!("Failed to hydrate wallet state: {}", e);
             }
 
+            startup_log!("Initializing keystore");
             let keystore = Keystore::initialize(&app.handle()).map_err(|e| {
-                eprintln!("Failed to initialize keystore: {e}");
+                startup_error!("Failed to initialize keystore: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Keystore initialized");
 
             let tax_engine = tax::initialize_tax_engine(&keystore);
+            startup_log!("Tax engine initialized");
 
             let audit_cache = AuditCache::new();
-            app.manage(audit_cache);
+            manage_state!(app, audit_cache, "AuditCache");
 
             let session_manager = SessionManager::new();
+            startup_log!("Session manager created");
             if let Err(e) = session_manager.hydrate(&keystore) {
-                eprintln!("Failed to hydrate session manager: {e}");
+                startup_error!("Failed to hydrate session manager: {}", e);
+            } else {
+                startup_log!("Session manager hydrated");
             }
 
             let two_factor_manager = TwoFactorManager::new();
+            startup_log!("Two-factor manager created");
             if let Err(e) = two_factor_manager.hydrate(&keystore) {
-                eprintln!("Failed to hydrate 2FA manager: {e}");
+                startup_error!("Failed to hydrate 2FA manager: {}", e);
+            } else {
+                startup_log!("2FA manager hydrated");
             }
 
             let ws_manager = core::websocket_manager::WebSocketManager::new(app.handle().clone());
+            startup_log!("WebSocket manager created");
 
+            startup_log!("Initializing multi-wallet manager");
             let multi_wallet_manager = MultiWalletManager::initialize(&keystore).map_err(|e| {
-                eprintln!("Failed to initialize multi-wallet manager: {e}");
+                startup_error!("Failed to initialize multi-wallet manager: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Multi-wallet manager initialized");
 
+            startup_log!("Initializing wallet operations manager");
             let wallet_operations_manager = WalletOperationsManager::initialize(&keystore)
                 .map_err(|e| {
-                    eprintln!("Failed to initialize wallet operations manager: {e}");
+                    startup_error!("Failed to initialize wallet operations manager: {}", e);
                     Box::new(e) as Box<dyn Error>
                 })?;
+            startup_log!("Wallet operations manager initialized");
 
+            startup_log!("Initializing activity logger");
             let activity_logger =
                 tauri::async_runtime::block_on(async { ActivityLogger::new(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize activity logger: {e}");
+                        startup_error!("Failed to initialize activity logger: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Activity logger initialized");
 
             let cleanup_logger = activity_logger.clone();
 
             // Initialize reputation engine
+            startup_log!("Initializing reputation engine");
             let reputation_engine = tauri::async_runtime::block_on(async {
                 ReputationEngine::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize reputation engine: {e}");
+                startup_error!("Failed to initialize reputation engine: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Reputation engine initialized");
 
             let shared_reputation_engine: SharedReputationEngine =
                 Arc::new(RwLock::new(reputation_engine));
-            app.manage(shared_reputation_engine.clone());
+            manage_state!(app, shared_reputation_engine.clone(), "SharedReputationEngine");
 
             // Initialize P2P system
+            startup_log!("Initializing P2P system");
             let p2p_db =
                 tauri::async_runtime::block_on(async { init_p2p_system(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize P2P system: {e}");
+                        startup_error!("Failed to initialize P2P system: {}", e);
                         e
                     })?;
-            app.manage(p2p_db.clone());
+            startup_log!("P2P system initialized");
+            manage_state!(app, p2p_db.clone(), "P2PDatabase");
 
             // Initialize academy engine
+            startup_log!("Initializing academy engine");
             let academy_engine = tauri::async_runtime::block_on(async {
                 academy::AcademyEngine::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize academy engine: {}", e);
+                startup_error!("Failed to initialize academy engine: {}", e);
                 Box::new(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     e.to_string(),
                 )) as Box<dyn Error>
             })?;
+            startup_log!("Academy engine initialized");
 
             let shared_academy_engine: academy::SharedAcademyEngine =
                 Arc::new(RwLock::new(academy_engine));
-            app.manage(shared_academy_engine.clone());
+            manage_state!(app, shared_academy_engine.clone(), "SharedAcademyEngine");
 
             // Initialize API config manager
             let api_config_manager = api_config::ApiConfigManager::new();
+            startup_log!("API config manager created");
             if let Err(e) = api_config_manager.initialize(&keystore) {
-                eprintln!("Failed to initialize API config manager: {e}");
+                startup_error!("Failed to initialize API config manager: {}", e);
+            } else {
+                startup_log!("API config manager initialized");
             }
 
             // Initialize API health monitor
+            startup_log!("Initializing API health monitor");
             let api_health_monitor = tauri::async_runtime::block_on(async {
                 ApiHealthMonitor::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize API health monitor: {e}");
+                startup_error!("Failed to initialize API health monitor: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("API health monitor initialized");
 
             let api_health_state: SharedApiHealthMonitor =
                 Arc::new(RwLock::new(api_health_monitor));
 
-            app.manage(multi_wallet_manager);
-            app.manage(wallet_operations_manager);
-            app.manage(session_manager);
-            app.manage(two_factor_manager);
-            app.manage(ws_manager);
-            app.manage(activity_logger);
-            app.manage(api_config_manager);
-            app.manage(api_health_state.clone());
+            manage_state!(app, multi_wallet_manager, "MultiWalletManager");
+            manage_state!(app, wallet_operations_manager, "WalletOperationsManager");
+            manage_state!(app, session_manager, "SessionManager");
+            manage_state!(app, two_factor_manager, "TwoFactorManager");
+            manage_state!(app, ws_manager, "WebSocketManager");
+            manage_state!(app, activity_logger, "ActivityLogger");
+            manage_state!(app, api_config_manager, "ApiConfigManager");
+            manage_state!(app, api_health_state.clone(), "ApiHealthMonitor");
 
+            startup_log!("Creating chain manager");
             let chain_manager: SharedChainManager = Arc::new(RwLock::new(ChainManager::new()));
-            app.manage(chain_manager.clone());
+            manage_state!(app, chain_manager.clone(), "ChainManager");
 
+            startup_log!("Creating bridge manager");
             let bridge_manager: SharedBridgeManager = Arc::new(RwLock::new(BridgeManager::new()));
-            app.manage(bridge_manager.clone());
+            manage_state!(app, bridge_manager.clone(), "BridgeManager");
 
+            startup_log!("Initializing API usage tracker");
             let usage_tracker =
                 api_analytics::initialize_usage_tracker(&app.handle()).map_err(|e| {
-                    eprintln!("Failed to initialize API usage tracker: {e}");
+                    startup_error!("Failed to initialize API usage tracker: {}", e);
                     Box::new(std::io::Error::new(std::io::ErrorKind::Other, e.clone())) as Box<dyn Error>
                 })?;
-            app.manage(usage_tracker);
+            startup_log!("API usage tracker initialized");
+            manage_state!(app, usage_tracker, "ApiUsageTracker");
 
             // Initialize universal settings manager
+            startup_log!("Initializing settings manager");
             let settings_manager = SettingsManager::new(&app.handle()).map_err(|e| {
-                eprintln!("Failed to initialize settings manager: {e}");
+                startup_error!("Failed to initialize settings manager: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Settings manager initialized");
             let settings_state: SharedSettingsManager = Arc::new(RwLock::new(settings_manager));
-            app.manage(settings_state.clone());
+            manage_state!(app, settings_state.clone(), "SettingsManager");
 
             // Initialize launchpad state
             let rpc_url = "https://api.mainnet-beta.solana.com".to_string();
+            startup_log!("Creating launchpad state");
             let launchpad_state = launchpad::commands::create_launchpad_state(rpc_url);
-            app.manage(launchpad_state);
+            manage_state!(app, launchpad_state, "LaunchpadState");
 
             // Initialize collaborative rooms state
+            startup_log!("Initializing collaborative rooms state");
             let collab_websocket = collab::websocket::CollabWebSocketManager::new(app.handle().clone());
             let collab_state = CollabState::new(collab_websocket);
-            app.manage(collab_state);
+            manage_state!(app, collab_state, "CollabState");
 
+            startup_log!("Spawning activity log cleanup task");
             tauri::async_runtime::spawn(async move {
                 use tokio::time::{sleep, Duration};
 
                 if let Err(err) = cleanup_logger.cleanup_old_logs(None).await {
-                    eprintln!("Failed to run initial activity log cleanup: {err}");
+                    startup_error!("Failed to run initial activity log cleanup: {}", err);
                 }
 
                 loop {
                     sleep(Duration::from_secs(24 * 60 * 60)).await;
                     if let Err(err) = cleanup_logger.cleanup_old_logs(None).await {
-                        eprintln!("Failed to run scheduled activity log cleanup: {err}");
+                        startup_error!("Failed to run scheduled activity log cleanup: {}", err);
                     }
                 }
             });
 
+            startup_log!("Registering trading states");
             trading::register_trading_state(&app.handle());
             trading::register_paper_trading_state(&app.handle());
             trading::register_auto_trading_state(&app);
             trading::register_optimizer_state(&app);
+            startup_log!("Trading states registered");
 
             // Initialize safety engine
             let default_policy = trading::safety::policy::SafetyPolicy::default();
             let safety_engine = trading::SafetyEngine::new(default_policy, 30);
+            startup_log!("Safety engine created");
             let safety_state: trading::SharedSafetyEngine = Arc::new(RwLock::new(safety_engine));
-            app.manage(safety_state.clone());
+            manage_state!(app, safety_state.clone(), "SafetyEngine");
 
             // Initialize wallet monitor
             let monitor_handle = app.handle().clone();
+            startup_log!("Spawning wallet monitor task");
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = insiders::init_wallet_monitor(&monitor_handle).await {
-                    eprintln!("Failed to initialize wallet monitor: {err}");
+                    startup_error!("Failed to initialize wallet monitor: {}", err);
                 }
             });
 
@@ -425,19 +501,21 @@ pub fn run() {
 
             multisig_db_path.push("multisig.db");
 
+            startup_log!("Initializing multisig database");
             let multisig_db = tauri::async_runtime::block_on(MultisigDatabase::new(
                 multisig_db_path,
             ))
             .map_err(|e| {
-                eprintln!("Failed to initialize multisig database: {e}");
+                startup_error!("Failed to initialize multisig database: {}", e);
                 Box::new(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     e.to_string(),
                 )) as Box<dyn Error>
             })?;
+            startup_log!("Multisig database initialized");
 
             let multisig_state: SharedMultisigDatabase = Arc::new(RwLock::new(multisig_db));
-            app.manage(multisig_state.clone());
+            manage_state!(app, multisig_state.clone(), "MultisigDatabase");
 
             // Initialize performance database
             let mut performance_db_path = app
@@ -450,16 +528,18 @@ pub fn run() {
 
             performance_db_path.push("performance.db");
 
+            startup_log!("Initializing performance database");
             let performance_db =
                 tauri::async_runtime::block_on(PerformanceDatabase::new(performance_db_path))
                     .map_err(|e| {
-                        eprintln!("Failed to initialize performance database: {e}");
+                        startup_error!("Failed to initialize performance database: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Performance database initialized");
 
             let performance_state: SharedPerformanceDatabase =
                 Arc::new(RwLock::new(performance_db));
-            app.manage(performance_state.clone());
+            manage_state!(app, performance_state.clone(), "PerformanceDatabase");
 
             // Initialize journal database
             let mut journal_db_path = app
@@ -469,37 +549,43 @@ pub fn run() {
 
             journal_db_path.push("journal.db");
 
+            startup_log!("Initializing journal database");
             let journal_db = tauri::async_runtime::block_on(JournalDatabase::new(journal_db_path))
                 .map_err(|e| {
-                    eprintln!("Failed to initialize journal database: {e}");
+                    startup_error!("Failed to initialize journal database: {}", e);
                     Box::new(e) as Box<dyn Error>
                 })?;
+            startup_log!("Journal database initialized");
 
             let journal_state: SharedJournalDatabase = Arc::new(RwLock::new(journal_db));
-            app.manage(journal_state.clone());
+            manage_state!(app, journal_state.clone(), "JournalDatabase");
 
             // Initialize backup service and scheduler
+            startup_log!("Initializing backup service");
             let backup_service = backup::service::BackupService::new(&app.handle());
             let backup_service_state: backup::service::SharedBackupService =
                 Arc::new(RwLock::new(backup_service));
-            app.manage(backup_service_state.clone());
+            manage_state!(app, backup_service_state.clone(), "BackupService");
 
+            startup_log!("Initializing backup scheduler");
             let backup_scheduler =
                 backup::scheduler::BackupScheduler::new(&app.handle()).map_err(|e| {
-                    eprintln!("Failed to initialize backup scheduler: {e}");
+                    startup_error!("Failed to initialize backup scheduler: {}", e);
                     Box::new(e) as Box<dyn Error>
                 })?;
+            startup_log!("Backup scheduler initialized");
             let backup_scheduler_state: backup::scheduler::SharedBackupScheduler =
                 Arc::new(RwLock::new(backup_scheduler));
-            app.manage(backup_scheduler_state.clone());
+            manage_state!(app, backup_scheduler_state.clone(), "BackupScheduler");
 
             let automation_handle = app.handle().clone();
+            startup_log!("Spawning automation tasks");
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = bots::init_dca(&automation_handle).await {
-                    eprintln!("Failed to initialize DCA bots: {err}");
+                    startup_error!("Failed to initialize DCA bots: {}", err);
                 }
                 if let Err(err) = trading::init_copy_trading(&automation_handle).await {
-                    eprintln!("Failed to initialize copy trading: {err}");
+                    startup_error!("Failed to initialize copy trading: {}", err);
                 }
             });
 
@@ -507,95 +593,116 @@ pub fn run() {
             let rebalancer_state = portfolio::RebalancerState::default();
             let tax_lots_state = portfolio::TaxLotsState::default();
 
-            app.manage(std::sync::Mutex::new(portfolio_data));
-            app.manage(std::sync::Mutex::new(rebalancer_state));
-            app.manage(std::sync::Mutex::new(tax_lots_state));
-            app.manage(tax_engine.clone());
+            startup_log!("Registering portfolio state containers");
+            manage_state!(
+                app,
+                std::sync::Mutex::new(portfolio_data),
+                "PortfolioDataState"
+            );
+            manage_state!(
+                app,
+                std::sync::Mutex::new(rebalancer_state),
+                "RebalancerState"
+            );
+            manage_state!(app, std::sync::Mutex::new(tax_lots_state), "TaxLotsState");
+            manage_state!(app, tax_engine.clone(), "TaxEngine");
 
             // Initialize new coins scanner
+            startup_log!("Initializing new coins scanner");
             let new_coins_scanner = tauri::async_runtime::block_on(async {
                 market::NewCoinsScanner::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize new coins scanner: {e}");
+                startup_error!("Failed to initialize new coins scanner: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("New coins scanner initialized");
 
             let scanner_state: market::SharedNewCoinsScanner =
                 Arc::new(RwLock::new(new_coins_scanner));
-            app.manage(scanner_state.clone());
+            manage_state!(app, scanner_state.clone(), "NewCoinsScanner");
 
             // Start background scanning task
             let scanner_for_loop = scanner_state.clone();
             market::start_new_coins_scanner(scanner_for_loop);
 
+            startup_log!("Creating top coins cache");
             let top_coins_cache: market::SharedTopCoinsCache =
                 Arc::new(RwLock::new(market::TopCoinsCache::new()));
-            app.manage(top_coins_cache.clone());
+            manage_state!(app, top_coins_cache.clone(), "TopCoinsCache");
 
             // Initialize watchlist manager
+            startup_log!("Initializing watchlist manager");
             let watchlist_manager = tauri::async_runtime::block_on(async {
                 WatchlistManager::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize watchlist manager: {e}");
+                startup_error!("Failed to initialize watchlist manager: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Watchlist manager initialized");
 
             let watchlist_state: SharedWatchlistManager = Arc::new(RwLock::new(watchlist_manager));
-            app.manage(watchlist_state.clone());
+            manage_state!(app, watchlist_state.clone(), "WatchlistManager");
 
             let token_flow_state = token_flow::commands::create_token_flow_state();
-            app.manage(token_flow_state.clone());
+            manage_state!(app, token_flow_state.clone(), "TokenFlowState");
 
             // Initialize alert manager
+            startup_log!("Initializing alert manager");
             let alert_manager =
                 tauri::async_runtime::block_on(async { AlertManager::new(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize alert manager: {e}");
+                        startup_error!("Failed to initialize alert manager: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Alert manager initialized");
 
             let alert_state: SharedAlertManager = Arc::new(RwLock::new(alert_manager));
-            app.manage(alert_state.clone());
+            manage_state!(app, alert_state.clone(), "AlertManager");
 
+            startup_log!("Initializing smart alert manager");
             let smart_alert_manager = tauri::async_runtime::block_on(async {
                 SmartAlertManager::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize smart alert manager: {e}");
+                startup_error!("Failed to initialize smart alert manager: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Smart alert manager initialized");
 
             let smart_alert_state: SharedSmartAlertManager =
                 Arc::new(RwLock::new(smart_alert_manager));
-            app.manage(smart_alert_state.clone());
+            manage_state!(app, smart_alert_state.clone(), "SmartAlertManager");
 
             // Start alert cooldown reset task
             let alert_reset_state = alert_state.clone();
+            startup_log!("Spawning alert cooldown reset task");
             tauri::async_runtime::spawn(async move {
                 use tokio::time::{sleep, Duration};
                 loop {
                     sleep(Duration::from_secs(60)).await; // Check every minute
                     let mgr = alert_reset_state.read().await;
                     if let Err(err) = mgr.reset_cooldowns().await {
-                        eprintln!("Failed to reset alert cooldowns: {err}");
+                        startup_error!("Failed to reset alert cooldowns: {}", err);
                     }
                 }
             });
 
             // Initialize notification router
+            startup_log!("Initializing notification router");
             let notification_router = tauri::async_runtime::block_on(async {
                 NotificationRouter::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize notification router: {e}");
+                startup_error!("Failed to initialize notification router: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Notification router initialized");
 
             let notification_state: SharedNotificationRouter =
                 Arc::new(RwLock::new(notification_router));
-            app.manage(notification_state.clone());
+            manage_state!(app, notification_state.clone(), "NotificationRouter");
 
             // Initialize indicator manager
             let app_data_dir = app
@@ -603,59 +710,68 @@ pub fn run() {
                 .app_data_dir()
                 .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
+            startup_log!("Initializing indicator manager");
             let indicator_manager = IndicatorManager::new(app_data_dir.clone());
             let indicator_state: SharedIndicatorManager = Arc::new(RwLock::new(indicator_manager));
-            app.manage(indicator_state.clone());
+            manage_state!(app, indicator_state.clone(), "IndicatorManager");
 
             // Initialize drawing manager
+            startup_log!("Initializing drawing manager");
             let drawing_manager = DrawingManager::new(app_data_dir.clone());
             let drawing_state: SharedDrawingManager = Arc::new(RwLock::new(drawing_manager));
-            app.manage(drawing_state.clone());
+            manage_state!(app, drawing_state.clone(), "DrawingManager");
 
             // Initialize webhook manager
+            startup_log!("Initializing webhook manager");
             let webhook_manager =
                 tauri::async_runtime::block_on(async { WebhookManager::new(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize webhook manager: {e}");
+                        startup_error!("Failed to initialize webhook manager: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Webhook manager initialized");
 
             let webhook_state: SharedWebhookManager = Arc::new(RwLock::new(webhook_manager));
-            app.manage(webhook_state.clone());
+            manage_state!(app, webhook_state.clone(), "WebhookManager");
 
             // Initialize cache manager
+            startup_log!("Initializing cache manager");
             let cache_manager = core::cache_manager::CacheManager::new(100, 1000);
             let shared_cache_manager = Arc::new(RwLock::new(cache_manager));
-            app.manage(shared_cache_manager.clone());
+            manage_state!(app, shared_cache_manager.clone(), "CacheManager");
 
             // Start background cache warming
             let app_handle = app.handle().clone();
             let cache_manager_handle = shared_cache_manager.clone();
+            startup_log!("Spawning cache warmup task");
             tauri::async_runtime::spawn(async move {
                 if let Err(err) = warm_cache_on_startup(app_handle.clone(), cache_manager_handle).await {
-                    eprintln!("Failed to warm cache on startup: {err}");
+                    startup_error!("Failed to warm cache on startup: {}", err);
                 }
             });
 
             // Initialize sentiment manager
+            startup_log!("Initializing sentiment manager");
             let sentiment_manager = sentiment::SentimentManager::new();
             let sentiment_state: sentiment::SharedSentimentManager =
                 Arc::new(RwLock::new(sentiment_manager));
-            app.manage(sentiment_state.clone());
+            manage_state!(app, sentiment_state.clone(), "SentimentManager");
 
             // Initialize social data service
+            startup_log!("Initializing social data service");
             let social_service = tauri::async_runtime::block_on(async {
                 SocialDataService::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize social data service: {e}");
+                startup_error!("Failed to initialize social data service: {}", e);
                 Box::new(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     e.to_string(),
                 )) as Box<dyn Error>
             })?;
+            startup_log!("Social data service initialized");
             let social_state: SharedSocialDataService = Arc::new(RwLock::new(social_service));
-            app.manage(social_state.clone());
+            manage_state!(app, social_state.clone(), "SocialDataService");
 
             // Initialize social analysis service
             let mut social_data_dir = app
@@ -666,37 +782,42 @@ pub fn run() {
             std::fs::create_dir_all(&social_data_dir)
                 .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
+            startup_log!("Initializing social cache for analysis");
             let social_cache = tauri::async_runtime::block_on(async {
                 social::SocialCache::new(social_data_dir).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize social cache for analysis: {e}");
+                startup_error!("Failed to initialize social cache for analysis: {}", e);
                 Box::new(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     e.to_string(),
                 )) as Box<dyn Error>
             })?;
+            startup_log!("Social cache initialized");
 
             let mut analysis_service = social::SocialAnalysisService::new(social_cache);
+            startup_log!("Initializing social analysis service");
             tauri::async_runtime::block_on(async { analysis_service.initialize().await }).map_err(
                 |e| {
-                    eprintln!("Failed to initialize social analysis service: {e}");
+                    startup_error!("Failed to initialize social analysis service: {}", e);
                     Box::new(std::io::Error::new(
                         std::io::ErrorKind::Other,
                         e.to_string(),
                     )) as Box<dyn Error>
                 },
             )?;
+            startup_log!("Social analysis service initialized");
 
             let analysis_state: social::SharedSocialAnalysisService =
                 Arc::new(RwLock::new(analysis_service));
-            app.manage(analysis_state.clone());
+            manage_state!(app, analysis_state.clone(), "SocialAnalysisService");
 
             // Initialize anomaly detector
+            startup_log!("Initializing anomaly detector");
             let anomaly_detector = anomalies::AnomalyDetector::new();
             let anomaly_state: anomalies::SharedAnomalyDetector =
                 Arc::new(RwLock::new(anomaly_detector));
-            app.manage(anomaly_state.clone());
+            manage_state!(app, anomaly_state.clone(), "AnomalyDetector");
 
             // Initialize event store
             let mut event_store_path = app
@@ -706,14 +827,16 @@ pub fn run() {
 
             event_store_path.push("events.db");
 
+            startup_log!("Initializing event store");
             let event_store = tauri::async_runtime::block_on(EventStore::new(event_store_path))
                 .map_err(|e| {
-                    eprintln!("Failed to initialize event store: {e}");
+                    startup_error!("Failed to initialize event store: {}", e);
                     Box::new(e) as Box<dyn Error>
                 })?;
+            startup_log!("Event store initialized");
 
             let shared_event_store: SharedEventStore = Arc::new(RwLock::new(event_store));
-            app.manage(shared_event_store.clone());
+            manage_state!(app, shared_event_store.clone(), "EventStore");
 
             // Initialize compression manager
             let mut compression_db_path = app
@@ -723,98 +846,115 @@ pub fn run() {
 
             compression_db_path.push("events.db");
 
+            startup_log!("Initializing compression manager");
             let compression_manager =
                 tauri::async_runtime::block_on(CompressionManager::new(compression_db_path))
                     .map_err(|e| {
-                        eprintln!("Failed to initialize compression manager: {e}");
+                        startup_error!("Failed to initialize compression manager: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Compression manager initialized");
 
             let shared_compression_manager: SharedCompressionManager =
                 Arc::new(RwLock::new(compression_manager));
-            app.manage(shared_compression_manager.clone());
+            manage_state!(app, shared_compression_manager.clone(), "CompressionManager");
 
             // Initialize holder analyzer
+            startup_log!("Initializing holder analyzer");
             let holder_analyzer =
                 tauri::async_runtime::block_on(async { HolderAnalyzer::new(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize holder analyzer: {e}");
+                        startup_error!("Failed to initialize holder analyzer: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Holder analyzer initialized");
 
             let shared_holder_analyzer: SharedHolderAnalyzer =
                 Arc::new(RwLock::new(holder_analyzer));
-            app.manage(shared_holder_analyzer.clone());
+            manage_state!(app, shared_holder_analyzer.clone(), "HolderAnalyzer");
 
             // Initialize stock cache state
+            startup_log!("Initializing stock cache state");
             let stock_cache: stocks::SharedStockCache =
                 Arc::new(RwLock::new(stocks::StockCache::default()));
-            app.manage(stock_cache.clone());
+            manage_state!(app, stock_cache.clone(), "StockCache");
             // Initialize risk analyzer
+            startup_log!("Initializing risk analyzer");
             let risk_analyzer = tauri::async_runtime::block_on(async {
                 ai_legacy::RiskAnalyzer::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize risk analyzer: {e}");
+                startup_error!("Failed to initialize risk analyzer: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Risk analyzer initialized");
 
             let shared_risk_analyzer: ai_legacy::SharedRiskAnalyzer = Arc::new(RwLock::new(risk_analyzer));
-            app.manage(shared_risk_analyzer.clone());
+            manage_state!(app, shared_risk_analyzer.clone(), "RiskAnalyzer");
 
             // Initialize AI portfolio advisor
+            startup_log!("Initializing AI portfolio advisor");
             let ai_advisor = tauri::async_runtime::block_on(async {
                 AIPortfolioAdvisor::new(&app.handle()).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize AI portfolio advisor: {e}");
+                startup_error!("Failed to initialize AI portfolio advisor: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("AI portfolio advisor initialized");
 
             let shared_ai_advisor: SharedAIPortfolioAdvisor = Arc::new(RwLock::new(ai_advisor));
-            app.manage(shared_ai_advisor.clone());
+            manage_state!(app, shared_ai_advisor.clone(), "AIPortfolioAdvisor");
 
             // Initialize AI Assistant
+            startup_log!("Initializing AI assistant");
             let ai_assistant = tauri::async_runtime::block_on(async {
                 ai_legacy::AIAssistant::new(&app.handle(), &keystore).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize AI assistant: {e}");
+                startup_error!("Failed to initialize AI assistant: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
+            startup_log!("AI assistant initialized");
 
             let shared_ai_assistant: ai_legacy::SharedAIAssistant = Arc::new(RwLock::new(ai_assistant));
-            app.manage(shared_ai_assistant.clone());
-            app.manage(keystore);
+            manage_state!(app, shared_ai_assistant.clone(), "AIAssistant");
+            manage_state!(app, keystore, "Keystore");
 
             // Initialize launch predictor
+            startup_log!("Initializing launch predictor");
             let launch_predictor =
                 tauri::async_runtime::block_on(async { LaunchPredictor::new(&app.handle()).await })
                     .map_err(|e| {
-                        eprintln!("Failed to initialize launch predictor: {e}");
+                        startup_error!("Failed to initialize launch predictor: {}", e);
                         Box::new(e) as Box<dyn Error>
                     })?;
+            startup_log!("Launch predictor initialized");
 
             let shared_launch_predictor: SharedLaunchPredictor =
                 Arc::new(RwLock::new(launch_predictor));
-            app.manage(shared_launch_predictor.clone());
+            manage_state!(app, shared_launch_predictor.clone(), "LaunchPredictor");
 
             // Initialize updater state
+            startup_log!("Initializing updater state");
             let updater_state = UpdaterState::new(&app.handle()).map_err(|e| {
-                eprintln!("Failed to initialize updater state: {e}");
+                startup_error!("Failed to initialize updater state: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
+            startup_log!("Updater state initialized");
 
             let shared_updater_state: SharedUpdaterState = Arc::new(updater_state);
-            app.manage(shared_updater_state.clone());
+            manage_state!(app, shared_updater_state.clone(), "UpdaterState");
 
             // Initialize system tray manager
+            startup_log!("Initializing system tray manager");
             let tray_manager = TrayManager::new();
             tray_manager.initialize(&app.handle());
             let shared_tray_manager: SharedTrayManager = Arc::new(tray_manager);
-            app.manage(shared_tray_manager.clone());
+            manage_state!(app, shared_tray_manager.clone(), "TrayManager");
 
             // Initialize auto-start manager
+            startup_log!("Preparing auto-start manager");
             let app_name = "Eclipse Market Pro";
             let app_path = std::env::current_exe()
                 .ok()
@@ -822,40 +962,44 @@ pub fn run() {
                 .unwrap_or_else(|| "eclipse-market-pro".to_string());
 
             let auto_start_manager = AutoStartManager::new(app_name, &app_path).map_err(|e| {
-                eprintln!("Failed to initialize auto-start manager: {e}");
+                startup_error!("Failed to initialize auto-start manager: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
             auto_start_manager.initialize(&app.handle());
             let shared_auto_start_manager: SharedAutoStartManager = Arc::new(auto_start_manager);
-            app.manage(shared_auto_start_manager.clone());
+            manage_state!(app, shared_auto_start_manager.clone(), "AutoStartManager");
 
             // Initialize historical replay manager
+            startup_log!("Initializing historical replay manager");
             let historical_replay_manager = tauri::async_runtime::block_on(async {
                 HistoricalReplayManager::new(&app.handle(), None).await
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize historical replay manager: {e}");
+                startup_error!("Failed to initialize historical replay manager: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
+            startup_log!("Historical replay manager initialized");
 
             let shared_historical_manager: SharedHistoricalReplayManager =
                 Arc::new(RwLock::new(historical_replay_manager));
-            app.manage(shared_historical_manager.clone());
+            manage_state!(app, shared_historical_manager.clone(), "HistoricalReplayManager");
 
             // Initialize voice state
+            startup_log!("Initializing voice state");
             let voice_state = VoiceState::new();
             let shared_voice_state: SharedVoiceState = Arc::new(RwLock::new(voice_state));
-            app.manage(shared_voice_state.clone());
+            manage_state!(app, shared_voice_state.clone(), "VoiceState");
 
             // Initialize theme engine
+            startup_log!("Initializing theme engine");
             let theme_engine =
                 ui::theme_engine::ThemeEngine::initialize(&app.handle()).map_err(|e| {
-                    eprintln!("Failed to initialize theme engine: {e}");
+                    startup_error!("Failed to initialize theme engine: {}", e);
                     Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
                 })?;
             let shared_theme_engine: ui::theme_engine::SharedThemeEngine =
                 Arc::new(std::sync::Mutex::new(theme_engine));
-            app.manage(shared_theme_engine.clone());
+            manage_state!(app, shared_theme_engine.clone(), "ThemeEngine");
 
             // Attach tray window listeners
             if let Some(window) = app.get_webview_window("main") {
@@ -891,6 +1035,7 @@ pub fn run() {
 
             // Start background compression job (runs daily at 3 AM)
             let compression_job = shared_compression_manager.clone();
+            startup_log!("Spawning compression maintenance task");
             tauri::async_runtime::spawn(async move {
                 use tokio::time::{sleep, Duration};
 
@@ -901,7 +1046,7 @@ pub fn run() {
                     let mut next_run = match now.date_naive().and_hms_opt(3, 0, 0) {
                         Some(time) => time.and_utc(),
                         None => {
-                            eprintln!("Failed to create time for 3 AM - using fallback");
+                            startup_error!("Failed to create 3 AM schedule time - using fallback");
                             now + chrono::Duration::hours(1) // Fallback: run in 1 hour
                         }
                     };
@@ -921,10 +1066,10 @@ pub fn run() {
 
                     if config.enabled && config.auto_compress {
                         if let Err(err) = manager.compress_old_events().await {
-                            eprintln!("Failed to compress old events: {err}");
+                            startup_error!("Failed to compress old events: {}", err);
                         }
                         if let Err(err) = manager.compress_old_trades().await {
-                            eprintln!("Failed to compress old trades: {err}");
+                            startup_error!("Failed to compress old trades: {}", err);
                         }
                         manager.cleanup_cache().await;
                     }
@@ -932,22 +1077,26 @@ pub fn run() {
             });
 
             // Initialize prediction market service
+            startup_log!("Initializing prediction market service");
             let prediction_service = market::PredictionMarketService::new();
             let shared_prediction_service: market::SharedPredictionMarketService =
                 Arc::new(RwLock::new(prediction_service));
-            app.manage(shared_prediction_service.clone());
+            manage_state!(app, shared_prediction_service.clone(), "PredictionMarketService");
 
             // Initialize diagnostics engine
+            startup_log!("Initializing diagnostics engine");
             let diagnostics_engine = diagnostics::tauri_commands::initialize_diagnostics_engine(
                 &app.handle(),
             )
             .map_err(|e| {
-                eprintln!("Failed to initialize diagnostics engine: {e}");
+                startup_error!("Failed to initialize diagnostics engine: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
-            app.manage(diagnostics_engine.clone());
+            startup_log!("Diagnostics engine initialized");
+            manage_state!(app, diagnostics_engine.clone(), "DiagnosticsEngine");
 
             let diagnostics_state = diagnostics_engine.clone();
+            startup_log!("Spawning diagnostics maintenance task");
             tauri::async_runtime::spawn(async move {
                 use tokio::time::{sleep, Duration};
                 loop {
@@ -959,38 +1108,42 @@ pub fn run() {
                 }
             });
             // Initialize dev tools
+            startup_log!("Initializing comprehensive logger");
             let logger = logger::ComprehensiveLogger::new(&app.handle()).map_err(|e| {
-                eprintln!("Failed to initialize logger: {e}");
+                startup_error!("Failed to initialize logger: {}", e);
                 Box::new(e) as Box<dyn Error>
             })?;
+            startup_log!("Logger initialized");
             let shared_logger: logger::SharedLogger = Arc::new(logger);
-            app.manage(shared_logger.clone());
+            manage_state!(app, shared_logger.clone(), "Logger");
 
+            startup_log!("Initializing crash reporter");
             let crash_reporter = errors::CrashReporter::new(&app.handle(), shared_logger.clone())
                 .map_err(|e| {
-                eprintln!("Failed to initialize crash reporter: {e}");
-                Box::new(e) as Box<dyn Error>
-            })?;
+                    startup_error!("Failed to initialize crash reporter: {}", e);
+                    Box::new(e) as Box<dyn Error>
+                })?;
+            startup_log!("Crash reporter initialized");
             let shared_crash_reporter: errors::SharedCrashReporter = Arc::new(crash_reporter);
-            app.manage(shared_crash_reporter.clone());
+            manage_state!(app, shared_crash_reporter.clone(), "CrashReporter");
 
             let runtime_handler = errors::RuntimeHandler::new(shared_logger.clone());
             let shared_runtime_handler: errors::SharedRuntimeHandler = Arc::new(runtime_handler);
-            app.manage(shared_runtime_handler.clone());
+            manage_state!(app, shared_runtime_handler.clone(), "RuntimeHandler");
 
             let performance_monitor = monitor::PerformanceMonitor::new();
             let shared_performance_monitor: monitor::SharedPerformanceMonitor =
                 Arc::new(performance_monitor);
-            app.manage(shared_performance_monitor.clone());
+            manage_state!(app, shared_performance_monitor.clone(), "PerformanceMonitor");
             shared_performance_monitor.start();
 
             let auto_compiler = compiler::AutoCompiler::new();
             let shared_auto_compiler = Arc::new(auto_compiler);
-            app.manage(shared_auto_compiler.clone());
+            manage_state!(app, shared_auto_compiler.clone(), "AutoCompiler");
 
             let auto_fixer = fixer::AutoFixer::new(3);
             let shared_auto_fixer = Arc::new(auto_fixer);
-            app.manage(shared_auto_fixer.clone());
+            manage_state!(app, shared_auto_fixer.clone(), "AutoFixer");
 
             shared_logger.info("Dev tools initialized successfully", None);
 
@@ -1004,38 +1157,45 @@ pub fn run() {
                 .map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
             let mut mobile_auth_manager = MobileAuthManager::new(mobile_data_dir.clone());
+            startup_log!("Loading mobile auth manager state");
             tauri::async_runtime::block_on(mobile_auth_manager.load()).map_err(|e| {
-                eprintln!("Failed to load mobile auth manager: {e}");
+                startup_error!("Failed to load mobile auth manager: {}", e);
                 Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn Error>
             })?;
+            startup_log!("Mobile auth manager state loaded");
             let mobile_auth_state: SharedMobileAuthManager =
                 Arc::new(RwLock::new(mobile_auth_manager));
-            app.manage(mobile_auth_state.clone());
+            manage_state!(app, mobile_auth_state.clone(), "MobileAuthManager");
 
+            startup_log!("Initializing mobile push notification manager");
             let push_notification_manager = PushNotificationManager::new(1000);
             let push_notification_state: SharedPushNotificationManager =
                 Arc::new(RwLock::new(push_notification_manager));
-            app.manage(push_notification_state.clone());
+            manage_state!(app, push_notification_state.clone(), "PushNotificationManager");
 
+            startup_log!("Initializing mobile sync manager");
             let mobile_sync_manager = MobileSyncManager::new();
             let mobile_sync_state: SharedMobileSyncManager =
                 Arc::new(RwLock::new(mobile_sync_manager));
-            app.manage(mobile_sync_state.clone());
+            manage_state!(app, mobile_sync_state.clone(), "MobileSyncManager");
 
+            startup_log!("Initializing mobile trade engine");
             let mobile_trade_engine = MobileTradeEngine::new();
             let mobile_trade_state: Arc<RwLock<MobileTradeEngine>> =
                 Arc::new(RwLock::new(mobile_trade_engine));
-            app.manage(mobile_trade_state.clone());
+            manage_state!(app, mobile_trade_state.clone(), "MobileTradeEngine");
 
+            startup_log!("Initializing widget manager");
             let widget_manager = WidgetManager::new();
             let widget_state: Arc<RwLock<WidgetManager>> = Arc::new(RwLock::new(widget_manager));
-            app.manage(widget_state.clone());
+            manage_state!(app, widget_state.clone(), "WidgetManager");
 
             // Initialize governance manager
+            startup_log!("Initializing governance manager");
             let governance_manager = governance::GovernanceManager::new();
             let governance_state: governance::SharedGovernanceManager =
                 Arc::new(RwLock::new(governance_manager));
-            app.manage(governance_state.clone());
+            manage_state!(app, governance_state.clone(), "GovernanceManager");
 
             // Initialize feature flags database
             let mut features_db_path = app
@@ -1045,30 +1205,42 @@ pub fn run() {
 
             features_db_path.push("features.db");
 
+            startup_log!("Initializing feature flags database");
             let features_pool = tauri::async_runtime::block_on(async {
                 let pool = sqlx::SqlitePool::connect(&format!("sqlite:{}", features_db_path.display()))
                     .await
-                    .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+                    .map_err(|e| {
+                        startup_error!("Failed to connect to features database: {}", e);
+                        Box::new(e) as Box<dyn Error>
+                    })?;
 
                 // Run migrations
                 sqlx::migrate!("./migrations")
                     .run(&pool)
                     .await
-                    .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+                    .map_err(|e| {
+                        startup_error!("Failed to run features database migrations: {}", e);
+                        Box::new(e) as Box<dyn Error>
+                    })?;
 
                 Ok::<_, Box<dyn Error>>(pool)
             })
             .map_err(|e| {
-                eprintln!("Failed to initialize features database: {e}");
+                startup_error!("Failed to initialize features database: {}", e);
                 e
             })?;
+            startup_log!("Features database initialized");
 
             let feature_flags = features::FeatureFlags::new(features_pool);
-            app.manage(feature_flags);
+            manage_state!(app, feature_flags, "FeatureFlags");
+
+            startup_log!("setup() closure completed successfully");
 
             Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![
+        });
+    startup_log!("Setup closure attached");
+
+    let builder = builder.invoke_handler(tauri::generate_handler![
             // Wallet
             phantom_connect,
             phantom_disconnect,
@@ -1948,10 +2120,12 @@ pub fn run() {
             enable_feature_flag,
             disable_feature_flag,
             is_feature_enabled,
-        ])
-        .run(tauri::generate_context!())
-        .unwrap_or_else(|e| {
-            eprintln!("Failed to run Tauri application: {e}");
-            std::process::exit(1);
-        });
+        ]);
+
+    startup_log!("Invoke handler attached");
+    startup_log!("Launching Tauri application loop");
+    if let Err(e) = builder.run(tauri::generate_context!()) {
+        startup_error!("Failed to run Tauri application: {}", e);
+        std::process::exit(1);
+    }
 }
