@@ -898,7 +898,13 @@ pub fn run() {
                     let now = chrono::Utc::now();
 
                     // Calculate time until 3 AM
-                    let mut next_run = now.date_naive().and_hms_opt(3, 0, 0).unwrap().and_utc();
+                    let mut next_run = match now.date_naive().and_hms_opt(3, 0, 0) {
+                        Some(time) => time.and_utc(),
+                        None => {
+                            eprintln!("Failed to create time for 3 AM - using fallback");
+                            now + chrono::Duration::hours(1) // Fallback: run in 1 hour
+                        }
+                    };
 
                     if now.hour() >= 3 {
                         next_run = next_run + chrono::Duration::days(1);
@@ -1944,5 +1950,8 @@ pub fn run() {
             is_feature_enabled,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to run Tauri application: {e}");
+            std::process::exit(1);
+        });
 }
