@@ -114,7 +114,16 @@ pub struct EventStore {
 impl EventStore {
     pub async fn new(db_path: PathBuf) -> Result<Self, sqlx::Error> {
         let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-        let pool = SqlitePool::connect(&db_url).await?;
+        
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: EventStore failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for EventStore");
+                eprintln!("EventStore using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         let store = Self {
             pool,

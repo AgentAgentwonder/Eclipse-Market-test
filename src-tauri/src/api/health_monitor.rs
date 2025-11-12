@@ -94,7 +94,16 @@ impl ApiHealthMonitor {
     pub async fn new(app: &AppHandle) -> Result<Self, HealthMonitorError> {
         let db_path = Self::health_db_path(app)?;
         let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-        let pool = SqlitePool::connect(&db_url).await?;
+        
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: ApiHealthMonitor failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for ApiHealthMonitor");
+                eprintln!("ApiHealthMonitor using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         let monitor = Self { pool };
         monitor.initialize().await?;

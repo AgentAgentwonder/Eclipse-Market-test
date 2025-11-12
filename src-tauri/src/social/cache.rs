@@ -58,13 +58,20 @@ pub struct SocialCache {
 
 impl SocialCache {
     pub async fn new(app_data_dir: PathBuf) -> Result<Self, CacheError> {
-        fs::create_dir_all(&app_data_dir).map_err(|e| {
-            CacheError::Internal(format!("Failed to create social cache directory: {}", e))
-        })?;
+        let _ = fs::create_dir_all(&app_data_dir);
 
         let db_path = app_data_dir.join(SOCIAL_DB_FILE);
         let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-        let pool = SqlitePool::connect(&db_url).await?;
+        
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: SocialCache failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for SocialCache");
+                eprintln!("SocialCache using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         let cache = Self { pool };
         cache.initialize().await?;
