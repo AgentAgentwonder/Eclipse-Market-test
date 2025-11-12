@@ -1,3 +1,4 @@
+use anyhow::Result;
 use chrono::{DateTime, Utc};
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
@@ -47,12 +48,12 @@ impl PerformanceMonitor {
         }
     }
 
-    pub fn start(self: &Arc<Self>) {
+    pub async fn start(self: &Arc<Self>) -> Result<()> {
         let system = self.system.clone();
         let latest_metrics = self.latest_metrics.clone();
         let tx = self.subscribers.clone();
 
-        tokio::spawn(async move {
+        tauri::async_runtime::spawn(async move {
             let mut interval = time::interval(Duration::from_millis(500));
             loop {
                 interval.tick().await;
@@ -65,6 +66,8 @@ impl PerformanceMonitor {
                 }
             }
         });
+
+        Ok(())
     }
 
     fn capture_metrics(system: &System) -> PerformanceMetrics {
