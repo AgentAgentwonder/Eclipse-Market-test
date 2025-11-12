@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Play, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { useTutorialStore } from '../../store/tutorialStore';
 import { shallow } from 'zustand/shallow';
+import { useMemo, useCallback } from 'react';
 
 interface TutorialMenuProps {
   currentPage?: string;
@@ -23,14 +24,35 @@ export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps
       shallow
     );
 
-  const availableTutorials = tutorials.filter(tutorial => {
-    if (currentPage && tutorial.requiredPages.length > 0) {
-      if (!tutorial.requiredPages.includes(currentPage)) {
-        return false;
+  const availableTutorials = useMemo(() => {
+    return tutorials.filter(tutorial => {
+      if (currentPage && tutorial.requiredPages.length > 0) {
+        if (!tutorial.requiredPages.includes(currentPage)) {
+          return false;
+        }
       }
-    }
-    return true;
-  });
+      return true;
+    });
+  }, [tutorials, currentPage]);
+
+  const handleAutoStartToggle = useCallback(() => {
+    setAutoStart(!autoStart);
+  }, [autoStart, setAutoStart]);
+
+  const handleStartTutorial = useCallback(
+    (tutorialId: string) => {
+      startTutorial(tutorialId);
+      onClose();
+    },
+    [startTutorial, onClose]
+  );
+
+  const handleResetTutorial = useCallback(
+    (tutorialId: string) => {
+      resetTutorial(tutorialId);
+    },
+    [resetTutorial]
+  );
 
   if (!isOpen) return null;
 
@@ -69,7 +91,7 @@ export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps
                 </p>
               </div>
               <button
-                onClick={() => setAutoStart(!autoStart)}
+                onClick={handleAutoStartToggle}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition border ${
                   autoStart
                     ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/30'
@@ -121,7 +143,7 @@ export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps
                       <div className="flex items-center gap-2 ml-4">
                         {(isCompleted || isSkipped) && (
                           <button
-                            onClick={() => resetTutorial(tutorial.id)}
+                            onClick={() => handleResetTutorial(tutorial.id)}
                             className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition"
                             title="Reset tutorial"
                             aria-label={`Reset ${tutorial.title}`}
@@ -130,10 +152,7 @@ export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps
                           </button>
                         )}
                         <button
-                          onClick={() => {
-                            startTutorial(tutorial.id);
-                            onClose();
-                          }}
+                          onClick={() => handleStartTutorial(tutorial.id)}
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-lg text-sm font-semibold transition"
                           aria-label={`Start ${tutorial.title}`}
                         >

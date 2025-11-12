@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
@@ -139,6 +139,9 @@ function App() {
   const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
   const [tutorialMenuOpen, setTutorialMenuOpen] = useState(false);
 
+  // Ref to track the last auto-started tutorial to prevent duplicate starts
+  const lastAutoStartedRef = useRef<{ page: string; tutorialId: string } | null>(null);
+
   const currentVersion = packageJson.version ?? '1.0.0';
   const tutorialAutoStart = useTutorialStore(state => state.autoStart);
   const getAvailableTutorials = useTutorialStore(state => state.getAvailableTutorials);
@@ -165,6 +168,11 @@ function App() {
   const activeWorkspace = useMemo(
     () => workspaces.find(workspace => workspace.id === activeWorkspaceId),
     [workspaces, activeWorkspaceId]
+  );
+
+  const CurrentPageComponent = useMemo(
+    () => pages.find(page => page.id === currentPage)?.component || null,
+    [pages, currentPage]
   );
 
   useAlertNotifications();
@@ -608,6 +616,18 @@ function App() {
     });
 
     if (nextTutorial) {
+      // Check if we've already auto-started this tutorial for this page
+      const lastAutoStarted = lastAutoStartedRef.current;
+      if (
+        lastAutoStarted &&
+        lastAutoStarted.page === currentPage &&
+        lastAutoStarted.tutorialId === nextTutorial.id
+      ) {
+        return; // Skip duplicate auto-start
+      }
+
+      // Record this auto-start and start the tutorial
+      lastAutoStartedRef.current = { page: currentPage, tutorialId: nextTutorial.id };
       startTutorial(nextTutorial.id);
     }
   }, [
@@ -618,6 +638,13 @@ function App() {
     startTutorial,
     tutorialPlaying,
   ]);
+
+  // Reset the auto-start ref when tutorial stops playing (completion/skip)
+  useEffect(() => {
+    if (!tutorialPlaying) {
+      lastAutoStartedRef.current = null;
+    }
+  }, [tutorialPlaying]);
 
   useEffect(() => {
     if (!isWhatsNewOpen && hasUnseenChanges(currentVersion)) {
@@ -1135,7 +1162,7 @@ function App() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <CurrentPageComponent />
+              {CurrentPageComponent && <CurrentPageComponent />}
             </motion.div>
           </AnimatePresence>
         </main>

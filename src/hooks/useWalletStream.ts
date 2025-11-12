@@ -138,7 +138,14 @@ export function useWalletStream(addresses: string[], options?: UseWalletStreamOp
       }
       subscribedKeyRef.current = '';
     };
-  }, [subscriptionKey, filterKey, historySize, subscribeWallets, unsubscribeWallets, preferences.enableWalletStream]);
+  }, [
+    subscriptionKey,
+    filterKey,
+    historySize,
+    subscribeWallets,
+    unsubscribeWallets,
+    preferences.enableWalletStream,
+  ]);
 
   return {
     transactions,
