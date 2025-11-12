@@ -140,24 +140,14 @@ function App() {
   const [tutorialMenuOpen, setTutorialMenuOpen] = useState(false);
 
   const currentVersion = packageJson.version ?? '1.0.0';
-  const {
-    autoStart: tutorialAutoStart,
-    getAvailableTutorials,
-    startTutorial,
-    progress: tutorialProgress,
-    isPlaying: tutorialPlaying,
-  } = useTutorialStore(state => ({
-    autoStart: state.autoStart,
-    getAvailableTutorials: state.getAvailableTutorials,
-    startTutorial: state.startTutorial,
-    progress: state.progress,
-    isPlaying: state.isPlaying,
-  }));
-  const { openWhatsNew, isWhatsNewOpen, hasUnseenChanges } = useChangelogStore(state => ({
-    openWhatsNew: state.openWhatsNew,
-    isWhatsNewOpen: state.isWhatsNewOpen,
-    hasUnseenChanges: state.hasUnseenChanges,
-  }));
+  const tutorialAutoStart = useTutorialStore(state => state.autoStart);
+  const getAvailableTutorials = useTutorialStore(state => state.getAvailableTutorials);
+  const startTutorial = useTutorialStore(state => state.startTutorial);
+  const tutorialProgress = useTutorialStore(state => state.progress);
+  const tutorialPlaying = useTutorialStore(state => state.isPlaying);
+  const openWhatsNew = useChangelogStore(state => state.openWhatsNew);
+  const isWhatsNewOpen = useChangelogStore(state => state.isWhatsNewOpen);
+  const hasUnseenChanges = useChangelogStore(state => state.hasUnseenChanges);
 
   const wallets = useWalletStore(state => state.wallets);
   const refreshMultiWallet = useWalletStore(state => state.refreshMultiWallet);

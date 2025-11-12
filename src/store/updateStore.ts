@@ -74,7 +74,15 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
   checkForUpdates: async () => {
     set({ isCheckingForUpdates: true, error: null });
     try {
-      const update = await check();
+      let update;
+      try {
+        update = await check();
+      } catch (err) {
+        console.warn('Update check command not available or failed:', err);
+        set({ isCheckingForUpdates: false });
+        return;
+      }
+
       if (update) {
         const settings = get().settings;
         const dismissedVersion = settings?.dismissedVersion;
@@ -102,10 +110,14 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
         // Update last check time
         const currentSettings = get().settings;
         if (currentSettings) {
-          await get().saveSettings({
-            ...currentSettings,
-            lastCheck: new Date().toISOString(),
-          });
+          try {
+            await get().saveSettings({
+              ...currentSettings,
+              lastCheck: new Date().toISOString(),
+            });
+          } catch (err) {
+            console.warn('Failed to save update check time:', err);
+          }
         }
       } else {
         set({ isCheckingForUpdates: false });
@@ -127,25 +139,37 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
         throw new Error('No update available to install');
       }
 
-      await updateInstance.downloadAndInstall(event => {
-        if (event.event === 'Progress') {
-          const progress = (event.data.chunkLength / 100) * 100; // Simple progress calculation
-          set({
-            downloadProgress: {
-              downloaded: Math.min(progress, 100),
-              total: 100,
-              percentage: Math.min(progress, 100),
-            },
-          });
-        }
-      });
+      try {
+        await updateInstance.downloadAndInstall(event => {
+          if (event.event === 'Progress') {
+            const progress = (event.data.chunkLength / 100) * 100; // Simple progress calculation
+            set({
+              downloadProgress: {
+                downloaded: Math.min(progress, 100),
+                total: 100,
+                percentage: Math.min(progress, 100),
+              },
+            });
+          }
+        });
 
-      set({ isDownloading: false, isInstalling: true });
+        set({ isDownloading: false, isInstalling: true });
 
-      // Relaunch app after a short delay
-      setTimeout(async () => {
-        await relaunch();
-      }, 1000);
+        // Relaunch app after a short delay
+        setTimeout(async () => {
+          try {
+            await relaunch();
+          } catch (err) {
+            console.warn('Failed to relaunch app:', err);
+          }
+        }, 1000);
+      } catch (err) {
+        console.warn('Update download/install command not available or failed:', err);
+        set({
+          error: 'Update feature not available',
+          isDownloading: false,
+        });
+      }
     } catch (error) {
       console.error('Failed to download and install update:', error);
       set({

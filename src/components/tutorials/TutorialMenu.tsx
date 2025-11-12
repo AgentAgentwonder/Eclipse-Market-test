@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Play, RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { useTutorialStore } from '../../store/tutorialStore';
+import { shallow } from 'zustand/shallow';
 
 interface TutorialMenuProps {
   currentPage?: string;
@@ -10,14 +11,17 @@ interface TutorialMenuProps {
 
 export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps) {
   const { tutorials, progress, startTutorial, resetTutorial, autoStart, setAutoStart } =
-    useTutorialStore(state => ({
-      tutorials: state.tutorials,
-      progress: state.progress,
-      startTutorial: state.startTutorial,
-      resetTutorial: state.resetTutorial,
-      autoStart: state.autoStart,
-      setAutoStart: state.setAutoStart,
-    }));
+    useTutorialStore(
+      state => ({
+        tutorials: state.tutorials,
+        progress: state.progress,
+        startTutorial: state.startTutorial,
+        resetTutorial: state.resetTutorial,
+        autoStart: state.autoStart,
+        setAutoStart: state.setAutoStart,
+      }),
+      shallow
+    );
 
   const availableTutorials = tutorials.filter(tutorial => {
     if (currentPage && tutorial.requiredPages.length > 0) {
