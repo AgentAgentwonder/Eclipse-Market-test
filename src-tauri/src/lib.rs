@@ -1143,7 +1143,12 @@ pub fn run() {
             let shared_performance_monitor: monitor::SharedPerformanceMonitor =
                 Arc::new(performance_monitor);
             manage_state!(app, shared_performance_monitor.clone(), "PerformanceMonitor");
-            shared_performance_monitor.start();
+            let perf_monitor = shared_performance_monitor.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = perf_monitor.start().await {
+                    eprintln!("Failed to start performance monitor: {e}");
+                }
+            });
 
             let auto_compiler = compiler::AutoCompiler::new();
             let shared_auto_compiler = Arc::new(auto_compiler);
