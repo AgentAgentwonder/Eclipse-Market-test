@@ -167,8 +167,14 @@ impl ReputationEngine {
                 "Unable to resolve app data directory",
             ))
         })?;
-
-        std::fs::create_dir_all(&app_dir)?;
+        
+        Self::new_with_path(&app_dir).await
+    }
+    
+    // Helper method for testing that accepts a path directly
+    pub async fn new_with_path<P: AsRef<std::path::Path>>(path: P) -> Result<Self, ReputationError> {
+        let app_dir = path.as_ref();
+        std::fs::create_dir_all(app_dir)?;
         let db_path = app_dir.join(REPUTATION_DB_FILE);
 
         // Ensure parent directory exists
@@ -178,17 +184,27 @@ impl ReputationEngine {
 
         eprintln!("ReputationEngine attempting to create database at: {:?}", db_path);
 
-        let pool = SqlitePool::connect(&format!("sqlite:{}", db_path.display()))
-            .await
-            .map_err(|e| {
-                ReputationError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!(
-                        "Failed to open reputation database at {:?}: {}",
-                        db_path, e
-                    ),
-                ))
-            })?;
+        let pool = match SqlitePool::connect(&format!("sqlite:{}", db_path.display())).await {
+            Ok(pool) => {
+                eprintln!("ReputationEngine successfully connected to file database");
+                pool
+            }
+            Err(e) => {
+                eprintln!("Failed to open reputation database at {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database");
+                
+                // Create in-memory fallback pool
+                let memory_pool = SqlitePool::connect("sqlite::memory:").await.map_err(|e| {
+                    ReputationError::Io(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        format!("Failed to create in-memory database: {}", e),
+                    ))
+                })?;
+                
+                eprintln!("ReputationEngine successfully created in-memory database");
+                memory_pool
+            }
+        };
 
         // Initialize database schema
         sqlx::query(
@@ -1329,5 +1345,52 @@ mod tests {
             ReputationLevel::from_score(10.0),
             ReputationLevel::Malicious
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+    
+    #[tokio::test]
+    async fn test_reputation_engine_fallback_to_memory() {
+        // Test with an invalid path directly
+        let result = ReputationEngine::new_with_path("/invalid/path/that/does/not/exist").await;
+        
+        // The engine should still initialize successfully with in-memory database
+        assert!(result.is_ok(), "ReputationEngine should fallback to in-memory database");
+        
+        let engine = result.unwrap();
+        
+        // Test that the engine works by getting a wallet reputation
+        let test_address = "test_address_12345";
+        let reputation = engine.get_wallet_reputation(test_address).await;
+        assert!(reputation.is_ok(), "Should be able to get wallet reputation from in-memory DB");
+        
+        let wallet_rep = reputation.unwrap();
+        assert_eq!(wallet_rep.address, test_address);
+        assert_eq!(wallet_rep.trust_score, 50.0); // Default score
+    }
+    
+    #[tokio::test]
+    async fn test_reputation_engine_normal_file_db() {
+        // Test with a valid temporary directory
+        let temp_dir = TempDir::new().unwrap();
+        let result = ReputationEngine::new_with_path(temp_dir.path()).await;
+        
+        assert!(result.is_ok(), "ReputationEngine should work with valid file path");
+        
+        let engine = result.unwrap();
+        
+        // Test basic functionality
+        let test_address = "test_file_db_address";
+        let reputation = engine.get_wallet_reputation(test_address).await;
+        assert!(reputation.is_ok(), "Should be able to get wallet reputation from file DB");
+        
+        let wallet_rep = reputation.unwrap();
+        assert_eq!(wallet_rep.address, test_address);
+        assert_eq!(wallet_rep.trust_score, 50.0); // Default score
     }
 }
