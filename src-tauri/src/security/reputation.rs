@@ -178,17 +178,67 @@ impl ReputationEngine {
 
         eprintln!("ReputationEngine attempting to create database at: {:?}", db_path);
 
-        let pool = SqlitePool::connect(&format!("sqlite:{}", db_path.display()))
-            .await
-            .map_err(|e| {
-                ReputationError::Io(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!(
-                        "Failed to open reputation database at {:?}: {}",
-                        db_path, e
-                    ),
-                ))
-            })?;
+        let db_url = format!("sqlite:{}", db_path.display());
+
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(connect_err) => {
+                let permissions_info = match std::fs::metadata(&app_dir) {
+                    Ok(metadata) => {
+                        let permissions = metadata.permissions();
+                        #[cfg(unix)]
+                        {
+                            use std::os::unix::fs::PermissionsExt;
+                            format!(
+                                "readonly: {}, mode: {:o}",
+                                permissions.readonly(),
+                                permissions.mode()
+                            )
+                        }
+                        #[cfg(not(unix))]
+                        {
+                            format!("readonly: {}", permissions.readonly())
+                        }
+                    }
+                    Err(meta_err) => format!("unable to read permissions: {}", meta_err),
+                };
+
+                let error_code = match &connect_err {
+                    sqlx::Error::Database(db_error) => db_error
+                        .code()
+                        .map(|code| code.to_string())
+                        .unwrap_or_else(|| "unknown".to_string()),
+                    _ => "unknown".to_string(),
+                };
+
+                eprintln!(
+                    "Warning: Failed to open reputation database at {} (error code: {}). Directory permissions for {} => {}. Falling back to in-memory database for this session. Try running the application as Administrator/root for persistent storage. Details: {}",
+                    db_path.display(),
+                    error_code,
+                    app_dir.display(),
+                    permissions_info,
+                    connect_err
+                );
+
+                tracing::warn!(
+                    path = %db_path.display(),
+                    error_code = %error_code,
+                    sqlite_error = %connect_err,
+                    directory_permissions = %permissions_info,
+                    "Failed to open reputation database; using in-memory fallback for this session. Run the application as Administrator/root for persistent storage."
+                );
+
+                let fallback_pool = SqlitePool::connect("sqlite::memory:")
+                    .await
+                    .map_err(ReputationError::Database)?;
+
+                eprintln!(
+                    "ReputationEngine is using an in-memory database. Reputation data will not persist after restart."
+                );
+
+                fallback_pool
+            }
+        };
 
         // Initialize database schema
         sqlx::query(
