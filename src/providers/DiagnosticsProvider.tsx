@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useCallback } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { record } from 'rrweb';
 import { useDiagnosticsStore } from '../store/diagnosticsStore';
 
@@ -7,34 +7,15 @@ interface DiagnosticsProviderProps {
 }
 
 export function DiagnosticsProvider({ children }: DiagnosticsProviderProps) {
-  const {
-    sessionRecordingEnabled,
-    sessionRecordingConsented,
-    privacyMaskingEnabled,
-    isRecording,
-    startRecording,
-    stopRecording,
-    addRecordingEvent,
-    addConsoleLog,
-    addErrorLog,
-    setSessionRecordingEnabled,
-  } = useDiagnosticsStore(
-    useCallback(
-      state => ({
-        sessionRecordingEnabled: state.sessionRecordingEnabled,
-        sessionRecordingConsented: state.sessionRecordingConsented,
-        privacyMaskingEnabled: state.privacyMaskingEnabled,
-        isRecording: state.isRecording,
-        startRecording: state.startRecording,
-        stopRecording: state.stopRecording,
-        addRecordingEvent: state.addRecordingEvent,
-        addConsoleLog: state.addConsoleLog,
-        addErrorLog: state.addErrorLog,
-        setSessionRecordingEnabled: state.setSessionRecordingEnabled,
-      }),
-      []
-    )
-  );
+  const sessionRecordingEnabled = useDiagnosticsStore(state => state.sessionRecordingEnabled);
+  const sessionRecordingConsented = useDiagnosticsStore(state => state.sessionRecordingConsented);
+  const privacyMaskingEnabled = useDiagnosticsStore(state => state.privacyMaskingEnabled);
+  const startRecording = useDiagnosticsStore(state => state.startRecording);
+  const stopRecording = useDiagnosticsStore(state => state.stopRecording);
+  const addRecordingEvent = useDiagnosticsStore(state => state.addRecordingEvent);
+  const addConsoleLog = useDiagnosticsStore(state => state.addConsoleLog);
+  const addErrorLog = useDiagnosticsStore(state => state.addErrorLog);
+  const setSessionRecordingEnabled = useDiagnosticsStore(state => state.setSessionRecordingEnabled);
 
   const stopRef = useRef<(() => void) | null>(null);
   const consoleOriginals = useRef<
@@ -75,15 +56,8 @@ export function DiagnosticsProvider({ children }: DiagnosticsProviderProps) {
       }
       stopRecording();
     };
-  }, [
-    sessionRecordingEnabled,
-    sessionRecordingConsented,
-    privacyMaskingEnabled,
-    startRecording,
-    stopRecording,
-    addRecordingEvent,
-    setSessionRecordingEnabled,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionRecordingEnabled, sessionRecordingConsented, privacyMaskingEnabled]);
 
   // Capture console logs while recording
   useEffect(() => {

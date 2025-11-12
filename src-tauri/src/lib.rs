@@ -1249,12 +1249,13 @@ pub fn run() {
     startup_log!("Setup closure attached");
 
     let builder = builder.invoke_handler(tauri::generate_handler![
-            // Wallet
-            phantom_connect,
-            phantom_disconnect,
-            phantom_sign_message,
-            phantom_sign_transaction,
-            phantom_balance,
+             // Wallet
+             phantom_connect,
+             phantom_disconnect,
+             phantom_session,
+             phantom_sign_message,
+             phantom_sign_transaction,
+             phantom_balance,
             list_hardware_wallets,
             connect_hardware_wallet,
             disconnect_hardware_wallet,
