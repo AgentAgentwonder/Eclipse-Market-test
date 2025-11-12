@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { useStream } from '../contexts/StreamContext';
 
 const CACHE_KEY = 'stream.price.cache';
 const CACHE_TTL = 30_000;
+
+function setStateIfChanged<T>(setState: Dispatch<SetStateAction<T>>, next: T) {
+  setState(prev => (Object.is(prev, next) ? prev : next));
+}
 
 interface PriceDelta {
   symbol: string;
@@ -36,14 +40,34 @@ export function usePriceStream(symbols: string[]) {
   const lastUpdateRef = useRef<Map<string, number>>(new Map());
   const throttleRef = useRef<number>(preferences.priceThrottleMs ?? 100);
 
+  const subscriptionKey = useMemo(() => {
+    if (symbols.length === 0) {
+      return '';
+    }
+    const unique = Array.from(new Set(symbols));
+    unique.sort();
+    return unique.join('|');
+  }, [symbols]);
+
+  const normalizedSymbols = useMemo(() => {
+    if (!subscriptionKey) {
+      return [] as string[];
+    }
+    return subscriptionKey.split('|');
+  }, [subscriptionKey]);
+
+  const symbolSet = useMemo(() => new Set(normalizedSymbols), [subscriptionKey]);
+
+  const subscribedKeyRef = useRef<string>('');
+
   useEffect(() => {
     throttleRef.current = preferences.priceThrottleMs ?? 100;
   }, [preferences.priceThrottleMs]);
 
   // Hydrate local cache with TTL
   useEffect(() => {
-    if (symbols.length === 0) {
-      setLoading(false);
+    if (normalizedSymbols.length === 0) {
+      setStateIfChanged(setLoading, false);
       return;
     }
 
@@ -57,7 +81,7 @@ export function usePriceStream(symbols: string[]) {
       const now = Date.now();
       const hydrated = new Map<string, PriceData>();
 
-      symbols.forEach(symbol => {
+      normalizedSymbols.forEach(symbol => {
         const cached = cache[symbol];
         if (cached && now - cached.cachedAt <= CACHE_TTL) {
           hydrated.set(symbol, {
@@ -72,12 +96,12 @@ export function usePriceStream(symbols: string[]) {
 
       if (hydrated.size > 0) {
         setPrices(hydrated);
-        setLoading(false);
+        setStateIfChanged(setLoading, false);
       }
     } catch (err) {
       console.warn('Failed to hydrate price cache', err);
     }
-  }, [symbols]);
+  }, [subscriptionKey]);
 
   // Persist cache when prices change
   useEffect(() => {
@@ -186,23 +210,26 @@ export function usePriceStream(symbols: string[]) {
     };
   }, []);
 
-  const symbolKey = useMemo(() => symbols.join(','), [symbols]);
-  const symbolSet = useMemo(() => new Set(symbols), [symbolKey]);
-
   useEffect(() => {
-    if (symbols.length === 0) {
-      setLoading(false);
+    if (normalizedSymbols.length === 0) {
+      setStateIfChanged(setLoading, false);
+      subscribedKeyRef.current = '';
       return;
     }
 
     let mounted = true;
+    let didSubscribe = false;
     let unlisten: UnlistenFn | undefined;
 
     const subscribe = async () => {
       try {
-        await subscribePrices(symbols);
-        setLoading(false);
-        setError(null);
+        await subscribePrices(normalizedSymbols);
+        subscribedKeyRef.current = subscriptionKey;
+        didSubscribe = true;
+        if (mounted) {
+          setStateIfChanged(setLoading, false);
+          setStateIfChanged(setError, null);
+        }
 
         unlisten = await listen<PriceDelta>('price_update', event => {
           if (!mounted) return;
@@ -217,8 +244,10 @@ export function usePriceStream(symbols: string[]) {
         });
       } catch (err) {
         console.error('Failed to subscribe to price stream:', err);
-        setError(err instanceof Error ? err.message : String(err));
-        setLoading(false);
+        if (mounted) {
+          setStateIfChanged(setError, err instanceof Error ? err.message : String(err));
+          setStateIfChanged(setLoading, false);
+        }
       }
     };
 
@@ -229,16 +258,19 @@ export function usePriceStream(symbols: string[]) {
       if (unlisten) {
         unlisten();
       }
-      unsubscribePrices(symbols).catch(err => {
-        console.error('Failed to unsubscribe from price stream:', err);
-      });
+      if (didSubscribe) {
+        unsubscribePrices(normalizedSymbols).catch(err => {
+          console.error('Failed to unsubscribe from price stream:', err);
+        });
+      }
+      subscribedKeyRef.current = '';
       if (rafRef.current !== null && typeof window !== 'undefined') {
         window.cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
       pendingRef.current.clear();
     };
-  }, [symbolKey, symbolSet, subscribePrices, unsubscribePrices, symbols]);
+  }, [subscriptionKey, subscribePrices, unsubscribePrices]);
 
   return useMemo(
     () => ({

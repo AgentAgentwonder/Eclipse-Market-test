@@ -14,6 +14,64 @@ const PRICE_STORAGE_KEY = 'stream.price.subscriptions';
 const WALLET_STORAGE_KEY = 'stream.wallet.subscriptions';
 const PREF_STORAGE_KEY = 'stream.preferences';
 
+function shallowEqualArray<T>(a: T[], b: T[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function shallowEqualPreferences(
+  a: StreamPreferences,
+  b: StreamPreferences
+): boolean {
+  return (
+    a.autoReconnect === b.autoReconnect &&
+    a.fallbackIntervalMs === b.fallbackIntervalMs &&
+    a.priceThrottleMs === b.priceThrottleMs &&
+    a.enablePriceStream === b.enablePriceStream &&
+    a.enableWalletStream === b.enableWalletStream
+  );
+}
+
+function statusListEqual(a: ConnectionStatus[], b: ConnectionStatus[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  
+  const sortKey = (s: ConnectionStatus) => s.provider;
+  const sortedA = [...a].sort((x, y) => sortKey(x).localeCompare(sortKey(y)));
+  const sortedB = [...b].sort((x, y) => sortKey(x).localeCompare(sortKey(y)));
+
+  for (let i = 0; i < sortedA.length; i++) {
+    const sa = sortedA[i];
+    const sb = sortedB[i];
+    if (
+      sa.provider !== sb.provider ||
+      sa.state !== sb.state ||
+      sa.lastMessage !== sb.lastMessage ||
+      sa.statistics.messagesReceived !== sb.statistics.messagesReceived ||
+      sa.statistics.messagesSent !== sb.statistics.messagesSent ||
+      sa.statistics.bytesReceived !== sb.statistics.bytesReceived ||
+      sa.statistics.bytesSent !== sb.statistics.bytesSent ||
+      sa.statistics.reconnectCount !== sb.statistics.reconnectCount ||
+      sa.statistics.uptimeMs !== sb.statistics.uptimeMs ||
+      sa.statistics.averageLatencyMs !== sb.statistics.averageLatencyMs ||
+      sa.statistics.droppedMessages !== sb.statistics.droppedMessages ||
+      !shallowEqualArray(sa.subscriptions.prices, sb.subscriptions.prices) ||
+      !shallowEqualArray(sa.subscriptions.wallets, sb.subscriptions.wallets) ||
+      (sa.fallback?.active !== sb.fallback?.active) ||
+      (sa.fallback?.lastSuccess !== sb.fallback?.lastSuccess) ||
+      (sa.fallback?.intervalMs !== sb.fallback?.intervalMs) ||
+      (sa.fallback?.reason !== sb.fallback?.reason)
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export interface StreamPreferences {
   autoReconnect: boolean;
   fallbackIntervalMs: number;
@@ -80,7 +138,9 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
     const hydrate = async () => {
       try {
         const initial = await invoke<ConnectionStatus[]>('get_stream_status');
-        setStatusList(initial);
+        if (Array.isArray(initial) && initial.length > 0) {
+          setStatusList(prev => (statusListEqual(prev, initial) ? prev : initial));
+        }
       } catch (err) {
         console.error('Failed to hydrate stream status:', err);
       }
@@ -89,9 +149,10 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (liveStatuses.length > 0) {
-      setStatusList(liveStatuses);
+    if (liveStatuses.length === 0) {
+      return;
     }
+    setStatusList(prev => (statusListEqual(prev, liveStatuses) ? prev : liveStatuses));
   }, [liveStatuses]);
 
   useEffect(() => {
@@ -175,7 +236,9 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
             newSymbols.push(symbol);
           }
         });
-        return Array.from(unique);
+        const next = Array.from(unique);
+        next.sort();
+        return shallowEqualArray(prev, next) ? prev : next;
       });
 
       if (newSymbols.length > 0) {
@@ -204,7 +267,9 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
             priceRefCounts.current.set(symbol, current - 1);
           }
         });
-        return Array.from(unique);
+        const next = Array.from(unique);
+        next.sort();
+        return shallowEqualArray(prev, next) ? prev : next;
       });
 
       if (toRemove.length > 0) {
@@ -229,7 +294,9 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
             newAddresses.push(address);
           }
         });
-        return Array.from(unique);
+        const next = Array.from(unique);
+        next.sort();
+        return shallowEqualArray(prev, next) ? prev : next;
       });
 
       if (newAddresses.length > 0) {
@@ -258,7 +325,9 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
             walletRefCounts.current.set(address, current - 1);
           }
         });
-        return Array.from(unique);
+        const next = Array.from(unique);
+        next.sort();
+        return shallowEqualArray(prev, next) ? prev : next;
       });
 
       if (toRemove.length > 0) {
@@ -307,7 +376,10 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updatePreferences = useCallback((update: Partial<StreamPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...update }));
+    setPreferences(prev => {
+      const next = { ...prev, ...update };
+      return shallowEqualPreferences(prev, next) ? prev : next;
+    });
   }, []);
 
   const isAnyConnected = useMemo(() => statusList.some(s => s.state === 'Connected'), [statusList]);
