@@ -1219,29 +1219,24 @@ pub fn run() {
             features_db_path.push("features.db");
 
             startup_log!("Initializing feature flags database");
-            let features_pool = tauri::async_runtime::block_on(async {
+            let features_pool = match tauri::async_runtime::block_on(async {
                 let pool = sqlx::SqlitePool::connect(&format!("sqlite:{}", features_db_path.display()))
-                    .await
-                    .map_err(|e| {
-                        startup_error!("Failed to connect to features database: {}", e);
-                        Box::new(e) as Box<dyn Error>
-                    })?;
-
-                // Run migrations
-                sqlx::migrate!("./migrations")
-                    .run(&pool)
-                    .await
-                    .map_err(|e| {
-                        startup_error!("Failed to run features database migrations: {}", e);
-                        Box::new(e) as Box<dyn Error>
-                    })?;
-
+                    .await?;
+                sqlx::migrate!("./migrations").run(&pool).await?;
                 Ok::<_, Box<dyn Error>>(pool)
-            })
-            .map_err(|e| {
-                startup_error!("Failed to initialize features database: {}", e);
-                e
-            })?;
+            }) {
+                Ok(pool) => pool,
+                Err(e) => {
+                    startup_error!("Failed to initialize features database at {:?}: {}", features_db_path, e);
+                    startup_error!("Using in-memory features database for this session");
+                    tauri::async_runtime::block_on(async {
+                        sqlx::SqlitePool::connect("sqlite::memory:").await
+                    }).map_err(|e| {
+                        startup_error!("Failed to create fallback in-memory features pool: {}", e);
+                        Box::new(e) as Box<dyn Error>
+                    })?
+                }
+            };
             startup_log!("Features database initialized");
 
             let feature_flags = features::FeatureFlags::new(features_pool);
