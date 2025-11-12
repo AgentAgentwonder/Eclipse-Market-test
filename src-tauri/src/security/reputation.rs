@@ -171,7 +171,24 @@ impl ReputationEngine {
         std::fs::create_dir_all(&app_dir)?;
         let db_path = app_dir.join(REPUTATION_DB_FILE);
 
-        let pool = SqlitePool::connect(&format!("sqlite:{}", db_path.display())).await?;
+        // Ensure parent directory exists
+        if let Some(parent) = db_path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+
+        eprintln!("ReputationEngine attempting to create database at: {:?}", db_path);
+
+        let pool = SqlitePool::connect(&format!("sqlite:{}", db_path.display()))
+            .await
+            .map_err(|e| {
+                ReputationError::Io(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!(
+                        "Failed to open reputation database at {:?}: {}",
+                        db_path, e
+                    ),
+                ))
+            })?;
 
         // Initialize database schema
         sqlx::query(
