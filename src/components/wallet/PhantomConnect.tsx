@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useWallet as useAdapterWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
@@ -6,7 +6,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Wallet, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { shallow } from 'zustand/shallow';
 
-import { useWalletStore, PhantomSession } from '../../store/walletStore';
+import { useWalletStore, PhantomSession, WalletStatus } from '../../store/walletStore';
 
 function getErrorMessage(error: unknown): string {
   if (!error) return 'Unknown error';
@@ -27,6 +27,7 @@ export function PhantomConnect() {
     setError,
     autoReconnect,
     attemptedAutoConnect,
+    lastConnected,
     setAttemptedAutoConnect,
     setLastConnected,
     setSession,
@@ -44,6 +45,7 @@ export function PhantomConnect() {
       setError: state.setError,
       autoReconnect: state.autoReconnect,
       attemptedAutoConnect: state.attemptedAutoConnect,
+      lastConnected: state.lastConnected,
       setAttemptedAutoConnect: state.setAttemptedAutoConnect,
       setLastConnected: state.setLastConnected,
       setSession: state.setSession,
@@ -66,24 +68,43 @@ export function PhantomConnect() {
 
   const base58Key = useMemo(() => adapterPublicKey?.toBase58() ?? null, [adapterPublicKey]);
 
+  // Refs to track last synced values to prevent redundant updates
+  const lastSyncedKey = useRef<string | null>(null);
+  const lastSyncedSessionId = useRef<string | null>(null);
+
   useEffect(() => {
+    let nextStatus: WalletStatus;
     if (connecting) {
-      setStatus('connecting');
+      nextStatus = 'connecting';
     } else if (connected) {
-      setStatus('connected');
+      nextStatus = 'connected';
     } else if (status !== 'error') {
-      setStatus('disconnected');
+      nextStatus = 'disconnected';
+    } else {
+      nextStatus = status;
     }
-  }, [connecting, connected, setStatus, status]);
+
+    if (nextStatus !== status) {
+      setStatus(nextStatus);
+    }
+  }, [connecting, connected, status, setStatus]);
 
   useEffect(() => {
     if (!connected || !base58Key) {
       return;
     }
 
-    setPublicKey(base58Key);
-    setLastConnected(new Date().toISOString());
-    setError(null);
+    // Only update state if values actually changed
+    if (publicKey !== base58Key) {
+      setPublicKey(base58Key);
+      setLastConnected(new Date().toISOString());
+    }
+    if (error !== null) {
+      setError(null);
+    }
+
+    // Update refs to current values
+    lastSyncedKey.current = base58Key;
 
     let cancelled = false;
 
@@ -97,7 +118,12 @@ export function PhantomConnect() {
           },
         });
         if (!cancelled) {
-          setSession(session);
+          // Only update session if it's different (compare by a unique identifier)
+          const sessionId = `${session.publicKey}-${session.network}-${session.connected}`;
+          if (lastSyncedSessionId.current !== sessionId) {
+            setSession(session);
+            lastSyncedSessionId.current = sessionId;
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -109,7 +135,7 @@ export function PhantomConnect() {
     const loadBalance = async () => {
       try {
         const bal = await invoke<number>('phantom_balance', { address: base58Key });
-        if (!cancelled) {
+        if (!cancelled && balance !== bal) {
           setBalance(bal);
         }
       } catch (err) {
@@ -119,7 +145,10 @@ export function PhantomConnect() {
             const lamports = await connection.getBalance(adapterPublicKey, {
               commitment: 'confirmed',
             });
-            setBalance(lamports / LAMPORTS_PER_SOL);
+            const newBalance = lamports / LAMPORTS_PER_SOL;
+            if (balance !== newBalance) {
+              setBalance(newBalance);
+            }
           } catch (fallbackErr) {
             console.warn('Failed to fetch balance from connection fallback:', fallbackErr);
           }
@@ -142,6 +171,9 @@ export function PhantomConnect() {
   }, [
     connected,
     base58Key,
+    publicKey,
+    balance,
+    error,
     setPublicKey,
     setLastConnected,
     setError,
@@ -164,9 +196,14 @@ export function PhantomConnect() {
       try {
         const session = await invoke<PhantomSession | null>('phantom_session');
         if (session) {
-          setSession(session);
-          setPublicKey(session.publicKey);
-          setLastConnected(session.lastConnected ?? null);
+          // Only update if values are different
+          if (session.publicKey !== publicKey) {
+            setSession(session);
+            setPublicKey(session.publicKey);
+          }
+          if ((session.lastConnected ?? null) !== lastConnected) {
+            setLastConnected(session.lastConnected ?? null);
+          }
 
           if (
             !connected &&
@@ -189,6 +226,8 @@ export function PhantomConnect() {
   }, [
     attemptedAutoConnect,
     autoReconnect,
+    publicKey,
+    lastConnected,
     setAttemptedAutoConnect,
     setSession,
     setPublicKey,

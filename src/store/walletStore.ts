@@ -330,31 +330,57 @@ export const useWalletStore = create<WalletStoreState>()(
       multisigError: null,
       proposalNotifications: [],
 
-      setStatus: status => set({ status }),
+      setStatus: status =>
+        set(state => {
+          if (state.status === status) return state;
+          return { status };
+        }),
       setPublicKey: publicKey =>
-        set(state => ({
-          publicKey,
-          activeWalletId: publicKey
-            ? (state.wallets.find(wallet => wallet.publicKey === publicKey)?.id ??
-              state.activeWalletId)
-            : state.activeWalletId,
-        })),
+        set(state => {
+          if (state.publicKey === publicKey) return state;
+          return {
+            publicKey,
+            activeWalletId: publicKey
+              ? (state.wallets.find(wallet => wallet.publicKey === publicKey)?.id ??
+                state.activeWalletId)
+              : state.activeWalletId,
+          };
+        }),
       setBalance: balance =>
-        set(state => ({
-          balance,
-          wallets: state.activeWalletId
-            ? state.wallets.map(wallet =>
-                wallet.id === state.activeWalletId ? { ...wallet, balance } : wallet
-              )
-            : state.wallets,
-        })),
-      setError: error => set({ error }),
+        set(state => {
+          if (state.balance === balance) return state;
+          return {
+            balance,
+            wallets: state.activeWalletId
+              ? state.wallets.map(wallet =>
+                  wallet.id === state.activeWalletId ? { ...wallet, balance } : wallet
+                )
+              : state.wallets,
+          };
+        }),
+      setError: error =>
+        set(state => {
+          if (state.error === error) return state;
+          return { error };
+        }),
       setNetwork: network => set({ network }),
       setEndpoint: endpoint => set({ endpoint }),
       setAutoReconnect: autoReconnect => set({ autoReconnect }),
-      setAttemptedAutoConnect: attempted => set({ attemptedAutoConnect: attempted }),
-      setLastConnected: timestamp => set({ lastConnected: timestamp }),
-      setSession: session => set({ session }),
+      setAttemptedAutoConnect: attempted =>
+        set(state => {
+          if (state.attemptedAutoConnect === attempted) return state;
+          return { attemptedAutoConnect: attempted };
+        }),
+      setLastConnected: timestamp =>
+        set(state => {
+          if (state.lastConnected === timestamp) return state;
+          return { lastConnected: timestamp };
+        }),
+      setSession: session =>
+        set(state => {
+          if (state.session === session) return state;
+          return { session };
+        }),
       setHardwareDevices: devices => set({ hardwareDevices: devices }),
       setActiveHardwareDevice: device => set({ activeHardwareDevice: device }),
       setSigningMethod: method => set({ signingMethod: method }),
