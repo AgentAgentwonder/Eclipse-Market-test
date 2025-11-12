@@ -101,8 +101,7 @@ export function PhantomConnect() {
         }
       } catch (err) {
         if (!cancelled) {
-          console.error('Failed to persist Phantom session:', err);
-          setError(getErrorMessage(err));
+          console.warn('phantom_connect command not available or failed:', err);
         }
       }
     };
@@ -114,7 +113,7 @@ export function PhantomConnect() {
           setBalance(bal);
         }
       } catch (err) {
-        console.warn('RPC balance lookup failed, attempting connection fallback', err);
+        console.warn('phantom_balance command failed, attempting connection fallback', err);
         if (!cancelled && adapterPublicKey) {
           try {
             const lamports = await connection.getBalance(adapterPublicKey, {
@@ -122,8 +121,7 @@ export function PhantomConnect() {
             });
             setBalance(lamports / LAMPORTS_PER_SOL);
           } catch (fallbackErr) {
-            console.error('Failed to fetch balance from connection:', fallbackErr);
-            setError('Unable to refresh SOL balance');
+            console.warn('Failed to fetch balance from connection fallback:', fallbackErr);
           }
         }
       }
@@ -183,7 +181,7 @@ export function PhantomConnect() {
           }
         }
       } catch (err) {
-        console.error('Failed to restore Phantom session:', err);
+        console.warn('phantom_session command not available or failed:', err);
       }
     };
 
@@ -229,14 +227,16 @@ export function PhantomConnect() {
   const handleDisconnect = useCallback(async () => {
     try {
       await disconnect();
-      await invoke('phantom_disconnect');
     } catch (err) {
       console.error('Failed to disconnect Phantom wallet:', err);
-      setError('Unable to disconnect wallet');
-    } finally {
-      reset();
     }
-  }, [disconnect, reset, setError]);
+    try {
+      await invoke('phantom_disconnect');
+    } catch (err) {
+      console.warn('phantom_disconnect command not available or failed:', err);
+    }
+    reset();
+  }, [disconnect, reset]);
 
   const renderStatusBadge = () => {
     switch (status) {
