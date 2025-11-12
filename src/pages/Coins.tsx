@@ -32,18 +32,37 @@ export default function Coins() {
   const activeWallet = useWalletStore(state => state.activeWallet);
 
   useEffect(() => {
-    invoke<string[]>('get_watchlist')
-      .then(result => setWatchlist(result))
+    invoke<string[]>('watchlist_list')
+      .then(result => {
+        const addresses = result.flatMap(
+          list => (list as any).items?.map((item: any) => item.mint) ?? []
+        );
+        setWatchlist(addresses);
+      })
       .catch(error => console.error('Failed to load watchlist:', error));
   }, []);
 
   const handleToggleWatchlist = async (address: string) => {
     try {
+      const lists = await invoke<any>('watchlist_list');
+      const defaultList = lists[0];
+      if (!defaultList) {
+        console.warn('No watchlist found');
+        return;
+      }
+
       if (watchlist.includes(address)) {
-        await invoke('remove_from_watchlist', { address });
+        await invoke('watchlist_remove_item', {
+          watchlist_id: defaultList.id,
+          mint: address,
+        });
         setWatchlist(prev => prev.filter(item => item !== address));
       } else {
-        await invoke('add_to_watchlist', { address });
+        await invoke('watchlist_add_item', {
+          watchlist_id: defaultList.id,
+          symbol: '',
+          mint: address,
+        });
         setWatchlist(prev => [...prev, address]);
       }
     } catch (error) {

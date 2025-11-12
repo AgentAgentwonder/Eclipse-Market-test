@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { motion } from 'framer-motion';
 import {
@@ -48,9 +48,10 @@ export function TrendingCoins({
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  const fetchTrendingCoins = async () => {
+  const fetchTrendingCoins = useCallback(async () => {
     try {
       const result = await invoke<TrendingCoin[]>('get_trending_coins', {
+        limit: 10,
         apiKey: apiKey || null,
       });
       setCoins(result);
@@ -60,11 +61,11 @@ export function TrendingCoins({
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiKey]);
 
   useEffect(() => {
     fetchTrendingCoins();
-  }, [apiKey]);
+  }, [fetchTrendingCoins]);
 
   useEffect(() => {
     if (!autoRefresh) return;
@@ -74,7 +75,7 @@ export function TrendingCoins({
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [autoRefresh, apiKey]);
+  }, [autoRefresh, fetchTrendingCoins]);
 
   const handleRefresh = () => {
     setLoading(true);
