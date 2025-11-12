@@ -181,6 +181,366 @@ function App() {
   useMonitorConfig();
   useDevConsoleCommands();
 
+  // Pages definition needed before functions that use it
+  const pages = useMemo(() => {
+    const basePages = [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: Home,
+        component: Dashboard,
+        panelType: 'dashboard' as PanelType,
+      },
+      {
+        id: 'coins',
+        label: 'Coins',
+        icon: TrendingUp,
+        component: Coins,
+        panelType: 'coins' as PanelType,
+      },
+      {
+        id: 'portfolio',
+        label: 'Portfolio',
+        icon: Briefcase,
+        component: Portfolio,
+        panelType: 'portfolio' as PanelType,
+      },
+      {
+        id: 'portfolio-analytics',
+        label: 'Portfolio Analytics',
+        icon: Activity,
+        component: PortfolioAnalytics,
+        panelType: 'portfolio-analytics' as PanelType,
+      },
+      {
+        id: 'multisig',
+        label: 'Multisig',
+        icon: Shield,
+        component: Multisig,
+        panelType: 'multisig' as PanelType,
+      },
+      {
+        id: 'api-health',
+        label: 'API Health',
+        icon: AlertTriangle,
+        component: ApiHealth,
+        panelType: 'api-health' as PanelType,
+      },
+      {
+        id: 'pro-charts',
+        label: 'Pro Charts',
+        icon: LineChart,
+        component: ProCharts,
+        panelType: 'pro-charts' as PanelType,
+      },
+      {
+        id: 'token-flow',
+        label: 'Token Flow',
+        icon: Network,
+        component: TokenFlow,
+        panelType: 'token-flow' as PanelType,
+      },
+      {
+        id: 'wallet',
+        label: 'Wallet',
+        icon: WalletIcon,
+        component: Wallet,
+        panelType: 'wallet' as PanelType,
+      },
+      {
+        id: 'launchpad',
+        label: 'Launchpad',
+        icon: Rocket,
+        component: Launchpad,
+        panelType: 'launchpad' as PanelType,
+      },
+      {
+        id: 'surveillance',
+        label: 'Market Surveillance',
+        icon: Shield,
+        component: MarketSurveillance,
+        panelType: 'surveillance' as PanelType,
+      },
+      {
+        id: 'paper-trading',
+        label: 'Paper Trading',
+        icon: FileText,
+        component: PaperTradingDashboard,
+        panelType: 'paper-trading' as PanelType,
+      },
+      {
+        id: 'ai-analysis',
+        label: 'AI Assistant',
+        icon: MessageSquare,
+        component: AIAnalysis,
+        panelType: 'ai-analysis' as PanelType,
+      },
+      {
+        id: 'dev-console',
+        label: 'Dev Console',
+        icon: Terminal,
+        component: DevConsole,
+        panelType: 'dev-console' as PanelType,
+      },
+      {
+        id: 'settings',
+        label: 'Settings',
+        icon: Settings,
+        component: SettingsPage,
+        panelType: 'settings' as PanelType,
+      },
+      {
+        id: 'advanced-settings',
+        label: 'Advanced Settings',
+        icon: Wrench,
+        component: AdvancedSettings,
+        panelType: 'settings' as PanelType,
+      },
+      {
+        id: 'multi-chain',
+        label: 'Multi-Chain',
+        icon: ArrowRightLeft,
+        component: MultiChain,
+        panelType: 'multi-chain' as PanelType,
+      },
+      {
+        id: 'launch-predictor',
+        label: 'Launch Predictor AI',
+        icon: GraduationCap,
+        component: LaunchPredictor,
+        panelType: 'launch-predictor' as PanelType,
+      },
+      {
+        id: 'prediction-markets',
+        label: 'Prediction Markets',
+        icon: PieChart,
+        component: PredictionMarkets,
+        panelType: 'prediction-markets' as PanelType,
+      },
+      {
+        id: 'defi',
+        label: 'DeFi Hub',
+        icon: BanknoteIcon,
+        component: DeFi,
+        panelType: 'defi' as PanelType,
+      },
+      {
+        id: 'governance',
+        label: 'Governance',
+        icon: Vote,
+        component: Governance,
+        panelType: 'governance' as PanelType,
+      },
+      {
+        id: 'historical-replay',
+        label: 'Historical Replay',
+        icon: Clock,
+        component: HistoricalReplay,
+        panelType: 'historical-replay' as PanelType,
+      },
+      {
+        id: 'troubleshooter',
+        label: 'System Troubleshooter',
+        icon: Handshake,
+        component: Troubleshooter,
+        panelType: 'troubleshooter' as PanelType,
+      },
+      {
+        id: 'p2p-marketplace',
+        label: 'P2P Marketplace',
+        icon: Users,
+        component: P2PMarketplace,
+        panelType: 'p2p-marketplace' as PanelType,
+      },
+      {
+        id: 'social-intelligence',
+        label: 'Social Intelligence',
+        icon: Users,
+        component: SocialIntelligence,
+        panelType: 'social-intelligence' as PanelType,
+      },
+      {
+        id: 'stocks',
+        label: 'Stocks',
+        icon: BarChart3,
+        component: Stocks,
+        panelType: 'stocks' as PanelType,
+      },
+      {
+        id: 'insiders',
+        label: 'Insiders',
+        icon: Users,
+        component: Insiders,
+        panelType: 'insiders' as PanelType,
+      },
+    ];
+
+    if (isPaperMode) {
+      basePages.splice(6, 0, {
+        id: 'paper-trading',
+        label: 'Paper Trading',
+        icon: FileText,
+        component: PaperTradingDashboard,
+        panelType: 'paper-trading' as PanelType,
+      });
+    }
+
+    return basePages;
+  }, [isPaperMode]);
+
+  // Function definitions moved here to avoid temporal dead zone errors
+  const handleAddPanelToWorkspace = useCallback(
+    (panelType: PanelType) => {
+      if (!activeWorkspaceId) return;
+
+      const { panel, layout } = createPanelDefinition(panelType);
+      addPanelToWorkspace(activeWorkspaceId, panel, layout);
+      setSidebarOpen(false);
+    },
+    [activeWorkspaceId, addPanelToWorkspace]
+  );
+
+  const ensurePanelForPage = useCallback(
+    (panelType: PanelType) => {
+      if (!useWorkspaceMode || !activeWorkspace) return;
+
+      const existingPanel = activeWorkspace.layout.panels.find(panel => panel.type === panelType);
+      if (existingPanel) {
+        setPanelMinimized(activeWorkspace.id, existingPanel.id, false);
+        return;
+      }
+
+      handleAddPanelToWorkspace(panelType);
+    },
+    [useWorkspaceMode, activeWorkspace, setPanelMinimized, handleAddPanelToWorkspace]
+  );
+
+  const emitShortcutAction = useCallback((action: string, payload?: Record<string, unknown>) => {
+    window.dispatchEvent(new CustomEvent('app:shortcut-action', { detail: { action, payload } }));
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    const doc: any = document;
+    const docEl: any = document.documentElement;
+
+    if (!docEl) return;
+
+    if (doc.fullscreenElement || doc.webkitFullscreenElement) {
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => undefined);
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
+      emitShortcutAction('window:fullscreen', { enabled: false });
+    } else {
+      const request = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+      if (request) {
+        Promise.resolve(request.call(docEl)).catch(() => undefined);
+        emitShortcutAction('window:fullscreen', { enabled: true });
+      }
+    }
+  }, [emitShortcutAction]);
+
+  const cycleWorkspace = useCallback(
+    (direction: 'next' | 'prev') => {
+      if (!workspaces.length) return;
+
+      const currentIndex = Math.max(
+        workspaces.findIndex(w => w.id === activeWorkspaceId),
+        0
+      );
+      const offset = direction === 'next' ? 1 : -1;
+      const nextIndex = (currentIndex + offset + workspaces.length) % workspaces.length;
+      const target = workspaces[nextIndex];
+      if (target) {
+        setActiveWorkspace(target.id);
+      }
+    },
+    [workspaces, activeWorkspaceId, setActiveWorkspace]
+  );
+
+  const navigateToPage = useCallback(
+    (pageId: string) => {
+      const target = pages.find(page => page.id === pageId);
+      if (!target) return;
+
+      setCurrentPage(pageId);
+      if (useWorkspaceMode && target.panelType) {
+        ensurePanelForPage(target.panelType);
+      }
+      setSidebarOpen(false);
+    },
+    [pages, useWorkspaceMode, ensurePanelForPage]
+  );
+
+  const handleShortcutAction = useCallback(
+    (action: string) => {
+      switch (action) {
+        case 'nav:dashboard':
+        case 'nav:coins':
+        case 'nav:portfolio':
+        case 'nav:trading':
+        case 'nav:defi':
+        case 'nav:settings':
+          navigateToPage(action.split(':')[1]);
+          emitShortcutAction(action);
+          break;
+        case 'window:toggle-sidebar':
+          setSidebarOpen(prev => {
+            const next = !prev;
+            emitShortcutAction(action, { open: next });
+            return next;
+          });
+          break;
+        case 'window:next-workspace':
+          cycleWorkspace('next');
+          emitShortcutAction(action);
+          break;
+        case 'window:prev-workspace':
+          cycleWorkspace('prev');
+          emitShortcutAction(action);
+          break;
+        case 'window:fullscreen':
+          toggleFullscreen();
+          break;
+        case 'general:refresh':
+          emitShortcutAction(action);
+          window.location.reload();
+          break;
+        case 'general:search':
+          emitShortcutAction(action);
+          break;
+        case 'tools:calculator':
+          setCommandPaletteOpen(true);
+          emitShortcutAction(action);
+          break;
+        case 'tools:export':
+          emitShortcutAction(action);
+          break;
+        case 'trading:quick-buy':
+        case 'trading:quick-sell':
+        case 'trading:swap':
+        case 'trading:limit-order':
+        case 'trading:cancel-all':
+          navigateToPage('trading');
+          emitShortcutAction(action);
+          break;
+        default:
+          emitShortcutAction(action);
+          break;
+      }
+    },
+    [
+      navigateToPage,
+      emitShortcutAction,
+      setCommandPaletteOpen,
+      cycleWorkspace,
+      toggleFullscreen,
+      sidebarOpen,
+    ]
+  );
+
   useKeyboardShortcuts({
     onCommandPalette: () => setCommandPaletteOpen(true),
     onHelp: () => setCheatSheetOpen(true),
@@ -563,383 +923,11 @@ function App() {
     handleCloseChart();
   };
 
-  const pages = useMemo(() => {
-    const basePages = [
-      {
-        id: 'dashboard',
-        label: 'Dashboard',
-        icon: Home,
-        component: Dashboard,
-        panelType: 'dashboard' as PanelType,
-      },
-      {
-        id: 'coins',
-        label: 'Coins',
-        icon: TrendingUp,
-        component: Coins,
-        panelType: 'coins' as PanelType,
-      },
-      {
-        id: 'portfolio',
-        label: 'Portfolio',
-        icon: Briefcase,
-        component: Portfolio,
-        panelType: 'portfolio' as PanelType,
-      },
-      {
-        id: 'portfolio-analytics',
-        label: 'Portfolio Analytics',
-        icon: Activity,
-        component: PortfolioAnalytics,
-        panelType: 'portfolio-analytics' as PanelType,
-      },
-      {
-        id: 'multisig',
-        label: 'Multisig',
-        icon: Shield,
-        component: Multisig,
-        panelType: 'multisig' as PanelType,
-      },
-      {
-        id: 'p2p-marketplace',
-        label: 'P2P Marketplace',
-        icon: Handshake,
-        component: P2PMarketplace,
-        panelType: 'p2p-marketplace' as PanelType,
-      },
-      {
-        id: 'stocks',
-        label: 'Stocks',
-        icon: BarChart3,
-        component: Stocks,
-        panelType: 'stocks' as PanelType,
-      },
-      {
-        id: 'insiders',
-        label: 'Insiders',
-        icon: Users,
-        component: Insiders,
-        panelType: 'insiders' as PanelType,
-      },
-      {
-        id: 'social-intelligence',
-        label: 'Social Intelligence',
-        icon: MessageSquare,
-        component: SocialIntelligence,
-        panelType: 'social-intelligence' as PanelType,
-      },
-      {
-        id: 'token-flow',
-        label: 'Token Flow',
-        icon: Network,
-        component: TokenFlow,
-        panelType: 'token-flow' as PanelType,
-      },
-      {
-        id: 'launchpad',
-        label: 'Launchpad',
-        icon: Rocket,
-        component: Launchpad,
-        panelType: 'launchpad' as PanelType,
-      },
-      {
-        id: 'surveillance',
-        label: 'Market Surveillance',
-        icon: AlertTriangle,
-        component: MarketSurveillance,
-        panelType: 'surveillance' as PanelType,
-      },
-      { id: 'dashboard', label: 'Dashboard', icon: Home, component: Dashboard },
-      { id: 'coins', label: 'Coins', icon: TrendingUp, component: Coins },
-      { id: 'portfolio', label: 'Portfolio', icon: Briefcase, component: Portfolio },
-      {
-        id: 'portfolio-analytics',
-        label: 'Portfolio Analytics',
-        icon: Activity,
-        component: PortfolioAnalytics,
-      },
-      { id: 'wallet', label: 'Wallet', icon: WalletIcon, component: Wallet },
-      { id: 'multi-chain', label: 'Multi-Chain', icon: ArrowRightLeft, component: MultiChain },
-      { id: 'multisig', label: 'Multisig', icon: Shield, component: Multisig },
-      { id: 'stocks', label: 'Stocks', icon: BarChart3, component: Stocks },
-      { id: 'insiders', label: 'Insiders', icon: Users, component: Insiders },
-      {
-        id: 'social-intelligence',
-        label: 'Social Intelligence',
-        icon: MessageSquare,
-        component: SocialIntelligence,
-      },
-      { id: 'token-flow', label: 'Token Flow', icon: Network, component: TokenFlow },
-      { id: 'launchpad', label: 'Launchpad', icon: Rocket, component: Launchpad },
-      {
-        id: 'surveillance',
-        label: 'Market Surveillance',
-        icon: AlertTriangle,
-        component: MarketSurveillance,
-      },
-      {
-        id: 'trading',
-        label: isPaperMode ? 'Live Trading' : 'Trading',
-        icon: Bell,
-        component: Trading,
-        panelType: 'trading' as PanelType,
-      },
-      {
-        id: 'pro-charts',
-        label: 'Pro Charts',
-        icon: LineChart,
-        component: ProCharts,
-        panelType: 'pro-charts' as PanelType,
-      },
-      {
-        id: 'ai-analysis',
-        label: 'AI Assistant',
-        icon: MessageSquare,
-        component: AIAnalysis,
-        panelType: 'ai-analysis' as PanelType,
-      },
-      {
-        id: 'launch-predictor',
-        label: 'Launch Predictor',
-        icon: Rocket,
-        component: LaunchPredictor,
-        panelType: 'launch-predictor' as PanelType,
-      },
-      {
-        id: 'prediction-markets',
-        label: 'Prediction Markets',
-        icon: PieChart,
-        component: PredictionMarkets,
-        panelType: 'prediction-markets' as PanelType,
-      },
-      {
-        id: 'defi',
-        label: 'DeFi',
-        icon: BanknoteIcon,
-        component: DeFi,
-        panelType: 'defi' as PanelType,
-      },
-      {
-        id: 'governance',
-        label: 'Governance',
-        icon: Vote,
-        component: Governance,
-        panelType: 'governance' as PanelType,
-      },
-      {
-        id: 'historical-replay',
-        label: 'Historical Replay',
-        icon: Clock,
-        component: HistoricalReplay,
-        panelType: 'historical-replay' as PanelType,
-      },
-      {
-        id: 'api-health',
-        label: 'API Health',
-        icon: Activity,
-        component: ApiHealth,
-        panelType: 'api-health' as PanelType,
-      },
-      {
-        id: 'troubleshooter',
-        label: 'Troubleshooter',
-        icon: Wrench,
-        component: Troubleshooter,
-        panelType: 'troubleshooter' as PanelType,
-      },
-      {
-        id: 'dev-console',
-        label: 'Dev Console',
-        icon: Terminal,
-        component: DevConsole,
-        panelType: 'dev-console' as PanelType,
-      },
-      {
-        id: 'settings',
-        label: 'Settings',
-        icon: Settings,
-        component: SettingsPage,
-        panelType: 'settings' as PanelType,
-      },
-      {
-        id: 'advanced-settings',
-        label: 'Advanced Settings',
-        icon: LayoutGrid,
-        component: AdvancedSettings,
-        panelType: 'settings' as PanelType,
-      },
-    ];
-
-    if (isPaperMode) {
-      basePages.splice(6, 0, {
-        id: 'paper-trading',
-        label: 'Paper Trading',
-        icon: FileText,
-        component: PaperTradingDashboard,
-        panelType: 'paper-trading' as PanelType,
-      });
-    }
-
-    return basePages;
-  }, [isPaperMode]);
-
-  const CurrentPageComponent = pages.find(p => p.id === currentPage)?.component || Dashboard;
-
-  const navigateToPage = useCallback(
-    (pageId: string) => {
-      const target = pages.find(page => page.id === pageId);
-      if (!target) return;
-
-      setCurrentPage(pageId);
-      if (useWorkspaceMode && target.panelType) {
-        ensurePanelForPage(target.panelType);
-      }
-      setSidebarOpen(false);
-    },
-    [pages, useWorkspaceMode, ensurePanelForPage]
-  );
-
-  const cycleWorkspace = useCallback(
-    (direction: 'next' | 'prev') => {
-      if (!workspaces.length) return;
-
-      const currentIndex = Math.max(
-        workspaces.findIndex(w => w.id === activeWorkspaceId),
-        0
-      );
-      const offset = direction === 'next' ? 1 : -1;
-      const nextIndex = (currentIndex + offset + workspaces.length) % workspaces.length;
-      const target = workspaces[nextIndex];
-      if (target) {
-        setActiveWorkspace(target.id);
-      }
-    },
-    [workspaces, activeWorkspaceId, setActiveWorkspace]
-  );
-
-  const emitShortcutAction = useCallback((action: string, payload?: Record<string, unknown>) => {
-    window.dispatchEvent(new CustomEvent('app:shortcut-action', { detail: { action, payload } }));
-  }, []);
-
-  const toggleFullscreen = useCallback(() => {
-    if (typeof document === 'undefined') return;
-    const doc: any = document;
-    const docEl: any = document.documentElement;
-
-    if (!docEl) return;
-
-    if (doc.fullscreenElement || doc.webkitFullscreenElement) {
-      if (doc.exitFullscreen) {
-        doc.exitFullscreen().catch(() => undefined);
-      } else if (doc.webkitExitFullscreen) {
-        doc.webkitExitFullscreen();
-      }
-      emitShortcutAction('window:fullscreen', { enabled: false });
-    } else {
-      const request = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
-      if (request) {
-        Promise.resolve(request.call(docEl)).catch(() => undefined);
-        emitShortcutAction('window:fullscreen', { enabled: true });
-      }
-    }
-  }, [emitShortcutAction]);
-
-  const handleShortcutAction = useCallback(
-    (action: string) => {
-      switch (action) {
-        case 'nav:dashboard':
-        case 'nav:coins':
-        case 'nav:portfolio':
-        case 'nav:trading':
-        case 'nav:defi':
-        case 'nav:settings':
-          navigateToPage(action.split(':')[1]);
-          emitShortcutAction(action);
-          break;
-        case 'window:toggle-sidebar':
-          setSidebarOpen(prev => {
-            const next = !prev;
-            emitShortcutAction(action, { open: next });
-            return next;
-          });
-          break;
-        case 'window:next-workspace':
-          cycleWorkspace('next');
-          emitShortcutAction(action);
-          break;
-        case 'window:prev-workspace':
-          cycleWorkspace('prev');
-          emitShortcutAction(action);
-          break;
-        case 'window:fullscreen':
-          toggleFullscreen();
-          break;
-        case 'general:refresh':
-          emitShortcutAction(action);
-          window.location.reload();
-          break;
-        case 'general:search':
-          emitShortcutAction(action);
-          break;
-        case 'tools:calculator':
-          setCommandPaletteOpen(true);
-          emitShortcutAction(action);
-          break;
-        case 'tools:export':
-          emitShortcutAction(action);
-          break;
-        case 'trading:quick-buy':
-        case 'trading:quick-sell':
-        case 'trading:swap':
-        case 'trading:limit-order':
-        case 'trading:cancel-all':
-          navigateToPage('trading');
-          emitShortcutAction(action);
-          break;
-        default:
-          emitShortcutAction(action);
-          break;
-      }
-    },
-    [
-      navigateToPage,
-      emitShortcutAction,
-      setCommandPaletteOpen,
-      cycleWorkspace,
-      toggleFullscreen,
-      sidebarOpen,
-    ]
-  );
+  // Duplicate pages definition removed
 
   const handleSwitchToLive = () => {
     setCurrentPage('settings');
   };
-
-  const handleAddPanelToWorkspace = useCallback(
-    (panelType: PanelType) => {
-      if (!activeWorkspaceId) return;
-
-      const { panel, layout } = createPanelDefinition(panelType);
-      addPanelToWorkspace(activeWorkspaceId, panel, layout);
-      setSidebarOpen(false);
-    },
-    [activeWorkspaceId, addPanelToWorkspace]
-  );
-
-  const ensurePanelForPage = useCallback(
-    (panelType: PanelType) => {
-      if (!useWorkspaceMode || !activeWorkspace) return;
-
-      const existingPanel = activeWorkspace.layout.panels.find(panel => panel.type === panelType);
-      if (existingPanel) {
-        setPanelMinimized(activeWorkspace.id, existingPanel.id, false);
-        return;
-      }
-
-      handleAddPanelToWorkspace(panelType);
-    },
-    [useWorkspaceMode, activeWorkspace, setPanelMinimized, handleAddPanelToWorkspace]
-  );
 
   return (
     <div

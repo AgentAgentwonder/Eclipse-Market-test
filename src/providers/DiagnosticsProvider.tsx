@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useCallback } from 'react';
 import { record } from 'rrweb';
 import { useDiagnosticsStore } from '../store/diagnosticsStore';
 
@@ -18,18 +18,23 @@ export function DiagnosticsProvider({ children }: DiagnosticsProviderProps) {
     addConsoleLog,
     addErrorLog,
     setSessionRecordingEnabled,
-  } = useDiagnosticsStore(state => ({
-    sessionRecordingEnabled: state.sessionRecordingEnabled,
-    sessionRecordingConsented: state.sessionRecordingConsented,
-    privacyMaskingEnabled: state.privacyMaskingEnabled,
-    isRecording: state.isRecording,
-    startRecording: state.startRecording,
-    stopRecording: state.stopRecording,
-    addRecordingEvent: state.addRecordingEvent,
-    addConsoleLog: state.addConsoleLog,
-    addErrorLog: state.addErrorLog,
-    setSessionRecordingEnabled: state.setSessionRecordingEnabled,
-  }));
+  } = useDiagnosticsStore(
+    useCallback(
+      state => ({
+        sessionRecordingEnabled: state.sessionRecordingEnabled,
+        sessionRecordingConsented: state.sessionRecordingConsented,
+        privacyMaskingEnabled: state.privacyMaskingEnabled,
+        isRecording: state.isRecording,
+        startRecording: state.startRecording,
+        stopRecording: state.stopRecording,
+        addRecordingEvent: state.addRecordingEvent,
+        addConsoleLog: state.addConsoleLog,
+        addErrorLog: state.addErrorLog,
+        setSessionRecordingEnabled: state.setSessionRecordingEnabled,
+      }),
+      []
+    )
+  );
 
   const stopRef = useRef<(() => void) | null>(null);
   const consoleOriginals = useRef<
