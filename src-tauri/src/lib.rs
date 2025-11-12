@@ -285,6 +285,14 @@ pub fn run() {
             })?;
             startup_log!("Keystore initialized");
 
+            let app_data_dir = app
+                .path()
+                .app_data_dir()
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            std::fs::create_dir_all(&app_data_dir)
+                .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            eprintln!("App data directory created/verified: {:?}", app_data_dir);
+
             let tax_engine = tax::initialize_tax_engine(&keystore);
             startup_log!("Tax engine initialized");
 
