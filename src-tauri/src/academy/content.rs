@@ -175,10 +175,19 @@ impl ContentService {
             ))
         })?;
 
-        std::fs::create_dir_all(&app_dir)?;
+        let _ = std::fs::create_dir_all(&app_dir);
         let db_path = app_dir.join(ACADEMY_DB_FILE);
+        let db_url = format!("sqlite:{}", db_path.display());
 
-        let pool = SqlitePool::connect(&format!("sqlite:{}", db_path.display())).await?;
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: ContentService failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for ContentService");
+                eprintln!("ContentService using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         // Initialize database schema
         Self::init_schema(&pool).await?;

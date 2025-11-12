@@ -125,7 +125,16 @@ pub struct MultisigDatabase {
 impl MultisigDatabase {
     pub async fn new(db_path: PathBuf) -> Result<Self> {
         let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-        let pool = SqlitePool::connect(&db_url).await?;
+        
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: MultisigDatabase failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for MultisigDatabase");
+                eprintln!("MultisigDatabase using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         let db = Self { pool };
         db.initialize().await?;

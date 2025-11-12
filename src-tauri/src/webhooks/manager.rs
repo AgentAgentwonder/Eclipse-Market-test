@@ -27,7 +27,16 @@ impl WebhookManager {
     pub async fn new(app: &AppHandle) -> Result<Self, WebhookError> {
         let db_path = Self::webhooks_db_path(app)?;
         let db_url = format!("sqlite:{}?mode=rwc", db_path.display());
-        let pool = SqlitePool::connect(&db_url).await?;
+        
+        let pool = match SqlitePool::connect(&db_url).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                eprintln!("Warning: WebhookManager failed to connect to {:?}: {}", db_path, e);
+                eprintln!("Falling back to in-memory database for WebhookManager");
+                eprintln!("WebhookManager using in-memory database for this session");
+                SqlitePool::connect("sqlite::memory:").await?
+            }
+        };
 
         let manager = Self {
             pool,
