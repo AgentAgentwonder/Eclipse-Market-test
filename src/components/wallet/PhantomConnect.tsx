@@ -16,25 +16,9 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function PhantomConnect() {
-  const {
-    status,
-    setStatus,
-    publicKey,
-    setPublicKey,
-    balance,
-    setBalance,
-    error,
-    setError,
-    autoReconnect,
-    attemptedAutoConnect,
-    lastConnected,
-    setAttemptedAutoConnect,
-    setLastConnected,
-    setSession,
-    reset,
-    network,
-  } = useWalletStore(
-    state => ({
+  // Memoize selector to prevent "getSnapshot should be cached" warning
+  const walletSelector = useCallback(
+    (state: ReturnType<typeof useWalletStore.getState>) => ({
       status: state.status,
       setStatus: state.setStatus,
       publicKey: state.publicKey,
@@ -52,8 +36,27 @@ export function PhantomConnect() {
       reset: state.reset,
       network: state.network,
     }),
-    shallow
+    []
   );
+
+  const {
+    status,
+    setStatus,
+    publicKey,
+    setPublicKey,
+    balance,
+    setBalance,
+    error,
+    setError,
+    autoReconnect,
+    attemptedAutoConnect,
+    lastConnected,
+    setAttemptedAutoConnect,
+    setLastConnected,
+    setSession,
+    reset,
+    network,
+  } = useWalletStore(walletSelector, shallow);
 
   const { connection } = useConnection();
   const {
@@ -89,22 +92,31 @@ export function PhantomConnect() {
     }
   }, [connecting, connected, status, setStatus]);
 
+  // Effect 1: Sync publicKey when connected
   useEffect(() => {
     if (!connected || !base58Key) {
       return;
     }
 
-    // Only update state if values actually changed
-    if (publicKey !== base58Key) {
-      setPublicKey(base58Key);
-      setLastConnected(new Date().toISOString());
+    // Only update if the key actually changed (check both ref and current store value)
+    // Don't add publicKey to deps to avoid loops, but read it for the check
+    if (lastSyncedKey.current !== base58Key) {
+      if (publicKey !== base58Key) {
+        console.log('[PhantomConnect] Syncing publicKey:', base58Key);
+        setPublicKey(base58Key);
+        setLastConnected(new Date().toISOString());
+        setError(null);
+      }
+      lastSyncedKey.current = base58Key;
     }
-    if (error !== null) {
-      setError(null);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, base58Key, setPublicKey, setLastConnected, setError]);
 
-    // Update refs to current values
-    lastSyncedKey.current = base58Key;
+  // Effect 2: Sync session with backend
+  useEffect(() => {
+    if (!connected || !base58Key) {
+      return;
+    }
 
     let cancelled = false;
 
@@ -132,10 +144,27 @@ export function PhantomConnect() {
       }
     };
 
+    syncSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connected, base58Key, network, wallet, setSession]);
+
+  // Effect 3: Load and poll balance
+  useEffect(() => {
+    if (!connected || !base58Key) {
+      return;
+    }
+
+    let cancelled = false;
+
     const loadBalance = async () => {
+      if (cancelled) return;
+
       try {
         const bal = await invoke<number>('phantom_balance', { address: base58Key });
-        if (!cancelled && balance !== bal) {
+        if (!cancelled) {
           setBalance(bal);
         }
       } catch (err) {
@@ -146,7 +175,7 @@ export function PhantomConnect() {
               commitment: 'confirmed',
             });
             const newBalance = lamports / LAMPORTS_PER_SOL;
-            if (balance !== newBalance) {
+            if (!cancelled) {
               setBalance(newBalance);
             }
           } catch (fallbackErr) {
@@ -156,35 +185,21 @@ export function PhantomConnect() {
       }
     };
 
-    syncSession();
     loadBalance();
 
     const interval = setInterval(() => {
-      if (cancelled || !base58Key) return;
-      loadBalance();
+      if (!cancelled) {
+        loadBalance();
+      }
     }, 15000);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [
-    connected,
-    base58Key,
-    publicKey,
-    balance,
-    error,
-    setPublicKey,
-    setLastConnected,
-    setError,
-    setBalance,
-    setSession,
-    network,
-    wallet,
-    adapterPublicKey,
-    connection,
-  ]);
+  }, [connected, base58Key, setBalance, adapterPublicKey, connection]);
 
+  // Effect 4: Auto-reconnect on mount
   useEffect(() => {
     if (attemptedAutoConnect || !autoReconnect) {
       return;
@@ -223,11 +238,10 @@ export function PhantomConnect() {
     };
 
     attemptRestore();
+    // Only run once on mount, removed publicKey and lastConnected from deps to prevent loops
   }, [
     attemptedAutoConnect,
     autoReconnect,
-    publicKey,
-    lastConnected,
     setAttemptedAutoConnect,
     setSession,
     setPublicKey,

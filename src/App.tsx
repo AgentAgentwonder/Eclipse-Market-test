@@ -602,6 +602,13 @@ function App() {
     hydrate();
   }, []);
 
+  // Memoize tutorialProgress keys to prevent infinite loops
+  const tutorialProgressKeys = useMemo(
+    () => Object.keys(tutorialProgress).sort().join(','),
+    [tutorialProgress]
+  );
+
+  // Auto-start tutorial effect with comprehensive loop prevention
   useEffect(() => {
     if (!tutorialAutoStart || tutorialPlaying) {
       return;
@@ -627,16 +634,19 @@ function App() {
       }
 
       // Record this auto-start and start the tutorial
+      console.log('[App] Auto-starting tutorial:', nextTutorial.id, 'on page:', currentPage);
       lastAutoStartedRef.current = { page: currentPage, tutorialId: nextTutorial.id };
       startTutorial(nextTutorial.id);
     }
+    // Use tutorialProgressKeys instead of tutorialProgress to reduce re-render frequency
   }, [
     currentPage,
     tutorialAutoStart,
     getAvailableTutorials,
-    tutorialProgress,
+    tutorialProgressKeys,
     startTutorial,
     tutorialPlaying,
+    tutorialProgress,
   ]);
 
   // Reset the auto-start ref when tutorial stops playing (completion/skip)
