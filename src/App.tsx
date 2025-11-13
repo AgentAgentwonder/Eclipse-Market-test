@@ -170,16 +170,7 @@ function App() {
     [workspaces, activeWorkspaceId]
   );
 
-  const CurrentPageComponent = useMemo(
-    () => pages.find(page => page.id === currentPage)?.component || null,
-    [pages, currentPage]
-  );
-
-  useAlertNotifications();
-  useMonitorConfig();
-  useDevConsoleCommands();
-
-  // Pages definition needed before functions that use it
+  // Pages definition - MUST be defined before CurrentPageComponent
   const pages = useMemo(() => {
     const basePages = [
       {
@@ -385,6 +376,15 @@ function App() {
 
     return basePages;
   }, [isPaperMode]);
+
+  const CurrentPageComponent = useMemo(
+    () => pages.find(page => page.id === currentPage)?.component || null,
+    [pages, currentPage]
+  );
+
+  useAlertNotifications();
+  useMonitorConfig();
+  useDevConsoleCommands();
 
   // Function definitions moved here to avoid temporal dead zone errors
   const handleAddPanelToWorkspace = useCallback(
