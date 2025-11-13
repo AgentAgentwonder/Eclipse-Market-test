@@ -11,18 +11,21 @@ interface TutorialMenuProps {
 }
 
 export function TutorialMenu({ currentPage, isOpen, onClose }: TutorialMenuProps) {
+  // Memoize selector to prevent "getSnapshot should be cached" warning
+  const tutorialSelector = useCallback(
+    (state: ReturnType<typeof useTutorialStore.getState>) => ({
+      tutorials: state.tutorials,
+      progress: state.progress,
+      startTutorial: state.startTutorial,
+      resetTutorial: state.resetTutorial,
+      autoStart: state.autoStart,
+      setAutoStart: state.setAutoStart,
+    }),
+    []
+  );
+
   const { tutorials, progress, startTutorial, resetTutorial, autoStart, setAutoStart } =
-    useTutorialStore(
-      state => ({
-        tutorials: state.tutorials,
-        progress: state.progress,
-        startTutorial: state.startTutorial,
-        resetTutorial: state.resetTutorial,
-        autoStart: state.autoStart,
-        setAutoStart: state.setAutoStart,
-      }),
-      shallow
-    );
+    useTutorialStore(tutorialSelector, shallow);
 
   const availableTutorials = useMemo(() => {
     return tutorials.filter(tutorial => {
