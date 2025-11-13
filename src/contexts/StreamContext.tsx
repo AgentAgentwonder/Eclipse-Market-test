@@ -23,10 +23,7 @@ function shallowEqualArray<T>(a: T[], b: T[]): boolean {
   return true;
 }
 
-function shallowEqualPreferences(
-  a: StreamPreferences,
-  b: StreamPreferences
-): boolean {
+function shallowEqualPreferences(a: StreamPreferences, b: StreamPreferences): boolean {
   return (
     a.autoReconnect === b.autoReconnect &&
     a.fallbackIntervalMs === b.fallbackIntervalMs &&
@@ -39,7 +36,7 @@ function shallowEqualPreferences(
 function statusListEqual(a: ConnectionStatus[], b: ConnectionStatus[]): boolean {
   if (a === b) return true;
   if (a.length !== b.length) return false;
-  
+
   const sortKey = (s: ConnectionStatus) => s.provider;
   const sortedA = [...a].sort((x, y) => sortKey(x).localeCompare(sortKey(y)));
   const sortedB = [...b].sort((x, y) => sortKey(x).localeCompare(sortKey(y)));
@@ -61,10 +58,10 @@ function statusListEqual(a: ConnectionStatus[], b: ConnectionStatus[]): boolean 
       sa.statistics.droppedMessages !== sb.statistics.droppedMessages ||
       !shallowEqualArray(sa.subscriptions.prices, sb.subscriptions.prices) ||
       !shallowEqualArray(sa.subscriptions.wallets, sb.subscriptions.wallets) ||
-      (sa.fallback?.active !== sb.fallback?.active) ||
-      (sa.fallback?.lastSuccess !== sb.fallback?.lastSuccess) ||
-      (sa.fallback?.intervalMs !== sb.fallback?.intervalMs) ||
-      (sa.fallback?.reason !== sb.fallback?.reason)
+      sa.fallback?.active !== sb.fallback?.active ||
+      sa.fallback?.lastSuccess !== sb.fallback?.lastSuccess ||
+      sa.fallback?.intervalMs !== sb.fallback?.intervalMs ||
+      sa.fallback?.reason !== sb.fallback?.reason
     ) {
       return false;
     }

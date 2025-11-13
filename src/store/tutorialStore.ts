@@ -164,6 +164,10 @@ export const useTutorialStore = create<TutorialState>()(
       },
 
       setAutoStart: (enabled: boolean) => {
+        const currentAutoStart = get().autoStart;
+        if (currentAutoStart === enabled) {
+          return; // Prevent redundant state updates
+        }
         set({ autoStart: enabled });
       },
 
