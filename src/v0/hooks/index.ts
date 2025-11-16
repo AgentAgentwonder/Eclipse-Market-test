@@ -7,3 +7,5 @@ export type { V0MediaQueryOptions } from './useMediaQuery';
 
 export { useV0Async } from './useAsync';
 export type { V0AsyncState } from './useAsync';
+
+export { useV0WalletData, useV0WalletActions, useV0WalletPreferences } from './useV0Wallet';
