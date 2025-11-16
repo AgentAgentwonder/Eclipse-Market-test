@@ -158,31 +158,13 @@
 
 /* Loading states */
 .v0-loading {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  animation: v0-spin 1s linear infinite;
 }
 
 .v0-skeleton {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: v0-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   background-color: var(--color-background-tertiary);
   border-radius: 0.375rem;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
 }
 
 /* Responsive utilities */

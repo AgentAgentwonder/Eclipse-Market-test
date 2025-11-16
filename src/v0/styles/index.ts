@@ -1,6 +1,10 @@
 // V0 Styles barrel exports
-import './globals.css';
-import './components.css';
+// CSS imports are now handled dynamically by the loader
+// import './globals.css';
+// import './components.css';
+
+// Export loader for conditional style loading
+export { loadV0Styles, areV0StylesLoaded, preloadV0Styles, forceLoadV0Styles } from './loader';
 
 // Re-export common CSS classes for programmatic use
 export const v0Classes = {
