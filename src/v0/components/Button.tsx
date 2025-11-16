@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from '@/v0/lib/utils';
+import { loadV0Styles } from '@/v0/styles';
 
 export interface V0ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
@@ -17,6 +18,11 @@ export const V0Button: React.FC<V0ButtonProps> = ({
   children,
   ...props
 }) => {
+  // Load v0 styles when component is first used
+  useEffect(() => {
+    loadV0Styles().catch(console.error);
+  }, []);
+
   const baseClasses = 'v0-button';
 
   const variants = {
