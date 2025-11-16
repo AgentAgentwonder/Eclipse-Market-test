@@ -24,3 +24,17 @@ export type { V0LinkProps, V0NavigationProps } from './Link';
 
 export { V0Image } from './Image';
 export type { V0ImageProps } from './Image';
+
+// Wallet components
+export {
+  V0WalletConnect,
+  V0WalletSwitcher,
+  V0WalletInfo,
+  V0WalletList,
+} from './wallet';
+export type {
+  V0WalletConnectProps,
+  V0WalletSwitcherProps,
+  V0WalletInfoProps,
+  V0WalletListProps,
+} from './wallet';
