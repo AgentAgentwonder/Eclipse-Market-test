@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from '@/v0/lib/utils';
+import { loadV0Styles } from '@/v0/styles';
 
 export interface V0CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
 export const V0Card: React.FC<V0CardProps> = ({ className, children, ...props }) => {
+  // Load v0 styles when component is first used
+  useEffect(() => {
+    loadV0Styles().catch(console.error);
+  }, []);
+
   return (
     <div className={cn('v0-card', className)} {...props}>
       {children}
