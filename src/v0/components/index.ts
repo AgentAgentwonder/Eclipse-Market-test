@@ -25,6 +25,20 @@ export type { V0LinkProps, V0NavigationProps } from './Link';
 export { V0Image } from './Image';
 export type { V0ImageProps } from './Image';
 
+// Alerts components
+export {
+  V0AlertNotification,
+  V0AlertsList,
+  V0AlertNotificationContainer,
+  V0AlertsBadge,
+} from './alerts';
+export type {
+  V0AlertNotificationProps,
+  V0AlertsListProps,
+  V0AlertNotificationContainerProps,
+  V0AlertsBadgeProps,
+} from './alerts';
+
 // Wallet components
 export {
   V0WalletConnect,
