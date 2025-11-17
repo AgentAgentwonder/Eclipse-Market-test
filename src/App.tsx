@@ -123,7 +123,20 @@ type BiometricStatus = {
   platform: 'WindowsHello' | 'TouchId' | 'PasswordOnly';
 };
 
+const startupLog = (message: string, data?: any) => {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] [APP] ${message}`;
+  console.log(logMessage, data || '');
+  
+  if (typeof window !== 'undefined') {
+    window.eclipseStartupLogs = window.eclipseStartupLogs || [];
+    window.eclipseStartupLogs.push({ timestamp, message, data, source: 'app' });
+  }
+};
+
 function App() {
+  startupLog('App component starting');
+  
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lockVisible, setLockVisible] = useState(false);
@@ -141,6 +154,8 @@ function App() {
 
   // Ref to track the last auto-started tutorial to prevent duplicate starts
   const lastAutoStartedRef = useRef<{ page: string; tutorialId: string } | null>(null);
+
+  try {
 
   const currentVersion = packageJson.version ?? '1.0.0';
   const tutorialAutoStart = useTutorialStore(state => state.autoStart);
@@ -1238,6 +1253,49 @@ function App() {
       <VoiceTradingOverlay />
     </div>
   );
+  } catch (error) {
+    startupLog('App component error', error);
+    console.error('App component failed:', error);
+    
+    return (
+      <div style={{ padding: '20px', fontFamily: 'monospace', background: '#1a1a1a', color: '#fff', minHeight: '100vh' }}>
+        <h1>Application Error</h1>
+        <p>The main application component failed to render:</p>
+        <pre style={{ background: '#2a2a2a', padding: '10px', borderRadius: '5px', overflow: 'auto' }}>
+          {error instanceof Error ? error.stack : String(error)}
+        </pre>
+        <button 
+          onClick={() => window.location.reload()} 
+          style={{ marginTop: '20px', padding: '10px 20px', background: '#007acc', color: 'white', border: 'none', borderRadius: '5px' }}
+        >
+          Reload Application
+        </button>
+        <div style={{ marginTop: '20px', padding: '10px', background: '#333', borderRadius: '5px' }}>
+          <h3>Debug Information:</h3>
+          <button 
+            onClick={() => {
+              if (window.eclipseStartupLogs) {
+                console.log('Startup Logs:', window.eclipseStartupLogs);
+                alert('Check browser console for detailed logs');
+              }
+            }}
+            style={{ padding: '5px 10px', background: '#555', color: 'white', border: 'none', borderRadius: '3px', marginRight: '10px' }}
+          >
+            Show Logs
+          </button>
+          <button 
+            onClick={() => {
+              window.location.search = '?desktop=1';
+              window.location.reload();
+            }}
+            style={{ padding: '5px 10px', background: '#555', color: 'white', border: 'none', borderRadius: '3px' }}
+          >
+            Force Desktop
+          </button>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
