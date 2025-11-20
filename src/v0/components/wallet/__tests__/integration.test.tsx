@@ -33,22 +33,24 @@ vi.mock('../../../lib/utils', () => ({
 describe('V0 Wallet Components Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Default mock state
-    (useWalletStore as any).mockImplementation((selector) => selector({
-      status: 'disconnected',
-      publicKey: null,
-      balance: 0,
-      error: null,
-      wallets: [],
-      activeWalletId: null,
-      aggregatedPortfolio: null,
-      multiWalletLoading: false,
-      multiWalletError: null,
-      setActiveWallet: vi.fn(),
-      listWallets: vi.fn(),
-      getAggregatedPortfolio: vi.fn(),
-    }));
+    (useWalletStore as any).mockImplementation(selector =>
+      selector({
+        status: 'disconnected',
+        publicKey: null,
+        balance: 0,
+        error: null,
+        wallets: [],
+        activeWalletId: null,
+        aggregatedPortfolio: null,
+        multiWalletLoading: false,
+        multiWalletError: null,
+        setActiveWallet: vi.fn(),
+        listWallets: vi.fn(),
+        getAggregatedPortfolio: vi.fn(),
+      })
+    );
   });
 
   it('V0WalletConnect renders without crashing', () => {
@@ -77,7 +79,7 @@ describe('V0 Wallet Components Integration', () => {
     (useWalletStore as any).mockImplementation(mockSelector);
 
     render(<V0WalletConnect />);
-    
+
     // Verify that store was accessed with atomic selectors
     expect(mockSelector).toHaveBeenCalled();
   });

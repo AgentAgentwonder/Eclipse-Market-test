@@ -71,7 +71,7 @@ describe('V0AlertsList', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAlertStore).mockImplementation((selector) => selector(mockStore));
+    vi.mocked(useAlertStore).mockImplementation(selector => selector(mockStore));
   });
 
   it('should render alerts list with alerts', () => {
@@ -84,7 +84,7 @@ describe('V0AlertsList', () => {
   });
 
   it('should render loading state', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, isLoading: true })
     );
 
@@ -96,9 +96,7 @@ describe('V0AlertsList', () => {
   });
 
   it('should render empty state when no alerts', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
-      selector({ ...mockStore, alerts: [] })
-    );
+    vi.mocked(useAlertStore).mockImplementation(selector => selector({ ...mockStore, alerts: [] }));
 
     render(<V0AlertsList showEmptyState={true} />);
 
@@ -107,9 +105,7 @@ describe('V0AlertsList', () => {
   });
 
   it('should not render anything when no alerts and empty state disabled', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
-      selector({ ...mockStore, alerts: [] })
-    );
+    vi.mocked(useAlertStore).mockImplementation(selector => selector({ ...mockStore, alerts: [] }));
 
     const { container } = render(<V0AlertsList showEmptyState={false} />);
 
@@ -199,7 +195,7 @@ describe('V0AlertsList', () => {
       notificationChannels: ['in_app', 'email', 'system', 'telegram'],
     };
 
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, alerts: [alertWithManyChannels] })
     );
 
@@ -223,7 +219,7 @@ describe('V0AlertsList', () => {
       state: 'disabled',
     };
 
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, alerts: [disabledAlert] })
     );
 
@@ -251,7 +247,7 @@ describe('V0AlertsList', () => {
       },
     };
 
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, alerts: [compoundAlert] })
     );
 

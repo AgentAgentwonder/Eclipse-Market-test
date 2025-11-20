@@ -45,7 +45,7 @@ describe('V0AlertNotificationContainer', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAlertStore).mockImplementation((selector) => selector(mockStore));
+    vi.mocked(useAlertStore).mockImplementation(selector => selector(mockStore));
   });
 
   it('should render notifications when present', () => {
@@ -58,7 +58,7 @@ describe('V0AlertNotificationContainer', () => {
   });
 
   it('should render nothing when no notifications', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, enhancedNotifications: [] })
     );
 
@@ -101,9 +101,7 @@ describe('V0AlertNotificationContainer', () => {
   });
 
   it('should apply custom className', () => {
-    const { container } = render(
-      <V0AlertNotificationContainer className="custom-class" />
-    );
+    const { container } = render(<V0AlertNotificationContainer className="custom-class" />);
 
     const innerDiv = container.querySelector('.max-w-md');
     expect(innerDiv).toHaveClass('custom-class');
@@ -126,7 +124,9 @@ describe('V0AlertNotificationContainer', () => {
     const firstAlert = screen.getByText('Test Alert 1');
     const secondAlert = screen.getByText('Test Alert 2');
 
-    expect(firstAlert.compareDocumentPosition(secondAlert) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      firstAlert.compareDocumentPosition(secondAlert) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 
   it('should handle onOpenChart being undefined', () => {

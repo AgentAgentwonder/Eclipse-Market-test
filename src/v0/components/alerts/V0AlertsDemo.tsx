@@ -21,7 +21,7 @@ export const V0AlertsDemo: React.FC = () => {
     <div className="p-6 space-y-6">
       <div className="bg-slate-900 rounded-xl p-6 border border-purple-500/20">
         <h2 className="text-xl font-bold text-white mb-4">V0 Alerts Integration Demo</h2>
-        
+
         {/* Alert Badge */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-white mb-2">Alert Badge</h3>
@@ -37,7 +37,7 @@ export const V0AlertsDemo: React.FC = () => {
         {/* Notification Container */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-2">Notifications</h3>
-          <V0AlertNotificationContainer 
+          <V0AlertNotificationContainer
             onOpenChart={(symbol, timestamp) => {
               console.log(`Open chart for ${symbol} at ${timestamp}`);
             }}
@@ -53,7 +53,8 @@ export const V0AlertsDemo: React.FC = () => {
             <span className="font-semibold">Total Alerts:</span> {alerts.length}
           </p>
           <p className="text-sm text-slate-300">
-            <span className="font-semibold">Pending Notifications:</span> {enhancedNotifications.length}
+            <span className="font-semibold">Pending Notifications:</span>{' '}
+            {enhancedNotifications.length}
           </p>
         </div>
       </div>

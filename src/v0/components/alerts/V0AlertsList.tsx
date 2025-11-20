@@ -30,32 +30,38 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
   const updateAlert = useAlertStore(state => state.updateAlert);
   const deleteAlert = useAlertStore(state => state.deleteAlert);
 
-  const handleToggleAlert = React.useCallback(async (alert: PriceAlert) => {
-    if (onToggleAlert) {
-      onToggleAlert(alert.id);
-      return;
-    }
+  const handleToggleAlert = React.useCallback(
+    async (alert: PriceAlert) => {
+      if (onToggleAlert) {
+        onToggleAlert(alert.id);
+        return;
+      }
 
-    try {
-      const newState = alert.state === 'active' ? 'disabled' : 'active';
-      await updateAlert(alert.id, { state: newState });
-    } catch (error) {
-      console.error('Failed to toggle alert:', error);
-    }
-  }, [onToggleAlert, updateAlert]);
+      try {
+        const newState = alert.state === 'active' ? 'disabled' : 'active';
+        await updateAlert(alert.id, { state: newState });
+      } catch (error) {
+        console.error('Failed to toggle alert:', error);
+      }
+    },
+    [onToggleAlert, updateAlert]
+  );
 
-  const handleDeleteAlert = React.useCallback(async (alertId: string) => {
-    if (onDeleteAlert) {
-      onDeleteAlert(alertId);
-      return;
-    }
+  const handleDeleteAlert = React.useCallback(
+    async (alertId: string) => {
+      if (onDeleteAlert) {
+        onDeleteAlert(alertId);
+        return;
+      }
 
-    try {
-      await deleteAlert(alertId);
-    } catch (error) {
-      console.error('Failed to delete alert:', error);
-    }
-  }, [onDeleteAlert, deleteAlert]);
+      try {
+        await deleteAlert(alertId);
+      } catch (error) {
+        console.error('Failed to delete alert:', error);
+      }
+    },
+    [onDeleteAlert, deleteAlert]
+  );
 
   const getStateIcon = (state: AlertState) => {
     switch (state) {
@@ -109,7 +115,7 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className={cn('space-y-2', className)}>
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
@@ -125,7 +131,7 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
 
   if (alerts.length === 0 && showEmptyState) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <Bell className="w-12 h-12 mx-auto mb-4 text-slate-600" />
         <p className="text-slate-400 text-sm mb-2">No alerts configured</p>
         <p className="text-slate-500 text-xs">Create your first price alert to get started</p>
@@ -138,7 +144,7 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       {alerts.map((alert, index) => (
         <motion.div
           key={alert.id}
@@ -151,12 +157,10 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-white text-sm truncate">
-                  {alert.name}
-                </h3>
+                <h3 className="font-semibold text-white text-sm truncate">{alert.name}</h3>
                 <div
                   className={cn(
-                    "flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium",
+                    'flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium',
                     getStateColor(alert.state)
                   )}
                 >
@@ -213,17 +217,21 @@ const V0AlertsList: React.FC<V0AlertsListProps> = ({
           <div className="flex items-center gap-2 pt-3 border-t border-slate-700">
             <button
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                 alert.state === 'active'
-                  ? "bg-slate-700/50 text-slate-300 hover:bg-slate-700"
-                  : "bg-purple-500/20 text-purple-300 hover:bg-purple-500/30"
+                  ? 'bg-slate-700/50 text-slate-300 hover:bg-slate-700'
+                  : 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30'
               )}
               onClick={() => handleToggleAlert(alert)}
             >
               {alert.state === 'active' ? (
-                <><Pause className="w-3 h-3" /> Disable</>
+                <>
+                  <Pause className="w-3 h-3" /> Disable
+                </>
               ) : (
-                <><Play className="w-3 h-3" /> Enable</>
+                <>
+                  <Play className="w-3 h-3" /> Enable
+                </>
               )}
             </button>
             <button

@@ -16,7 +16,7 @@ const startupLog = (message: string, data?: any) => {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] [STARTUP] ${message}`;
   console.log(logMessage, data || '');
-  
+
   // Also write to a global variable for debugging
   if (typeof window !== 'undefined') {
     window.eclipseStartupLogs = window.eclipseStartupLogs || [];
@@ -27,26 +27,26 @@ const startupLog = (message: string, data?: any) => {
 const initializeApp = () => {
   try {
     startupLog('Starting app initialization');
-    
+
     startupLog('Initializing theme store');
     const themeStore = useThemeStore.getState();
     startupLog('Theme store loaded', { theme: themeStore.currentTheme.name });
-    
+
     startupLog('Applying theme colors');
     themeStore.applyThemeColors();
-    
+
     startupLog('Initializing accessibility store');
     const accessibilityStore = useAccessibilityStore.getState();
     startupLog('Accessibility store loaded', { fontScale: accessibilityStore.fontScale });
-    
+
     startupLog('Applying accessibility settings');
     accessibilityStore.applyAccessibilitySettings();
-    
+
     startupLog('App initialization completed successfully');
   } catch (error) {
     startupLog('App initialization failed', error);
     console.error('Failed to initialize app:', error);
-    
+
     // Show error on screen for debugging
     if (typeof document !== 'undefined') {
       document.body.innerHTML = `
@@ -66,19 +66,19 @@ const initializeApp = () => {
 };
 
 // Add startup error handler
-window.addEventListener('error', (event) => {
-  startupLog('Global error caught', { 
-    message: event.message, 
-    filename: event.filename, 
+window.addEventListener('error', event => {
+  startupLog('Global error caught', {
+    message: event.message,
+    filename: event.filename,
     lineno: event.lineno,
     colno: event.colno,
-    error: event.error
+    error: event.error,
   });
 });
 
-window.addEventListener('unhandledrejection', (event) => {
-  startupLog('Unhandled promise rejection', { 
-    reason: event.reason 
+window.addEventListener('unhandledrejection', event => {
+  startupLog('Unhandled promise rejection', {
+    reason: event.reason,
   });
 });
 

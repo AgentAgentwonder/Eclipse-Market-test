@@ -7,17 +7,9 @@ interface V0PaperTradingOverviewProps {
   className?: string;
 }
 
-export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({
-  className,
-}) => {
-  const {
-    isPaperMode,
-    virtualBalance,
-    totalPnL,
-    totalPnLPercent,
-    winRate,
-    positions,
-  } = useV0PaperTradingData();
+export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({ className }) => {
+  const { isPaperMode, virtualBalance, totalPnL, totalPnLPercent, winRate, positions } =
+    useV0PaperTradingData();
 
   const isProfitable = totalPnL >= 0;
 
@@ -39,18 +31,16 @@ export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({
             <span className="text-sm text-gray-400">Virtual Balance</span>
             <Wallet className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
-            ${virtualBalance.toFixed(2)}
-          </div>
+          <div className="text-2xl font-bold text-white">${virtualBalance.toFixed(2)}</div>
         </div>
 
         {/* Total P&L */}
-        <div className={cn(
-          'rounded-lg p-4 border',
-          isProfitable
-            ? 'bg-green-500/10 border-green-500/20'
-            : 'bg-red-500/10 border-red-500/20'
-        )}>
+        <div
+          className={cn(
+            'rounded-lg p-4 border',
+            isProfitable ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'
+          )}
+        >
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-400">Total P&L</span>
             {isProfitable ? (
@@ -59,17 +49,16 @@ export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({
               <TrendingDown className="w-4 h-4 text-red-400" />
             )}
           </div>
-          <div className={cn(
-            'text-2xl font-bold',
-            isProfitable ? 'text-green-400' : 'text-red-400'
-          )}>
+          <div
+            className={cn('text-2xl font-bold', isProfitable ? 'text-green-400' : 'text-red-400')}
+          >
             {isProfitable ? '+' : ''}${totalPnL.toFixed(2)}
           </div>
-          <div className={cn(
-            'text-sm mt-2',
-            isProfitable ? 'text-green-400/70' : 'text-red-400/70'
-          )}>
-            {isProfitable ? '+' : ''}{totalPnLPercent.toFixed(2)}%
+          <div
+            className={cn('text-sm mt-2', isProfitable ? 'text-green-400/70' : 'text-red-400/70')}
+          >
+            {isProfitable ? '+' : ''}
+            {totalPnLPercent.toFixed(2)}%
           </div>
         </div>
 
@@ -79,9 +68,7 @@ export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({
             <span className="text-sm text-gray-400">Win Rate</span>
             <Target className="w-4 h-4 text-blue-400" />
           </div>
-          <div className="text-2xl font-bold text-white">
-            {winRate.toFixed(1)}%
-          </div>
+          <div className="text-2xl font-bold text-white">{winRate.toFixed(1)}%</div>
         </div>
 
         {/* Open Positions */}
@@ -104,13 +91,17 @@ export const V0PaperTradingOverview: React.FC<V0PaperTradingOverviewProps> = ({
           <h3 className="text-sm font-semibold text-gray-200 mb-3">Open Positions</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {positions.map(pos => (
-              <div key={pos.token} className="flex items-center justify-between text-sm p-2 bg-gray-700/50 rounded">
+              <div
+                key={pos.token}
+                className="flex items-center justify-between text-sm p-2 bg-gray-700/50 rounded"
+              >
                 <div>
                   <span className="font-medium text-white">{pos.token}</span>
                   <span className="text-gray-400 text-xs ml-2">{pos.amount.toFixed(6)}</span>
                 </div>
                 <div className={pos.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-                  {pos.pnl >= 0 ? '+' : ''}{pos.pnl.toFixed(2)}
+                  {pos.pnl >= 0 ? '+' : ''}
+                  {pos.pnl.toFixed(2)}
                 </div>
               </div>
             ))}

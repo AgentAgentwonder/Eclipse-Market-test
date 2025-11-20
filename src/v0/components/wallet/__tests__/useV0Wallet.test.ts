@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useV0WalletData, useV0WalletActions, useV0WalletPreferences } from '../../../hooks/useV0Wallet';
+import {
+  useV0WalletData,
+  useV0WalletActions,
+  useV0WalletPreferences,
+} from '../../../hooks/useV0Wallet';
 import { useWalletStore } from '../../../../store/walletStore';
 
 // Mock wallet store
@@ -45,7 +49,7 @@ describe('useV0WalletData', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('returns wallet data correctly', () => {
@@ -71,7 +75,7 @@ describe('useV0WalletData', () => {
       multiWalletLoading: true,
     };
 
-    (useWalletStore as any).mockImplementation((selector) => selector(loadingState));
+    (useWalletStore as any).mockImplementation(selector => selector(loadingState));
 
     const { result } = renderHook(() => useV0WalletData());
 
@@ -102,7 +106,7 @@ describe('useV0WalletActions', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('provides wallet action functions', () => {
@@ -120,7 +124,12 @@ describe('useV0WalletActions', () => {
   it('handles add wallet with error handling', async () => {
     const { result } = renderHook(() => useV0WalletActions());
 
-    const request = { publicKey: 'test', label: 'Test', network: 'mainnet', walletType: 'phantom' as const };
+    const request = {
+      publicKey: 'test',
+      label: 'Test',
+      network: 'mainnet',
+      walletType: 'phantom' as const,
+    };
     await result.current.addWallet(request);
 
     expect(mockStoreState.addWallet).toHaveBeenCalledWith(request);
@@ -168,7 +177,7 @@ describe('useV0WalletPreferences', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('returns wallet preferences', () => {
@@ -189,7 +198,7 @@ describe('useV0WalletPreferences', () => {
       activeWalletId: null,
     };
 
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
 
     const { result } = renderHook(() => useV0WalletPreferences());
 
@@ -215,7 +224,7 @@ describe('useV0WalletPreferences', () => {
       activeWalletId: 'wallet1',
     };
 
-    (useWalletStore as any).mockImplementation((selector) => selector(stateWithoutPreferences));
+    (useWalletStore as any).mockImplementation(selector => selector(stateWithoutPreferences));
 
     const { result } = renderHook(() => useV0WalletPreferences());
 

@@ -11,14 +11,14 @@ export function useV0WalletData() {
   const publicKey = useWalletStore(state => state.publicKey);
   const balance = useWalletStore(state => state.balance);
   const error = useWalletStore(state => state.error);
-  
+
   // Multi-wallet state
   const wallets = useWalletStore(state => state.wallets);
   const activeWalletId = useWalletStore(state => state.activeWalletId);
   const aggregatedPortfolio = useWalletStore(state => state.aggregatedPortfolio);
   const multiWalletLoading = useWalletStore(state => state.multiWalletLoading);
   const multiWalletError = useWalletStore(state => state.multiWalletError);
-  
+
   // Store actions
   const setActiveWallet = useWalletStore(state => state.setActiveWallet);
   const listWallets = useWalletStore(state => state.listWallets);
@@ -46,14 +46,14 @@ export function useV0WalletData() {
     error,
     isConnected,
     isLoading,
-    
+
     // Multi-wallet state
     wallets,
     activeWallet,
     activeWalletId,
     aggregatedPortfolio,
     multiWalletError,
-    
+
     // Actions
     setActiveWallet,
     listWallets,
@@ -78,41 +78,53 @@ export function useV0WalletActions() {
   const deleteGroup = useWalletStore(state => state.deleteGroup);
   const listGroups = useWalletStore(state => state.listGroups);
 
-  const handleAddWallet = useCallback(async (request: any) => {
-    try {
-      return await addWallet(request);
-    } catch (error) {
-      console.error('Failed to add wallet:', error);
-      throw error;
-    }
-  }, [addWallet]);
+  const handleAddWallet = useCallback(
+    async (request: any) => {
+      try {
+        return await addWallet(request);
+      } catch (error) {
+        console.error('Failed to add wallet:', error);
+        throw error;
+      }
+    },
+    [addWallet]
+  );
 
-  const handleUpdateWallet = useCallback(async (request: any) => {
-    try {
-      return await updateWallet(request);
-    } catch (error) {
-      console.error('Failed to update wallet:', error);
-      throw error;
-    }
-  }, [updateWallet]);
+  const handleUpdateWallet = useCallback(
+    async (request: any) => {
+      try {
+        return await updateWallet(request);
+      } catch (error) {
+        console.error('Failed to update wallet:', error);
+        throw error;
+      }
+    },
+    [updateWallet]
+  );
 
-  const handleRemoveWallet = useCallback(async (walletId: string) => {
-    try {
-      await removeWallet(walletId);
-    } catch (error) {
-      console.error('Failed to remove wallet:', error);
-      throw error;
-    }
-  }, [removeWallet]);
+  const handleRemoveWallet = useCallback(
+    async (walletId: string) => {
+      try {
+        await removeWallet(walletId);
+      } catch (error) {
+        console.error('Failed to remove wallet:', error);
+        throw error;
+      }
+    },
+    [removeWallet]
+  );
 
-  const handleUpdateBalance = useCallback(async (walletId: string, balance: number) => {
-    try {
-      await updateWalletBalance(walletId, balance);
-    } catch (error) {
-      console.error('Failed to update wallet balance:', error);
-      throw error;
-    }
-  }, [updateWalletBalance]);
+  const handleUpdateBalance = useCallback(
+    async (walletId: string, balance: number) => {
+      try {
+        await updateWalletBalance(walletId, balance);
+      } catch (error) {
+        console.error('Failed to update wallet balance:', error);
+        throw error;
+      }
+    },
+    [updateWalletBalance]
+  );
 
   return {
     addWallet: handleAddWallet,
@@ -133,9 +145,9 @@ export function useV0WalletActions() {
 export function useV0WalletPreferences() {
   const wallets = useWalletStore(state => state.wallets);
   const activeWalletId = useWalletStore(state => state.activeWalletId);
-  
+
   const activeWallet = wallets.find(w => w.id === activeWalletId);
-  
+
   return {
     preferences: activeWallet?.preferences,
     tradingEnabled: activeWallet?.preferences?.tradingEnabled ?? false,

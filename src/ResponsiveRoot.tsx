@@ -6,7 +6,7 @@ const startupLog = (message: string, data?: any) => {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] [RESPONSIVE] ${message}`;
   console.log(logMessage, data || '');
-  
+
   if (typeof window !== 'undefined') {
     window.eclipseStartupLogs = window.eclipseStartupLogs || [];
     window.eclipseStartupLogs.push({ timestamp, message, data, source: 'responsive' });
@@ -31,15 +31,15 @@ const isMobileViewport = () => {
     const forceMobile = searchParams.get('mobile') === '1';
     const forceDesktop = searchParams.get('desktop') === '1';
 
-    const result = forceDesktop ? false : (forceMobile ? true : (isMobileUserAgent || isSmallViewport));
-    
+    const result = forceDesktop ? false : forceMobile ? true : isMobileUserAgent || isSmallViewport;
+
     startupLog('Mobile viewport detection', {
       userAgent: userAgent.substring(0, 50),
       isMobileUserAgent,
       isSmallViewport,
       forceMobile,
       forceDesktop,
-      result
+      result,
     });
 
     return result;
@@ -51,7 +51,7 @@ const isMobileViewport = () => {
 
 export const ResponsiveRoot: React.FC = () => {
   startupLog('ResponsiveRoot component starting');
-  
+
   const [mobile, setMobile] = useState<boolean>(() => {
     const initialMobile = isMobileViewport();
     startupLog('Initial mobile state', { mobile: initialMobile });
@@ -60,7 +60,7 @@ export const ResponsiveRoot: React.FC = () => {
 
   useEffect(() => {
     startupLog('Setting up resize listener');
-    
+
     const handleResize = () => {
       const newMobile = isMobileViewport();
       startupLog('Resize detected', { newMobile, oldMobile: mobile });
@@ -70,7 +70,7 @@ export const ResponsiveRoot: React.FC = () => {
     try {
       window.addEventListener('resize', handleResize);
       startupLog('Resize listener added successfully');
-      
+
       return () => {
         startupLog('Cleaning up resize listener');
         window.removeEventListener('resize', handleResize);
@@ -83,7 +83,7 @@ export const ResponsiveRoot: React.FC = () => {
   const content = useMemo(() => {
     try {
       startupLog('Determining content to render', { mobile });
-      
+
       if (mobile) {
         startupLog('Rendering MobileApp');
         return <MobileApp />;
@@ -94,7 +94,15 @@ export const ResponsiveRoot: React.FC = () => {
     } catch (error) {
       startupLog('Error in content determination', error);
       return (
-        <div style={{ padding: '20px', fontFamily: 'monospace', background: '#1a1a1a', color: '#fff', minHeight: '100vh' }}>
+        <div
+          style={{
+            padding: '20px',
+            fontFamily: 'monospace',
+            background: '#1a1a1a',
+            color: '#fff',
+            minHeight: '100vh',
+          }}
+        >
           <h1>Component Loading Error</h1>
           <p>Failed to load the application component:</p>
           <pre style={{ background: '#2a2a2a', padding: '10px', borderRadius: '5px' }}>

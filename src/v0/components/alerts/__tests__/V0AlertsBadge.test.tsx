@@ -69,7 +69,7 @@ describe('V0AlertsBadge', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAlertStore).mockImplementation((selector) => selector(mockStore));
+    vi.mocked(useAlertStore).mockImplementation(selector => selector(mockStore));
   });
 
   it('should render badge with alert count', () => {
@@ -85,9 +85,7 @@ describe('V0AlertsBadge', () => {
   });
 
   it('should not render when no alerts and not minimal variant', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
-      selector({ ...mockStore, alerts: [] })
-    );
+    vi.mocked(useAlertStore).mockImplementation(selector => selector({ ...mockStore, alerts: [] }));
 
     const { container } = render(<V0AlertsBadge />);
 
@@ -95,9 +93,7 @@ describe('V0AlertsBadge', () => {
   });
 
   it('should render in minimal variant even with no alerts', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
-      selector({ ...mockStore, alerts: [] })
-    );
+    vi.mocked(useAlertStore).mockImplementation(selector => selector({ ...mockStore, alerts: [] }));
 
     render(<V0AlertsBadge variant="minimal" />);
 
@@ -106,7 +102,7 @@ describe('V0AlertsBadge', () => {
   });
 
   it('should show pending notification indicator', () => {
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({
         ...mockStore,
         enhancedNotifications: [
@@ -131,8 +127,8 @@ describe('V0AlertsBadge', () => {
 
   it('should show recent trigger indicator', () => {
     const recentTime = new Date(Date.now() - 2 * 60 * 1000).toISOString(); // 2 minutes ago
-    
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({
         ...mockStore,
         lastTriggerEvent: {
@@ -155,8 +151,8 @@ describe('V0AlertsBadge', () => {
 
   it('should not show recent trigger indicator for old events', () => {
     const oldTime = new Date(Date.now() - 10 * 60 * 1000).toISOString(); // 10 minutes ago
-    
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({
         ...mockStore,
         lastTriggerEvent: {
@@ -184,7 +180,7 @@ describe('V0AlertsBadge', () => {
       name: `Alert ${i}`,
     }));
 
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, alerts: manyAlerts })
     );
 
@@ -238,10 +234,19 @@ describe('V0AlertsBadge', () => {
 
   it('should show correct icon colors based on state', () => {
     // Test with pending notifications (red)
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({
         ...mockStore,
-        enhancedNotifications: [{ alertId: 'notif-1', alertName: 'Test', symbol: 'SOL', currentPrice: 150, conditionsMet: 'Test', triggeredAt: new Date().toISOString() }],
+        enhancedNotifications: [
+          {
+            alertId: 'notif-1',
+            alertName: 'Test',
+            symbol: 'SOL',
+            currentPrice: 150,
+            conditionsMet: 'Test',
+            triggeredAt: new Date().toISOString(),
+          },
+        ],
       })
     );
 
@@ -249,7 +254,7 @@ describe('V0AlertsBadge', () => {
     expect(redContainer.querySelector('.text-red-400')).toBeInTheDocument();
 
     // Test with active alerts only (green)
-    vi.mocked(useAlertStore).mockImplementation((selector) => 
+    vi.mocked(useAlertStore).mockImplementation(selector =>
       selector({ ...mockStore, enhancedNotifications: [] })
     );
 

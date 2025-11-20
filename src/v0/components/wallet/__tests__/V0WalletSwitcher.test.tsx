@@ -60,12 +60,12 @@ describe('V0WalletSwitcher', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('renders active wallet info', () => {
     render(<V0WalletSwitcher />);
-    
+
     expect(screen.getByText('Main Wallet')).toBeInTheDocument();
     expect(screen.getByText('abc1...f456')).toBeInTheDocument();
     expect(screen.getByText('1.5000 SOL')).toBeInTheDocument();
@@ -73,10 +73,10 @@ describe('V0WalletSwitcher', () => {
 
   it('shows dropdown when clicked', async () => {
     render(<V0WalletSwitcher />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Portfolio Overview')).toBeInTheDocument();
       expect(screen.getByText('Trading Wallet')).toBeInTheDocument();
@@ -85,10 +85,10 @@ describe('V0WalletSwitcher', () => {
 
   it('displays portfolio overview when multiple wallets', async () => {
     render(<V0WalletSwitcher />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Total Balance')).toBeInTheDocument();
       expect(screen.getByText('2.2500 SOL')).toBeInTheDocument();
@@ -101,15 +101,15 @@ describe('V0WalletSwitcher', () => {
 
   it('calls setActiveWallet when wallet is selected', async () => {
     render(<V0WalletSwitcher />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       const tradingWallet = screen.getByText('Trading Wallet');
       fireEvent.click(tradingWallet);
     });
-    
+
     await waitFor(() => {
       expect(mockStoreState.setActiveWallet).toHaveBeenCalledWith('wallet2');
     });
@@ -122,11 +122,11 @@ describe('V0WalletSwitcher', () => {
       activeWalletId: null,
       aggregatedPortfolio: null,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
+
     render(<V0WalletSwitcher />);
-    
+
     expect(screen.getByText('Add Wallet')).toBeInTheDocument();
     expect(screen.queryByText('Main Wallet')).not.toBeInTheDocument();
   });
@@ -138,50 +138,50 @@ describe('V0WalletSwitcher', () => {
       activeWalletId: null,
       aggregatedPortfolio: null,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
+
     const onAddWallet = vi.fn();
     render(<V0WalletSwitcher onAddWallet={onAddWallet} />);
-    
+
     const addButton = screen.getByText('Add Wallet');
     fireEvent.click(addButton);
-    
+
     expect(onAddWallet).toHaveBeenCalled();
   });
 
   it('calls onWalletSettings when settings is clicked', async () => {
     const onWalletSettings = vi.fn();
     render(<V0WalletSwitcher onWalletSettings={onWalletSettings} />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       const settingsButtons = screen.getAllByRole('button');
-      const settingsButton = settingsButtons.find(btn => 
-        btn.querySelector('svg') && !btn.textContent
+      const settingsButton = settingsButtons.find(
+        btn => btn.querySelector('svg') && !btn.textContent
       );
       if (settingsButton) {
         fireEvent.click(settingsButton);
       }
     });
-    
+
     // Note: This test might need adjustment based on the actual SVG icon detection
   });
 
   it('calls onManageGroups when groups button is clicked', async () => {
     const onManageGroups = vi.fn();
     render(<V0WalletSwitcher onManageGroups={onManageGroups} />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       const groupsButton = screen.getByText('Groups');
       fireEvent.click(groupsButton);
     });
-    
+
     expect(onManageGroups).toHaveBeenCalled();
   });
 });
