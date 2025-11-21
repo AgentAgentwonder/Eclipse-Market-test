@@ -49,12 +49,12 @@ describe('V0WalletInfo', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('renders wallet information', () => {
     render(<V0WalletInfo />);
-    
+
     expect(screen.getByText('Main Wallet')).toBeInTheDocument();
     expect(screen.getByText('abc12...ef456')).toBeInTheDocument();
     expect(screen.getByText('1.5000 SOL')).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('V0WalletInfo', () => {
 
   it('shows performance metrics when enabled', () => {
     render(<V0WalletInfo showPerformance={true} />);
-    
+
     expect(screen.getByText('Total Trades')).toBeInTheDocument();
     expect(screen.getByText('25')).toBeInTheDocument();
     expect(screen.getByText('Success Rate')).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('V0WalletInfo', () => {
 
   it('hides performance metrics when disabled', () => {
     render(<V0WalletInfo showPerformance={false} />);
-    
+
     expect(screen.queryByText('Total Trades')).not.toBeInTheDocument();
     expect(screen.queryByText('Success Rate')).not.toBeInTheDocument();
     expect(screen.queryByText('Realized P&L')).not.toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('V0WalletInfo', () => {
 
   it('renders compact view', () => {
     render(<V0WalletInfo compact={true} />);
-    
+
     expect(screen.getByText('abc123...f456')).toBeInTheDocument();
     expect(screen.getByText('1.5000 SOL')).toBeInTheDocument();
     expect(screen.queryByText('Main Wallet')).not.toBeInTheDocument();
@@ -96,11 +96,11 @@ describe('V0WalletInfo', () => {
       wallets: [],
       activeWalletId: null,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
+
     render(<V0WalletInfo />);
-    
+
     expect(screen.getByText('No wallet selected')).toBeInTheDocument();
   });
 
@@ -131,11 +131,11 @@ describe('V0WalletInfo', () => {
       ],
       activeWalletId: 'wallet1',
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(multipleWalletsState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(multipleWalletsState));
+
     render(<V0WalletInfo walletId="wallet2" />);
-    
+
     expect(screen.getByText('Trading Wallet')).toBeInTheDocument();
     expect(screen.getByText('xyz78...w012')).toBeInTheDocument();
     expect(screen.getByText('0.7500 SOL')).toBeInTheDocument();
@@ -151,16 +151,16 @@ describe('V0WalletInfo', () => {
         realizedPnl: -1.2,
       },
     };
-    
+
     const negativePnLState = {
       wallets: [negativePnLWallet],
       activeWalletId: 'wallet1',
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(negativePnLState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(negativePnLState));
+
     render(<V0WalletInfo showPerformance={true} />);
-    
+
     const pnlElement = screen.getByText('-1.200 SOL');
     expect(pnlElement).toBeInTheDocument();
     expect(pnlElement).toHaveClass('text-red-400');
@@ -171,16 +171,16 @@ describe('V0WalletInfo', () => {
       ...mockWallets[0],
       groupId: 'group1',
     };
-    
+
     const groupedState = {
       wallets: [groupedWallet],
       activeWalletId: 'wallet1',
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(groupedState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(groupedState));
+
     render(<V0WalletInfo />);
-    
+
     expect(screen.getByText('Grouped')).toBeInTheDocument();
   });
 });

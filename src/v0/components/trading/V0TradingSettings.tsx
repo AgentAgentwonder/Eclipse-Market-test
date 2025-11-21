@@ -98,8 +98,7 @@ export const V0TradingSettings: React.FC<V0TradingSettingsProps> = ({ className 
                   className="w-full"
                 />
                 <div className="text-xs text-gray-500 mt-1">
-                  Currently: {(slippageTolerance / 100).toFixed(2)}% (
-                  {slippageTolerance} bps)
+                  Currently: {(slippageTolerance / 100).toFixed(2)}% ({slippageTolerance} bps)
                 </div>
               </div>
 
@@ -125,9 +124,7 @@ export const V0TradingSettings: React.FC<V0TradingSettingsProps> = ({ className 
                   onChange={e => setSlippageRejectAbove(e.target.checked)}
                   className="w-4 h-4 rounded"
                 />
-                <span className="text-sm text-gray-400">
-                  Reject trades exceeding max tolerance
-                </span>
+                <span className="text-sm text-gray-400">Reject trades exceeding max tolerance</span>
               </label>
             </div>
           </div>
@@ -189,9 +186,7 @@ export const V0TradingSettings: React.FC<V0TradingSettingsProps> = ({ className 
               />
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-green-400" />
-                <span className="text-sm font-medium text-white">
-                  Enable MEV Protection
-                </span>
+                <span className="text-sm font-medium text-white">Enable MEV Protection</span>
               </div>
             </label>
 

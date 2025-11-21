@@ -39,8 +39,8 @@ const V0AlertNotification: React.FC<V0AlertNotificationProps> = ({
   return (
     <motion.div
       className={cn(
-        "relative bg-slate-900/95 border border-purple-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-xl max-w-sm",
-        "hover:border-purple-500/40 transition-all duration-200",
+        'relative bg-slate-900/95 border border-purple-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-xl max-w-sm',
+        'hover:border-purple-500/40 transition-all duration-200',
         className
       )}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -53,9 +53,7 @@ const V0AlertNotification: React.FC<V0AlertNotificationProps> = ({
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {getPriceIcon()}
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-white text-sm truncate">
-              {notification.alertName}
-            </h4>
+            <h4 className="font-semibold text-white text-sm truncate">{notification.alertName}</h4>
             <p className="text-xs text-gray-400">
               {notification.symbol} • ${notification.currentPrice.toFixed(2)}
             </p>
@@ -72,20 +70,19 @@ const V0AlertNotification: React.FC<V0AlertNotificationProps> = ({
       {/* Alert Details */}
       <div className="space-y-2 mb-3">
         <p className="text-xs text-purple-300">{notification.conditionsMet}</p>
-        
+
         {notification.priceChange24h !== undefined && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">24h:</span>
-            <span className={cn("text-xs font-medium", getPriceColor())}>
-              {notification.priceChange24h >= 0 ? '+' : ''}{notification.priceChange24h.toFixed(2)}%
+            <span className={cn('text-xs font-medium', getPriceColor())}>
+              {notification.priceChange24h >= 0 ? '+' : ''}
+              {notification.priceChange24h.toFixed(2)}%
             </span>
           </div>
         )}
 
         {notification.contextMessage && (
-          <p className="text-xs text-gray-300 italic">
-            {notification.contextMessage}
-          </p>
+          <p className="text-xs text-gray-300 italic">{notification.contextMessage}</p>
         )}
       </div>
 
@@ -123,8 +120,9 @@ const V0AlertNotification: React.FC<V0AlertNotificationProps> = ({
             {notification.similarOpportunities.slice(0, 2).map((opp, index) => (
               <div key={index} className="flex items-center justify-between text-xs">
                 <span className="text-purple-300">{opp.symbol}</span>
-                <span className={cn("font-mono", getPriceColor())}>
-                  {opp.priceChange24h >= 0 ? '+' : ''}{opp.priceChange24h.toFixed(2)}%
+                <span className={cn('font-mono', getPriceColor())}>
+                  {opp.priceChange24h >= 0 ? '+' : ''}
+                  {opp.priceChange24h.toFixed(2)}%
                 </span>
               </div>
             ))}

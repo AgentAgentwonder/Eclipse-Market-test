@@ -37,14 +37,7 @@ export const V0WalletConnect: React.FC<V0WalletConnectProps> = ({
   const setError = useWalletStore(state => state.setError);
   const reset = useWalletStore(state => state.reset);
 
-  const {
-    connected,
-    connecting,
-    connect,
-    disconnect,
-    wallet,
-    readyState,
-  } = useAdapterWallet();
+  const { connected, connecting, connect, disconnect, wallet, readyState } = useAdapterWallet();
 
   React.useEffect(() => {
     let nextStatus: WalletStatus;
@@ -103,30 +96,36 @@ export const V0WalletConnect: React.FC<V0WalletConnectProps> = ({
     switch (status) {
       case 'connected':
         return (
-          <div className={cn(
-            "flex items-center gap-2 px-3 py-1 rounded-lg text-sm",
-            "bg-green-500/20 border border-green-500/30 text-green-400"
-          )}>
+          <div
+            className={cn(
+              'flex items-center gap-2 px-3 py-1 rounded-lg text-sm',
+              'bg-green-500/20 border border-green-500/30 text-green-400'
+            )}
+          >
             <CheckCircle className="w-4 h-4" />
             <span>Connected</span>
           </div>
         );
       case 'connecting':
         return (
-          <div className={cn(
-            "flex items-center gap-2 px-3 py-1 rounded-lg text-sm",
-            "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-          )}>
+          <div
+            className={cn(
+              'flex items-center gap-2 px-3 py-1 rounded-lg text-sm',
+              'bg-blue-500/20 border border-blue-500/30 text-blue-400'
+            )}
+          >
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Connecting...</span>
           </div>
         );
       case 'error':
         return (
-          <div className={cn(
-            "flex items-center gap-2 px-3 py-1 rounded-lg text-sm",
-            "bg-red-500/20 border border-red-500/30 text-red-400"
-          )}>
+          <div
+            className={cn(
+              'flex items-center gap-2 px-3 py-1 rounded-lg text-sm',
+              'bg-red-500/20 border border-red-500/30 text-red-400'
+            )}
+          >
             <AlertCircle className="w-4 h-4" />
             <span>Error</span>
           </div>
@@ -138,27 +137,31 @@ export const V0WalletConnect: React.FC<V0WalletConnectProps> = ({
 
   if (connected && publicKey) {
     return (
-      <div className={cn("flex items-center gap-3", className)}>
-        <div className={cn(
-          "px-4 py-2 rounded-xl flex items-center gap-2",
-          "bg-purple-500/20 border border-purple-500/30"
-        )}>
+      <div className={cn('flex items-center gap-3', className)}>
+        <div
+          className={cn(
+            'px-4 py-2 rounded-xl flex items-center gap-2',
+            'bg-purple-500/20 border border-purple-500/30'
+          )}
+        >
           <Wallet className="w-4 h-4" />
           <span className="font-mono text-sm">
             {publicKey.slice(0, 4)}...{publicKey.slice(-4)}
           </span>
         </div>
-        <div className={cn(
-          "px-4 py-2 rounded-xl font-bold",
-          "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
-        )}>
+        <div
+          className={cn(
+            'px-4 py-2 rounded-xl font-bold',
+            'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30'
+          )}
+        >
           {balance.toFixed(4)} SOL
         </div>
         <button
           onClick={handleDisconnect}
           className={cn(
-            "px-4 py-2 rounded-xl border-2 text-sm transition-all",
-            "border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10"
+            'px-4 py-2 rounded-xl border-2 text-sm transition-all',
+            'border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10'
           )}
         >
           Disconnect
@@ -169,12 +172,12 @@ export const V0WalletConnect: React.FC<V0WalletConnectProps> = ({
   }
 
   return (
-    <div className={cn("flex items-center gap-3", className)}>
+    <div className={cn('flex items-center gap-3', className)}>
       <button
         onClick={handleConnect}
         disabled={status === 'connecting'}
         className={cn(
-          "px-6 py-2 rounded-xl font-medium transition-all shadow-lg",
+          'px-6 py-2 rounded-xl font-medium transition-all shadow-lg',
           status === 'connecting'
             ? 'bg-gray-500/50 cursor-not-allowed'
             : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/30'
@@ -191,10 +194,12 @@ export const V0WalletConnect: React.FC<V0WalletConnectProps> = ({
       </button>
       {renderStatusBadge()}
       {error && (
-        <div className={cn(
-          "px-4 py-2 rounded-xl text-sm max-w-xs truncate",
-          "bg-red-500/10 border border-red-500/30 text-red-400"
-        )}>
+        <div
+          className={cn(
+            'px-4 py-2 rounded-xl text-sm max-w-xs truncate',
+            'bg-red-500/10 border border-red-500/30 text-red-400'
+          )}
+        >
           {error}
         </div>
       )}

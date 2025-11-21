@@ -35,7 +35,8 @@ const V0AlertsBadge: React.FC<V0AlertsBadgeProps> = ({
   const activeAlertsCount = alerts.filter(alert => alert.state === 'active').length;
   const totalAlertsCount = alerts.length;
   const pendingNotificationsCount = enhancedNotifications.length;
-  const hasRecentTrigger = lastTriggerEvent && 
+  const hasRecentTrigger =
+    lastTriggerEvent &&
     new Date(lastTriggerEvent.triggeredAt).getTime() > Date.now() - 5 * 60 * 1000; // Last 5 minutes
 
   const displayCount = showActiveOnly ? activeAlertsCount : totalAlertsCount;
@@ -86,15 +87,15 @@ const V0AlertsBadge: React.FC<V0AlertsBadgeProps> = ({
     <button
       onClick={onClick}
       className={cn(
-        "relative flex items-center justify-center rounded-lg transition-all duration-200",
+        'relative flex items-center justify-center rounded-lg transition-all duration-200',
         getSizeClasses(),
         getVariantClasses(),
-        onClick && "cursor-pointer hover:scale-105",
+        onClick && 'cursor-pointer hover:scale-105',
         className
       )}
     >
       {/* Icon */}
-      <Bell className={cn("w-4 h-4", getIconColor())} />
+      <Bell className={cn('w-4 h-4', getIconColor())} />
 
       {/* Notification indicator */}
       {pendingNotificationsCount > 0 && (
@@ -109,7 +110,7 @@ const V0AlertsBadge: React.FC<V0AlertsBadgeProps> = ({
       {showCount && displayCount > 0 && (
         <div
           className={cn(
-            "absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full text-xs font-medium text-white flex items-center justify-center",
+            'absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full text-xs font-medium text-white flex items-center justify-center',
             getBadgeColor()
           )}
         >

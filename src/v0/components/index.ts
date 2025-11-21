@@ -40,12 +40,7 @@ export type {
 } from './alerts';
 
 // Wallet components
-export {
-  V0WalletConnect,
-  V0WalletSwitcher,
-  V0WalletInfo,
-  V0WalletList,
-} from './wallet';
+export { V0WalletConnect, V0WalletSwitcher, V0WalletInfo, V0WalletList } from './wallet';
 export type {
   V0WalletConnectProps,
   V0WalletSwitcherProps,

@@ -84,12 +84,12 @@ describe('V0WalletList', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('renders wallet list with portfolio overview', () => {
     render(<V0WalletList />);
-    
+
     expect(screen.getByText('Portfolio Overview')).toBeInTheDocument();
     expect(screen.getByText('Total Balance')).toBeInTheDocument();
     expect(screen.getByText('2.2500 SOL')).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe('V0WalletList', () => {
 
   it('renders compact view', () => {
     render(<V0WalletList compact={true} />);
-    
+
     expect(screen.queryByText('Portfolio Overview')).not.toBeInTheDocument();
     expect(screen.getByText('Main Wallet')).toBeInTheDocument();
     expect(screen.getByText('abc123...f456')).toBeInTheDocument();
@@ -109,10 +109,10 @@ describe('V0WalletList', () => {
 
   it('calls setActiveWallet when wallet is selected', async () => {
     render(<V0WalletList />);
-    
+
     const walletButton = screen.getByText('Trading Wallet').closest('button');
     fireEvent.click(walletButton!);
-    
+
     await waitFor(() => {
       expect(mockStoreState.setActiveWallet).toHaveBeenCalledWith('wallet2');
     });
@@ -125,11 +125,11 @@ describe('V0WalletList', () => {
       activeWalletId: null,
       aggregatedPortfolio: null,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
+
     render(<V0WalletList />);
-    
+
     expect(screen.getByText('No wallets connected')).toBeInTheDocument();
     expect(screen.getByText('Add Your First Wallet')).toBeInTheDocument();
   });
@@ -141,27 +141,27 @@ describe('V0WalletList', () => {
       activeWalletId: null,
       aggregatedPortfolio: null,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(emptyState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(emptyState));
+
     const onAddWallet = vi.fn();
     render(<V0WalletList onAddWallet={onAddWallet} />);
-    
+
     const addButton = screen.getByText('Add Your First Wallet');
     fireEvent.click(addButton);
-    
+
     expect(onAddWallet).toHaveBeenCalled();
   });
 
   it('calls onWalletSettings when settings is clicked', () => {
     const onWalletSettings = vi.fn();
     render(<V0WalletList onWalletSettings={onWalletSettings} />);
-    
+
     const settingsButtons = screen.getAllByRole('button');
-    const settingsButton = settingsButtons.find(btn => 
-      btn.querySelector('svg') && !btn.textContent
+    const settingsButton = settingsButtons.find(
+      btn => btn.querySelector('svg') && !btn.textContent
     );
-    
+
     if (settingsButton) {
       fireEvent.click(settingsButton);
       expect(onWalletSettings).toHaveBeenCalled();
@@ -170,16 +170,16 @@ describe('V0WalletList', () => {
 
   it('hides balances when hideBalances is toggled', async () => {
     render(<V0WalletList />);
-    
+
     // Initially shows balances
     expect(screen.getByText('2.2500 SOL')).toBeInTheDocument();
     expect(screen.getByText('1.5000 SOL')).toBeInTheDocument();
-    
+
     // Click hide balances button
     const hideButton = screen.getByRole('button').querySelector('svg');
     if (hideButton) {
       fireEvent.click(hideButton.closest('button')!);
-      
+
       await waitFor(() => {
         expect(screen.getByText('****')).toBeInTheDocument();
         expect(screen.queryByText('2.2500 SOL')).not.toBeInTheDocument();
@@ -189,30 +189,30 @@ describe('V0WalletList', () => {
 
   it('hides performance when showPerformance is false', () => {
     render(<V0WalletList showPerformance={false} />);
-    
+
     expect(screen.queryByText('P&L:')).not.toBeInTheDocument();
   });
 
   it('shows performance when showPerformance is true', () => {
     render(<V0WalletList showPerformance={true} />);
-    
+
     expect(screen.getByText('P&L: +2.300 SOL')).toBeInTheDocument();
     expect(screen.getByText('P&L: -0.500 SOL')).toBeInTheDocument();
   });
 
   it('displays wallet type and network information', () => {
     render(<V0WalletList />);
-    
+
     expect(screen.getByText('phantom • mainnet')).toBeInTheDocument();
     expect(screen.getByText('hardware • ledger • mainnet')).toBeInTheDocument();
   });
 
   it('highlights active wallet', () => {
     render(<V0WalletList />);
-    
+
     const activeWalletButton = screen.getByText('Main Wallet').closest('button');
     const inactiveWalletButton = screen.getByText('Trading Wallet').closest('button');
-    
+
     expect(activeWalletButton?.className).toContain('border-purple-500/50');
     expect(inactiveWalletButton?.className).not.toContain('border-purple-500/50');
   });
@@ -220,18 +220,21 @@ describe('V0WalletList', () => {
   it('calls onWalletSelect when wallet is selected via callback', async () => {
     const onWalletSelect = vi.fn();
     render(<V0WalletList onWalletSelect={onWalletSelect} />);
-    
+
     // Click on the wallet icon button inside the Trading Wallet card
     const tradingWalletText = screen.getByText('Trading Wallet');
     const tradingWalletCard = tradingWalletText.closest('.p-4'); // Get the parent card
     const walletButton = tradingWalletCard?.querySelector('button'); // Get the first button (wallet icon)
-    
+
     if (walletButton) {
       fireEvent.click(walletButton);
     }
-    
-    await waitFor(() => {
-      expect(onWalletSelect).toHaveBeenCalledWith('wallet2');
-    }, { timeout: 3000 });
+
+    await waitFor(
+      () => {
+        expect(onWalletSelect).toHaveBeenCalledWith('wallet2');
+      },
+      { timeout: 3000 }
+    );
   });
 });

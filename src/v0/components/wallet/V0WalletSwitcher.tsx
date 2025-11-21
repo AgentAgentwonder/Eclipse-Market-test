@@ -66,8 +66,8 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
       <button
         onClick={onAddWallet}
         className={cn(
-          "px-6 py-2 rounded-xl font-medium transition-all shadow-lg",
-          "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/30",
+          'px-6 py-2 rounded-xl font-medium transition-all shadow-lg',
+          'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/30',
           className
         )}
       >
@@ -80,12 +80,12 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
   }
 
   return (
-    <div className={cn("relative", className)} ref={dropdownRef}>
+    <div className={cn('relative', className)} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-3 px-4 py-2 rounded-xl transition-all",
-          "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 hover:border-purple-500/50"
+          'flex items-center gap-3 px-4 py-2 rounded-xl transition-all',
+          'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 hover:border-purple-500/50'
         )}
       >
         {activeWallet && (
@@ -97,10 +97,12 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
                 {activeWallet.publicKey.slice(0, 4)}...{activeWallet.publicKey.slice(-4)}
               </span>
             </div>
-            <div className={cn(
-              "ml-4 px-3 py-1 rounded-lg",
-              "bg-purple-500/20 border border-purple-500/30"
-            )}>
+            <div
+              className={cn(
+                'ml-4 px-3 py-1 rounded-lg',
+                'bg-purple-500/20 border border-purple-500/30'
+              )}
+            >
               <span className="text-sm font-bold">{activeWallet.balance.toFixed(4)} SOL</span>
             </div>
           </>
@@ -109,34 +111,38 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
       </button>
 
       {isOpen && (
-        <div className={cn(
-          "absolute top-full right-0 mt-2 w-96 overflow-hidden z-50",
-          "bg-slate-900/95 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl"
-        )}>
+        <div
+          className={cn(
+            'absolute top-full right-0 mt-2 w-96 overflow-hidden z-50',
+            'bg-slate-900/95 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl'
+          )}
+        >
           {aggregatedPortfolio && wallets.length > 1 && (
             <div className="p-4 border-b border-purple-500/20">
               <h3 className="text-sm font-medium text-gray-400 mb-2">Portfolio Overview</h3>
               <div className="grid grid-cols-2 gap-2">
-                <div className={cn("px-3 py-2 rounded-lg", "bg-purple-500/10")}>
+                <div className={cn('px-3 py-2 rounded-lg', 'bg-purple-500/10')}>
                   <div className="text-xs text-gray-400">Total Balance</div>
                   <div className="text-sm font-bold">
                     {aggregatedPortfolio.totalBalance.toFixed(4)} SOL
                   </div>
                 </div>
-                <div className={cn("px-3 py-2 rounded-lg", "bg-purple-500/10")}>
+                <div className={cn('px-3 py-2 rounded-lg', 'bg-purple-500/10')}>
                   <div className="text-xs text-gray-400">Total Wallets</div>
                   <div className="text-sm font-bold">{aggregatedPortfolio.totalWallets}</div>
                 </div>
-                <div className={cn("px-3 py-2 rounded-lg", "bg-green-500/10")}>
+                <div className={cn('px-3 py-2 rounded-lg', 'bg-green-500/10')}>
                   <div className="text-xs text-gray-400">Realized P&L</div>
-                  <div className={`text-sm font-bold ${
-                    aggregatedPortfolio.totalRealizedPnl >= 0 ? 'text-green-400' : 'text-red-400'
-                  }`}>
+                  <div
+                    className={`text-sm font-bold ${
+                      aggregatedPortfolio.totalRealizedPnl >= 0 ? 'text-green-400' : 'text-red-400'
+                    }`}
+                  >
                     {aggregatedPortfolio.totalRealizedPnl >= 0 ? '+' : ''}
                     {aggregatedPortfolio.totalRealizedPnl.toFixed(2)} SOL
                   </div>
                 </div>
-                <div className={cn("px-3 py-2 rounded-lg", "bg-blue-500/10")}>
+                <div className={cn('px-3 py-2 rounded-lg', 'bg-blue-500/10')}>
                   <div className="text-xs text-gray-400">Total Volume</div>
                   <div className="text-sm font-bold">
                     {aggregatedPortfolio.totalVolume.toFixed(2)} SOL
@@ -154,10 +160,10 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
                   key={wallet.id}
                   onClick={() => handleWalletSelect(wallet.id)}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all",
+                    'w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all',
                     wallet.id === activeWalletId
-                      ? "bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-purple-500/50"
-                      : "hover:bg-white/5"
+                      ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 border border-purple-500/50'
+                      : 'hover:bg-white/5'
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -178,7 +184,7 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
                           onWalletSettings(wallet.id);
                           setIsOpen(false);
                         }}
-                        className={cn("p-1 hover:bg-white/10 rounded transition-all")}
+                        className={cn('p-1 hover:bg-white/10 rounded transition-all')}
                       >
                         <SettingsIcon className="w-3 h-3" />
                       </button>
@@ -197,8 +203,8 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm",
-                  "bg-purple-500/20 hover:bg-purple-500/30"
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm',
+                  'bg-purple-500/20 hover:bg-purple-500/30'
                 )}
               >
                 <Plus className="w-4 h-4" />
@@ -212,8 +218,8 @@ export const V0WalletSwitcher: React.FC<V0WalletSwitcherProps> = ({
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm",
-                  "bg-purple-500/20 hover:bg-purple-500/30"
+                  'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm',
+                  'bg-purple-500/20 hover:bg-purple-500/30'
                 )}
               >
                 <Users className="w-4 h-4" />

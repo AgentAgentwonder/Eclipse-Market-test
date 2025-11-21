@@ -17,7 +17,7 @@ const V0AlertNotificationContainer: React.FC<V0AlertNotificationContainerProps> 
   position = 'bottom-right',
 }) => {
   // Atomic selectors from existing alert store
-  const enhancedNotifications = useAlertStore(state => 
+  const enhancedNotifications = useAlertStore(state =>
     state.enhancedNotifications.slice(0, maxNotifications)
   );
   const dismissNotification = useAlertStore(state => state.dismissNotification);

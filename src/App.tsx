@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { shallow } from 'zustand/react';
 import {
   Menu,
   X,
@@ -127,7 +128,7 @@ const startupLog = (message: string, data?: any) => {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] [APP] ${message}`;
   console.log(logMessage, data || '');
-  
+
   if (typeof window !== 'undefined') {
     window.eclipseStartupLogs = window.eclipseStartupLogs || [];
     window.eclipseStartupLogs.push({ timestamp, message, data, source: 'app' });
@@ -136,7 +137,7 @@ const startupLog = (message: string, data?: any) => {
 
 function App() {
   startupLog('App component starting');
-  
+
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lockVisible, setLockVisible] = useState(false);
@@ -155,8 +156,6 @@ function App() {
   // Ref to track the last auto-started tutorial to prevent duplicate starts
   const lastAutoStartedRef = useRef<{ page: string; tutorialId: string } | null>(null);
 
-  try {
-
   const currentVersion = packageJson.version ?? '1.0.0';
   const tutorialAutoStart = useTutorialStore(state => state.autoStart);
   const getAvailableTutorials = useTutorialStore(state => state.getAvailableTutorials);
@@ -167,18 +166,60 @@ function App() {
   const isWhatsNewOpen = useChangelogStore(state => state.isWhatsNewOpen);
   const hasUnseenChanges = useChangelogStore(state => state.hasUnseenChanges);
 
-  const wallets = useWalletStore(state => state.wallets);
-  const refreshMultiWallet = useWalletStore(state => state.refreshMultiWallet);
-  const { isPaperMode } = usePaperTradingStore();
-  const proposalNotifications = useWalletStore(state => state.proposalNotifications);
-  const dismissProposalNotification = useWalletStore(state => state.dismissProposalNotification);
-  const activeWorkspaceId = useWorkspaceStore(state => state.activeWorkspaceId);
-  const workspaces = useWorkspaceStore(state => state.workspaces);
-  const addPanelToWorkspace = useWorkspaceStore(state => state.addPanel);
-  const setPanelMinimized = useWorkspaceStore(state => state.setPanelMinimized);
-  const setActiveWorkspace = useWorkspaceStore(state => state.setActiveWorkspace);
-  const registerCommands = useCommandStore(state => state.registerCommands);
-  const unregisterCommands = useCommandStore(state => state.unregisterCommands);
+  const { wallets, refreshMultiWallet, proposalNotifications, dismissProposalNotification } =
+    useWalletStore(
+      useCallback(
+        (state: ReturnType<typeof useWalletStore.getState>) => ({
+          wallets: state.wallets,
+          refreshMultiWallet: state.refreshMultiWallet,
+          proposalNotifications: state.proposalNotifications,
+          dismissProposalNotification: state.dismissProposalNotification,
+        }),
+        []
+      ),
+      shallow
+    );
+
+  const { isPaperMode } = usePaperTradingStore(
+    useCallback(
+      (state: ReturnType<typeof usePaperTradingStore.getState>) => ({
+        isPaperMode: state.isPaperMode,
+      }),
+      []
+    ),
+    shallow
+  );
+
+  const {
+    activeWorkspaceId,
+    workspaces,
+    addPanel: addPanelToWorkspace,
+    setPanelMinimized,
+    setActiveWorkspace,
+  } = useWorkspaceStore(
+    useCallback(
+      (state: ReturnType<typeof useWorkspaceStore.getState>) => ({
+        activeWorkspaceId: state.activeWorkspaceId,
+        workspaces: state.workspaces,
+        addPanel: state.addPanel,
+        setPanelMinimized: state.setPanelMinimized,
+        setActiveWorkspace: state.setActiveWorkspace,
+      }),
+      []
+    ),
+    shallow
+  );
+
+  const { registerCommands, unregisterCommands } = useCommandStore(
+    useCallback(
+      (state: ReturnType<typeof useCommandStore.getState>) => ({
+        registerCommands: state.registerCommands,
+        unregisterCommands: state.unregisterCommands,
+      }),
+      []
+    ),
+    shallow
+  );
 
   const activeWorkspace = useMemo(
     () => workspaces.find(workspace => workspace.id === activeWorkspaceId),
@@ -971,324 +1012,357 @@ function App() {
     setCurrentPage('settings');
   };
 
-  return (
-    <div
-      className="min-h-screen eclipse-gradient text-[var(--color-text)]"
-      data-theme={currentTheme.id}
-    >
-      <a href="#main-content" className="skip-link" aria-label="Skip to main content">
-        Skip to main content
-      </a>
-
-      <PaperModeIndicator onSwitchToLive={handleSwitchToLive} />
-
-      <header
-        className={`glass-header sticky z-40 backdrop-blur-xl border-b ${isPaperMode ? 'top-[52px]' : 'top-0'}`}
-        style={{
-          backgroundColor: 'var(--color-background-secondary-80)',
-          borderColor: 'var(--color-border)',
-        }}
+  try {
+    return (
+      <div
+        className="min-h-screen eclipse-gradient text-[var(--color-text)]"
+        data-theme={currentTheme.id}
       >
-        <div className="max-w-[1800px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="flex items-center gap-3 hover:opacity-80 transition-all group"
-              >
-                <motion.div
-                  animate={{ rotate: sidebarOpen ? 180 : 0 }}
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-[var(--color-background)] lunar-glow"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(255, 107, 53, 0.92), rgba(255, 140, 66, 0.85))',
-                    boxShadow: '0 0 30px rgba(255, 107, 53, var(--effect-glow-strength))',
-                  }}
-                >
-                  {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                </motion.div>
-                <span className="text-xl font-bold">Eclipse Market Pro</span>
-              </button>
-            </div>
+        <a href="#main-content" className="skip-link" aria-label="Skip to main content">
+          Skip to main content
+        </a>
 
-            <div className="flex items-center gap-4" data-help="header-controls">
-              <button
-                onClick={() => setTutorialMenuOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-800/60 border border-purple-500/20 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:border-purple-400/30 transition"
-                data-tutorial="tutorials-menu"
-              >
-                <GraduationCap className="w-4 h-4" aria-hidden="true" />
-                Tutorials
-              </button>
-              <button
-                onClick={() => setCommandPaletteOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-800/60 border border-purple-500/20 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:border-purple-400/30 transition"
-                data-tutorial="command-palette"
-              >
-                <Command className="w-4 h-4" aria-hidden="true" />
-                Command
-              </button>
-              <HelpButton />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setUseWorkspaceMode(!useWorkspaceMode)}
-                className={`p-2 rounded-lg transition-all ${
-                  useWorkspaceMode
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'bg-slate-800/50 hover:bg-slate-800/70 border border-purple-500/20'
-                }`}
-                title={useWorkspaceMode ? 'Switch to Page Mode' : 'Switch to Workspace Mode'}
-                data-tutorial="workspace-mode"
-              >
-                <LayoutGrid className="w-5 h-5" />
-              </motion.button>
-              <div data-tutorial="chain-selector">
-                <ChainSelector />
+        <PaperModeIndicator onSwitchToLive={handleSwitchToLive} />
+
+        <header
+          className={`glass-header sticky z-40 backdrop-blur-xl border-b ${isPaperMode ? 'top-[52px]' : 'top-0'}`}
+          style={{
+            backgroundColor: 'var(--color-background-secondary-80)',
+            borderColor: 'var(--color-border)',
+          }}
+        >
+          <div className="max-w-[1800px] mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-8">
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="flex items-center gap-3 hover:opacity-80 transition-all group"
+                >
+                  <motion.div
+                    animate={{ rotate: sidebarOpen ? 180 : 0 }}
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center text-[var(--color-background)] lunar-glow"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, rgba(255, 107, 53, 0.92), rgba(255, 140, 66, 0.85))',
+                      boxShadow: '0 0 30px rgba(255, 107, 53, var(--effect-glow-strength))',
+                    }}
+                  >
+                    {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  </motion.div>
+                  <span className="text-xl font-bold">Eclipse Market Pro</span>
+                </button>
               </div>
-              <div data-tutorial="wallet-connect" data-help="wallet-connect">
-                <WalletSwitcher
-                  onAddWallet={() => setAddWalletModalOpen(true)}
-                  onManageGroups={() => setGroupsModalOpen(true)}
-                  onWalletSettings={walletId => {
-                    setSelectedWalletId(walletId);
-                    setWalletSettingsModalOpen(true);
-                  }}
-                />
+
+              <div className="flex items-center gap-4" data-help="header-controls">
+                <button
+                  onClick={() => setTutorialMenuOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-slate-800/60 border border-purple-500/20 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:border-purple-400/30 transition"
+                  data-tutorial="tutorials-menu"
+                >
+                  <GraduationCap className="w-4 h-4" aria-hidden="true" />
+                  Tutorials
+                </button>
+                <button
+                  onClick={() => setCommandPaletteOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-slate-800/60 border border-purple-500/20 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:border-purple-400/30 transition"
+                  data-tutorial="command-palette"
+                >
+                  <Command className="w-4 h-4" aria-hidden="true" />
+                  Command
+                </button>
+                <HelpButton />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setUseWorkspaceMode(!useWorkspaceMode)}
+                  className={`p-2 rounded-lg transition-all ${
+                    useWorkspaceMode
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                      : 'bg-slate-800/50 hover:bg-slate-800/70 border border-purple-500/20'
+                  }`}
+                  title={useWorkspaceMode ? 'Switch to Page Mode' : 'Switch to Workspace Mode'}
+                  data-tutorial="workspace-mode"
+                >
+                  <LayoutGrid className="w-5 h-5" />
+                </motion.button>
+                <div data-tutorial="chain-selector">
+                  <ChainSelector />
+                </div>
+                <div data-tutorial="wallet-connect" data-help="wallet-connect">
+                  <WalletSwitcher
+                    onAddWallet={() => setAddWalletModalOpen(true)}
+                    onManageGroups={() => setGroupsModalOpen(true)}
+                    onWalletSettings={walletId => {
+                      setSelectedWalletId(walletId);
+                      setWalletSettingsModalOpen(true);
+                    }}
+                  />
+                </div>
+                <PhantomConnect />
+                <NetworkStatusIndicator />
               </div>
-              <PhantomConnect />
-              <NetworkStatusIndicator />
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-              onClick={() => setSidebarOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: -320 }}
-              animate={{ x: 0 }}
-              exit={{ x: -320 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="glass-panel fixed left-0 top-0 bottom-0 w-80 z-50 backdrop-blur-xl border-r shadow-2xl overflow-y-auto"
-              style={{
-                borderColor: 'rgba(255, 140, 66, 0.2)',
-              }}
-              data-tutorial="sidebar"
-            >
-              <div className="p-6">
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold mb-2 text-moonlight-silver">Navigation</h2>
-                  <div className="h-px bg-gradient-to-r from-[rgba(255,140,66,0.45)] via-[rgba(78,205,196,0.25)] to-transparent"></div>
-                </div>
+        <AnimatePresence>
+          {sidebarOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+                onClick={() => setSidebarOpen(false)}
+              />
+              <motion.aside
+                initial={{ x: -320 }}
+                animate={{ x: 0 }}
+                exit={{ x: -320 }}
+                transition={{ type: 'spring', damping: 25 }}
+                className="glass-panel fixed left-0 top-0 bottom-0 w-80 z-50 backdrop-blur-xl border-r shadow-2xl overflow-y-auto"
+                style={{
+                  borderColor: 'rgba(255, 140, 66, 0.2)',
+                }}
+                data-tutorial="sidebar"
+              >
+                <div className="p-6">
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold mb-2 text-moonlight-silver">Navigation</h2>
+                    <div className="h-px bg-gradient-to-r from-[rgba(255,140,66,0.45)] via-[rgba(78,205,196,0.25)] to-transparent"></div>
+                  </div>
 
-                <div className="space-y-4 mb-8">
-                  <button
-                    onClick={() => {
-                      setTutorialMenuOpen(true);
-                      setSidebarOpen(false);
-                    }}
-                    className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-card transition-all group hover:-translate-y-0.5"
-                  >
-                    <GraduationCap className="w-5 h-5 text-[var(--color-eclipse-orange)] group-hover:opacity-80 transition" />
-                    <span className="font-medium text-moonlight-silver">Tutorials</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCommandPaletteOpen(true);
-                      setSidebarOpen(false);
-                    }}
-                    className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-panel transition-all group hover:-translate-y-0.5"
-                    data-tutorial="command-palette"
-                  >
-                    <Command className="w-5 h-5 text-[var(--color-info)] group-hover:opacity-80 transition" />
-                    <span className="font-medium text-moonlight-silver">Command Palette</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCheatSheetOpen(true);
-                      setSidebarOpen(false);
-                    }}
-                    className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-panel transition-all group hover:-translate-y-0.5"
-                  >
-                    <Keyboard className="w-5 h-5 text-[var(--color-info)] group-hover:opacity-80 transition" />
-                    <span className="font-medium text-moonlight-silver">Keyboard Shortcuts</span>
-                  </button>
-                </div>
-
-                <nav className="space-y-2">
-                  {pages.map(page => (
+                  <div className="space-y-4 mb-8">
                     <button
-                      key={page.id}
                       onClick={() => {
-                        if (useWorkspaceMode) {
-                          setCurrentPage(page.id);
-                          ensurePanelForPage(page.panelType);
-                          setSidebarOpen(false);
-                        } else {
-                          setCurrentPage(page.id);
-                          setSidebarOpen(false);
-                        }
+                        setTutorialMenuOpen(true);
+                        setSidebarOpen(false);
                       }}
-                      className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
-                        currentPage === page.id
-                          ? 'glass-card lunar-glow'
-                          : 'glass-panel hover:-translate-y-0.5'
-                      }`}
-                      style={
-                        currentPage === page.id
-                          ? { borderColor: 'rgba(255, 140, 66, 0.45)' }
-                          : undefined
-                      }
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-card transition-all group hover:-translate-y-0.5"
                     >
-                      <page.icon
-                        className={`w-5 h-5 ${currentPage === page.id ? 'text-[var(--color-eclipse-orange)]' : 'text-moonlight-silver'}`}
-                      />
-                      <span
-                        className={`font-medium ${currentPage === page.id ? 'text-[var(--color-eclipse-orange)]' : 'text-moonlight-silver'}`}
-                      >
-                        {page.label}
-                      </span>
+                      <GraduationCap className="w-5 h-5 text-[var(--color-eclipse-orange)] group-hover:opacity-80 transition" />
+                      <span className="font-medium text-moonlight-silver">Tutorials</span>
                     </button>
-                  ))}
-                </nav>
-              </div>
-            </motion.aside>
-          </>
+                    <button
+                      onClick={() => {
+                        setCommandPaletteOpen(true);
+                        setSidebarOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-panel transition-all group hover:-translate-y-0.5"
+                      data-tutorial="command-palette"
+                    >
+                      <Command className="w-5 h-5 text-[var(--color-info)] group-hover:opacity-80 transition" />
+                      <span className="font-medium text-moonlight-silver">Command Palette</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCheatSheetOpen(true);
+                        setSidebarOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-xl glass-panel transition-all group hover:-translate-y-0.5"
+                    >
+                      <Keyboard className="w-5 h-5 text-[var(--color-info)] group-hover:opacity-80 transition" />
+                      <span className="font-medium text-moonlight-silver">Keyboard Shortcuts</span>
+                    </button>
+                  </div>
+
+                  <nav className="space-y-2">
+                    {pages.map(page => (
+                      <button
+                        key={page.id}
+                        onClick={() => {
+                          if (useWorkspaceMode) {
+                            setCurrentPage(page.id);
+                            ensurePanelForPage(page.panelType);
+                            setSidebarOpen(false);
+                          } else {
+                            setCurrentPage(page.id);
+                            setSidebarOpen(false);
+                          }
+                        }}
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
+                          currentPage === page.id
+                            ? 'glass-card lunar-glow'
+                            : 'glass-panel hover:-translate-y-0.5'
+                        }`}
+                        style={
+                          currentPage === page.id
+                            ? { borderColor: 'rgba(255, 140, 66, 0.45)' }
+                            : undefined
+                        }
+                      >
+                        <page.icon
+                          className={`w-5 h-5 ${currentPage === page.id ? 'text-[var(--color-eclipse-orange)]' : 'text-moonlight-silver'}`}
+                        />
+                        <span
+                          className={`font-medium ${currentPage === page.id ? 'text-[var(--color-eclipse-orange)]' : 'text-moonlight-silver'}`}
+                        >
+                          {page.label}
+                        </span>
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
+
+        {useWorkspaceMode ? (
+          <div
+            id="main-content"
+            className="max-w-[1800px] mx-auto px-6 py-8 space-y-6 relative"
+            role="main"
+          >
+            <WorkspaceTabs />
+            <WorkspaceToolbar />
+            <GridLayoutContainer />
+            <FloatingWindowManager />
+          </div>
+        ) : (
+          <main id="main-content" className="max-w-[1800px] mx-auto px-6 py-8" role="main">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentPage}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {CurrentPageComponent && <CurrentPageComponent />}
+              </motion.div>
+            </AnimatePresence>
+          </main>
         )}
-      </AnimatePresence>
 
-      {useWorkspaceMode ? (
-        <div
-          id="main-content"
-          className="max-w-[1800px] mx-auto px-6 py-8 space-y-6 relative"
-          role="main"
-        >
-          <WorkspaceTabs />
-          <WorkspaceToolbar />
-          <GridLayoutContainer />
-          <FloatingWindowManager />
-        </div>
-      ) : (
-        <main id="main-content" className="max-w-[1800px] mx-auto px-6 py-8" role="main">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPage}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {CurrentPageComponent && <CurrentPageComponent />}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      )}
+        {!initializingLock && lockVisible && <LockScreen onUnlock={() => setLockVisible(false)} />}
 
-      {!initializingLock && lockVisible && <LockScreen onUnlock={() => setLockVisible(false)} />}
+        <PaperTradingTutorial />
 
-      <PaperTradingTutorial />
-
-      <AddWalletModal isOpen={addWalletModalOpen} onClose={() => setAddWalletModalOpen(false)} />
-      <GroupManagementModal isOpen={groupsModalOpen} onClose={() => setGroupsModalOpen(false)} />
-      <WalletSettingsModal
-        isOpen={walletSettingsModalOpen}
-        onClose={() => {
-          setWalletSettingsModalOpen(false);
-          setSelectedWalletId(null);
-        }}
-        walletId={selectedWalletId}
-      />
-
-      <ProposalNotification
-        notifications={proposalNotifications}
-        onDismiss={dismissProposalNotification}
-        onOpenProposal={id => {
-          setCurrentPage('multisig');
-          dismissProposalNotification(id);
-        }}
-      />
-
-      <AlertNotificationContainer onOpenChart={handleOpenChart} />
-
-      {chartSymbol && (
-        <AlertChartModal
-          isOpen={true}
-          symbol={chartSymbol}
-          timestamp={chartTimestamp || undefined}
-          onClose={handleCloseChart}
-          onQuickTrade={handleQuickTrade}
+        <AddWalletModal isOpen={addWalletModalOpen} onClose={() => setAddWalletModalOpen(false)} />
+        <GroupManagementModal isOpen={groupsModalOpen} onClose={() => setGroupsModalOpen(false)} />
+        <WalletSettingsModal
+          isOpen={walletSettingsModalOpen}
+          onClose={() => {
+            setWalletSettingsModalOpen(false);
+            setSelectedWalletId(null);
+          }}
+          walletId={selectedWalletId}
         />
-      )}
 
-      <WorkspaceSwitcher />
+        <ProposalNotification
+          notifications={proposalNotifications}
+          onDismiss={dismissProposalNotification}
+          onOpenProposal={id => {
+            setCurrentPage('multisig');
+            dismissProposalNotification(id);
+          }}
+        />
 
-      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
-      <ShortcutCheatSheet isOpen={cheatSheetOpen} onClose={() => setCheatSheetOpen(false)} />
+        <AlertNotificationContainer onOpenChart={handleOpenChart} />
 
-      <UpdateNotificationModal />
-      <PerformanceMonitor />
+        {chartSymbol && (
+          <AlertChartModal
+            isOpen={true}
+            symbol={chartSymbol}
+            timestamp={chartTimestamp || undefined}
+            onClose={handleCloseChart}
+            onQuickTrade={handleQuickTrade}
+          />
+        )}
 
-      <TutorialEngine />
-      <TutorialMenu
-        currentPage={currentPage}
-        isOpen={tutorialMenuOpen}
-        onClose={() => setTutorialMenuOpen(false)}
-      />
-      <HelpPanel />
-      <WhatsThisMode />
-      <ChangelogViewer />
-      <WhatsNewModal currentVersion={currentVersion} />
-      <MaintenanceBanner />
-      <DeveloperConsole />
-      <VoiceNotificationRouter />
-      <VoiceTradingOverlay />
-    </div>
-  );
+        <WorkspaceSwitcher />
+
+        <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
+        <ShortcutCheatSheet isOpen={cheatSheetOpen} onClose={() => setCheatSheetOpen(false)} />
+
+        <UpdateNotificationModal />
+        <PerformanceMonitor />
+
+        <TutorialEngine />
+        <TutorialMenu
+          currentPage={currentPage}
+          isOpen={tutorialMenuOpen}
+          onClose={() => setTutorialMenuOpen(false)}
+        />
+        <HelpPanel />
+        <WhatsThisMode />
+        <ChangelogViewer />
+        <WhatsNewModal currentVersion={currentVersion} />
+        <MaintenanceBanner />
+        <DeveloperConsole />
+        <VoiceNotificationRouter />
+        <VoiceTradingOverlay />
+      </div>
+    );
   } catch (error) {
     startupLog('App component error', error);
     console.error('App component failed:', error);
-    
+
     return (
-      <div style={{ padding: '20px', fontFamily: 'monospace', background: '#1a1a1a', color: '#fff', minHeight: '100vh' }}>
+      <div
+        style={{
+          padding: '20px',
+          fontFamily: 'monospace',
+          background: '#1a1a1a',
+          color: '#fff',
+          minHeight: '100vh',
+        }}
+      >
         <h1>Application Error</h1>
         <p>The main application component failed to render:</p>
-        <pre style={{ background: '#2a2a2a', padding: '10px', borderRadius: '5px', overflow: 'auto' }}>
+        <pre
+          style={{ background: '#2a2a2a', padding: '10px', borderRadius: '5px', overflow: 'auto' }}
+        >
           {error instanceof Error ? error.stack : String(error)}
         </pre>
-        <button 
-          onClick={() => window.location.reload()} 
-          style={{ marginTop: '20px', padding: '10px 20px', background: '#007acc', color: 'white', border: 'none', borderRadius: '5px' }}
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: '20px',
+            padding: '10px 20px',
+            background: '#007acc',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+          }}
         >
           Reload Application
         </button>
-        <div style={{ marginTop: '20px', padding: '10px', background: '#333', borderRadius: '5px' }}>
+        <div
+          style={{ marginTop: '20px', padding: '10px', background: '#333', borderRadius: '5px' }}
+        >
           <h3>Debug Information:</h3>
-          <button 
+          <button
             onClick={() => {
               if (window.eclipseStartupLogs) {
                 console.log('Startup Logs:', window.eclipseStartupLogs);
                 alert('Check browser console for detailed logs');
               }
             }}
-            style={{ padding: '5px 10px', background: '#555', color: 'white', border: 'none', borderRadius: '3px', marginRight: '10px' }}
+            style={{
+              padding: '5px 10px',
+              background: '#555',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+              marginRight: '10px',
+            }}
           >
             Show Logs
           </button>
-          <button 
+          <button
             onClick={() => {
               window.location.search = '?desktop=1';
               window.location.reload();
             }}
-            style={{ padding: '5px 10px', background: '#555', color: 'white', border: 'none', borderRadius: '3px' }}
+            style={{
+              padding: '5px 10px',
+              background: '#555',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+            }}
           >
             Force Desktop
           </button>

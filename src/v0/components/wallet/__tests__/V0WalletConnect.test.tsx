@@ -43,12 +43,12 @@ describe('V0WalletConnect', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWalletStore as any).mockImplementation((selector) => selector(mockStoreState));
+    (useWalletStore as any).mockImplementation(selector => selector(mockStoreState));
   });
 
   it('renders connect button when disconnected', () => {
     render(<V0WalletConnect />);
-    
+
     expect(screen.getByText('Connect Wallet')).toBeInTheDocument();
     expect(screen.queryByText('Disconnect')).not.toBeInTheDocument();
   });
@@ -60,11 +60,11 @@ describe('V0WalletConnect', () => {
       publicKey: 'abc123def456',
       balance: 1.5,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(connectedState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(connectedState));
+
     render(<V0WalletConnect />);
-    
+
     expect(screen.getByText('abc1...f456')).toBeInTheDocument();
     expect(screen.getByText('1.5000 SOL')).toBeInTheDocument();
     expect(screen.getByText('Disconnect')).toBeInTheDocument();
@@ -76,11 +76,11 @@ describe('V0WalletConnect', () => {
       ...mockStoreState,
       status: 'connecting' as const,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(connectingState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(connectingState));
+
     render(<V0WalletConnect />);
-    
+
     expect(screen.getByText('Connecting...')).toBeInTheDocument();
     expect(screen.getByText('Connect Wallet')).toBeDisabled();
   });
@@ -91,11 +91,11 @@ describe('V0WalletConnect', () => {
       status: 'error' as const,
       error: 'Connection failed',
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(errorState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(errorState));
+
     render(<V0WalletConnect />);
-    
+
     expect(screen.getByText('Connection failed')).toBeInTheDocument();
     expect(screen.getByText('Error')).toBeInTheDocument();
   });
@@ -104,7 +104,7 @@ describe('V0WalletConnect', () => {
     const onConnect = vi.fn();
     const { useWallet } = await import('@solana/wallet-adapter-react');
     const mockConnect = vi.fn().mockResolvedValue(undefined);
-    
+
     (useWallet as any).mockReturnValue({
       connected: true,
       connecting: false,
@@ -113,12 +113,12 @@ describe('V0WalletConnect', () => {
       wallet: { adapter: { name: 'Phantom' } },
       readyState: 'Installed' as const,
     });
-    
+
     render(<V0WalletConnect onConnect={onConnect} />);
-    
+
     const connectButton = screen.getByText('Connect Wallet');
     fireEvent.click(connectButton);
-    
+
     await waitFor(() => {
       expect(mockConnect).toHaveBeenCalled();
     });
@@ -132,14 +132,14 @@ describe('V0WalletConnect', () => {
       publicKey: 'abc123def456',
       balance: 1.5,
     };
-    
-    (useWalletStore as any).mockImplementation((selector) => selector(connectedState));
-    
+
+    (useWalletStore as any).mockImplementation(selector => selector(connectedState));
+
     render(<V0WalletConnect onDisconnect={onDisconnect} />);
-    
+
     const disconnectButton = screen.getByText('Disconnect');
     fireEvent.click(disconnectButton);
-    
+
     await waitFor(() => {
       expect(onDisconnect).toHaveBeenCalled();
     });

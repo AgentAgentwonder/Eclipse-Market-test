@@ -98,16 +98,10 @@ export function useV0TradingSettingsData() {
   );
 
   // MEV protection
-  const mevProtectionEnabled = useTradingSettingsStore(
-    state => state.mevProtection.enabled
-  );
+  const mevProtectionEnabled = useTradingSettingsStore(state => state.mevProtection.enabled);
   const jitoEnabled = useTradingSettingsStore(state => state.mevProtection.useJito);
-  const privateRPCEnabled = useTradingSettingsStore(
-    state => state.mevProtection.usePrivateRPC
-  );
-  const protectedTrades = useTradingSettingsStore(
-    state => state.mevProtection.protectedTrades
-  );
+  const privateRPCEnabled = useTradingSettingsStore(state => state.mevProtection.usePrivateRPC);
+  const protectedTrades = useTradingSettingsStore(state => state.mevProtection.protectedTrades);
   const estimatedMevSavings = useTradingSettingsStore(
     state => state.mevProtection.estimatedSavings
   );
@@ -127,21 +121,11 @@ export function useV0TradingSettingsData() {
   const timezone = useTradingSettingsStore(state => state.timezone);
 
   // Store actions
-  const setSlippageTolerance = useTradingSettingsStore(
-    state => state.setSlippageTolerance
-  );
-  const setSlippageAutoAdjust = useTradingSettingsStore(
-    state => state.setSlippageAutoAdjust
-  );
-  const setPriorityFeePreset = useTradingSettingsStore(
-    state => state.setPriorityFeePreset
-  );
-  const getRecommendedSlippage = useTradingSettingsStore(
-    state => state.getRecommendedSlippage
-  );
-  const getPriorityFeeForPreset = useTradingSettingsStore(
-    state => state.getPriorityFeeForPreset
-  );
+  const setSlippageTolerance = useTradingSettingsStore(state => state.setSlippageTolerance);
+  const setSlippageAutoAdjust = useTradingSettingsStore(state => state.setSlippageAutoAdjust);
+  const setPriorityFeePreset = useTradingSettingsStore(state => state.setPriorityFeePreset);
+  const getRecommendedSlippage = useTradingSettingsStore(state => state.getRecommendedSlippage);
+  const getPriorityFeeForPreset = useTradingSettingsStore(state => state.getPriorityFeeForPreset);
   const shouldBlockTrade = useTradingSettingsStore(state => state.shouldBlockTrade);
 
   return {
@@ -182,43 +166,21 @@ export function useV0TradingSettingsData() {
  * Hook for trading settings operations
  */
 export function useV0TradingSettingsActions() {
-  const setSlippageTolerance = useTradingSettingsStore(
-    state => state.setSlippageTolerance
-  );
-  const setSlippageAutoAdjust = useTradingSettingsStore(
-    state => state.setSlippageAutoAdjust
-  );
-  const setSlippageMaxTolerance = useTradingSettingsStore(
-    state => state.setSlippageMaxTolerance
-  );
-  const setSlippageRejectAbove = useTradingSettingsStore(
-    state => state.setSlippageRejectAbove
-  );
-  const toggleMEVProtection = useTradingSettingsStore(
-    state => state.toggleMEVProtection
-  );
+  const setSlippageTolerance = useTradingSettingsStore(state => state.setSlippageTolerance);
+  const setSlippageAutoAdjust = useTradingSettingsStore(state => state.setSlippageAutoAdjust);
+  const setSlippageMaxTolerance = useTradingSettingsStore(state => state.setSlippageMaxTolerance);
+  const setSlippageRejectAbove = useTradingSettingsStore(state => state.setSlippageRejectAbove);
+  const toggleMEVProtection = useTradingSettingsStore(state => state.toggleMEVProtection);
   const setJitoEnabled = useTradingSettingsStore(state => state.setJitoEnabled);
-  const setPrivateRPCEnabled = useTradingSettingsStore(
-    state => state.setPrivateRPCEnabled
-  );
-  const setPriorityFeePreset = useTradingSettingsStore(
-    state => state.setPriorityFeePreset
-  );
-  const setCustomPriorityFee = useTradingSettingsStore(
-    state => state.setCustomPriorityFee
-  );
-  const updateCongestionData = useTradingSettingsStore(
-    state => state.updateCongestionData
-  );
+  const setPrivateRPCEnabled = useTradingSettingsStore(state => state.setPrivateRPCEnabled);
+  const setPriorityFeePreset = useTradingSettingsStore(state => state.setPriorityFeePreset);
+  const setCustomPriorityFee = useTradingSettingsStore(state => state.setCustomPriorityFee);
+  const updateCongestionData = useTradingSettingsStore(state => state.updateCongestionData);
   const addTradeToHistory = useTradingSettingsStore(state => state.addTradeToHistory);
-  const updateTradeInHistory = useTradingSettingsStore(
-    state => state.updateTradeInHistory
-  );
+  const updateTradeInHistory = useTradingSettingsStore(state => state.updateTradeInHistory);
   const setTradeFilters = useTradingSettingsStore(state => state.setTradeFilters);
   const resetTradeFilters = useTradingSettingsStore(state => state.resetTradeFilters);
-  const setTradePagination = useTradingSettingsStore(
-    state => state.setTradePagination
-  );
+  const setTradePagination = useTradingSettingsStore(state => state.setTradePagination);
 
   const handleSetSlippageTolerance = useCallback(
     (tolerance: number) => {
@@ -294,9 +256,7 @@ export function useV0AutoTradingActions() {
   const stopStrategy = useAutoTradingStore(state => state.stopStrategy);
   const pauseStrategy = useAutoTradingStore(state => state.pauseStrategy);
   const activateKillSwitch = useAutoTradingStore(state => state.activateKillSwitch);
-  const deactivateKillSwitch = useAutoTradingStore(
-    state => state.deactivateKillSwitch
-  );
+  const deactivateKillSwitch = useAutoTradingStore(state => state.deactivateKillSwitch);
 
   const handleAddStrategy = useCallback(
     async (strategy: any) => {

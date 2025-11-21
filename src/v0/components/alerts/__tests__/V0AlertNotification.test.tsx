@@ -113,7 +113,9 @@ describe('V0AlertNotification', () => {
       ],
     };
 
-    render(<V0AlertNotification notification={notificationWithOpportunities} onDismiss={vi.fn()} />);
+    render(
+      <V0AlertNotification notification={notificationWithOpportunities} onDismiss={vi.fn()} />
+    );
 
     expect(screen.getByText('Similar opportunities:')).toBeInTheDocument();
     expect(screen.getByText('USDC')).toBeInTheDocument();
