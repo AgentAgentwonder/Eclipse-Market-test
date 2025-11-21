@@ -1,80 +1,114 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './node_modules/@solana/wallet-adapter-react-ui/**/*.js'
-  ],
+  darkMode: ['class'],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+    },
     extend: {
       colors: {
-        'solana-purple': '#9945FF',
-        'solana-green': '#14F195',
-        'deep-space': 'var(--color-deep-space, #050810)',
-        'eclipse-orange': 'var(--color-eclipse-orange, #FF6B35)',
-        'moonlight-silver': 'var(--color-moonlight-silver, #C0CCDA)',
-        'shadow-accent': 'var(--color-shadow-accent, #1F2937)',
-        // V0 compatible color tokens
-        background: 'var(--color-background, #0a0e1a)',
-        foreground: 'var(--color-text, #e8ebf0)',
-        card: 'var(--color-background-secondary, #121826)',
-        'card-foreground': 'var(--color-text, #e8ebf0)',
-        popover: 'var(--color-background-secondary, #121826)',
-        'popover-foreground': 'var(--color-text, #e8ebf0)',
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
         primary: {
-          DEFAULT: 'var(--color-primary, #ff6b35)',
-          foreground: 'var(--color-background, #0a0e1a)',
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
         },
         secondary: {
-          DEFAULT: 'var(--color-background-tertiary, #1a2235)',
-          foreground: 'var(--color-text, #e8ebf0)',
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
         },
         muted: {
-          DEFAULT: 'var(--color-background-tertiary, #1a2235)',
-          foreground: 'var(--color-text-muted, #8b92a3)',
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
         },
         accent: {
-          DEFAULT: 'var(--color-accent, #ff8c42)',
-          foreground: 'var(--color-background, #0a0e1a)',
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
         },
         destructive: {
-          DEFAULT: 'var(--color-error, #ff6b6b)',
-          foreground: 'var(--color-background, #0a0e1a)',
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
         },
-        border: 'var(--color-border, #2a3447)',
-        input: 'var(--color-border, #2a3447)',
-        ring: 'var(--color-accent, #ff8c42)',
+        sidebar: {
+          DEFAULT: 'var(--sidebar)',
+          foreground: 'var(--sidebar-foreground)',
+          primary: 'var(--sidebar-primary)',
+          'primary-foreground': 'var(--sidebar-primary-foreground)',
+          accent: 'var(--sidebar-accent)',
+          'accent-foreground': 'var(--sidebar-accent-foreground)',
+          border: 'var(--sidebar-border)',
+          ring: 'var(--sidebar-ring)',
+        },
+        chart: {
+          1: 'var(--chart-1)',
+          2: 'var(--chart-2)',
+          3: 'var(--chart-3)',
+          4: 'var(--chart-4)',
+          5: 'var(--chart-5)',
+        },
       },
-      backdropBlur: {
-        xs: '2px',
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
-      backgroundImage: {
-        'lunar-gradient': 'linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-middle), var(--color-gradient-end))',
-        'eclipse-radial': 'radial-gradient(circle at 30% 50%, var(--color-eclipse-orange), transparent 50%)',
+      fontFamily: {
+        sans: ['"Geist"', ...defaultTheme.fontFamily.sans],
+        mono: ['"Geist Mono"', ...defaultTheme.fontFamily.mono],
       },
       boxShadow: {
         'glow-subtle': '0 0 15px rgba(255, 107, 53, 0.2)',
         'glow-normal': '0 0 25px rgba(255, 107, 53, 0.4)',
         'glow-strong': '0 0 35px rgba(255, 107, 53, 0.65)',
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
       },
       keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: 1 },
+          '20%,50%': { opacity: 0 },
+        },
         'v0-fade-in': {
-          'from': { opacity: '0' },
-          'to': { opacity: '1' },
+          from: { opacity: '0' },
+          to: { opacity: '1' },
         },
         'v0-fade-out': {
-          'from': { opacity: '1' },
-          'to': { opacity: '0' },
+          from: { opacity: '1' },
+          to: { opacity: '0' },
         },
         'v0-slide-in-from-top': {
-          'from': { transform: 'translateY(-100%)' },
-          'to': { transform: 'translateY(0)' },
+          from: { transform: 'translateY(-100%)' },
+          to: { transform: 'translateY(0)' },
         },
         'v0-slide-out-to-top': {
-          'from': { transform: 'translateY(0)' },
-          'to': { transform: 'translateY(-100%)' },
+          from: { transform: 'translateY(0)' },
+          to: { transform: 'translateY(-100%)' },
         },
         'v0-spin': {
-          'from': { transform: 'rotate(0deg)' },
-          'to': { transform: 'rotate(360deg)' },
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(360deg)' },
         },
         'v0-pulse': {
           '0%, 100%': { opacity: '1' },
@@ -82,6 +116,9 @@ module.exports = {
         },
       },
       animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'caret-blink': 'caret-blink 1.2s step-end infinite',
         'v0-fade-in': 'v0-fade-in 0.2s ease-out',
         'v0-fade-out': 'v0-fade-out 0.2s ease-out',
         'v0-slide-in-from-top': 'v0-slide-in-from-top 0.2s ease-out',
@@ -91,5 +128,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 }

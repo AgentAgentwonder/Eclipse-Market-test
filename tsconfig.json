@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -10,7 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": []
+  "include": ["src", "src-minimal", "tests", "vite.config.ts", "vitest.config.ts"]
 }
