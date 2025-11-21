@@ -20,10 +20,10 @@
     "mobile:android:dev": "cargo tauri android dev",
     "mobile:ios:build": "cargo tauri ios build --release",
     "mobile:android:build": "cargo tauri android build --release",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
-    "lint": "eslint --config .eslintrc.cjs \"src/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint --config .eslintrc.cjs \"src/**/*.{ts,tsx}\" --fix"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css}\"",
+    "lint": "eslint --config .eslintrc.cjs \"**/*.{ts,tsx}\"",
+    "lint:fix": "eslint --config .eslintrc.cjs \"**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
     "@ledgerhq/hw-app-solana": "^7.5.5",

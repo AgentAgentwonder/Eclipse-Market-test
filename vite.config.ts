@@ -14,10 +14,7 @@ export default defineConfig({
   },
   envPrefix: ['VITE_', 'TAURI_'],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@/v0': path.resolve(__dirname, './src/v0'),
-    },
+    alias: {},
   },
   build: {
     target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome120' : 'safari14',
