@@ -1,6 +1,6 @@
+import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { getPersistentStorage } from './storage';
-import { createBoundStore } from './createBoundStore';
 
 export type Theme = 'dark' | 'light' | 'auto';
 
@@ -13,6 +13,18 @@ export interface PanelVisibility {
   alerts: boolean;
 }
 
+export interface ToastMessage {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message?: string;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
 interface UiStoreState {
   theme: Theme;
   panelVisibility: PanelVisibility;
@@ -23,6 +35,10 @@ interface UiStoreState {
   soundEnabled: boolean;
   animationsEnabled: boolean;
   compactMode: boolean;
+  isAppLoading: boolean;
+  appLoadingMessage: string | null;
+  toasts: ToastMessage[];
+  devConsoleOpen: boolean;
 
   // Actions
   setTheme: (theme: Theme) => void;
@@ -37,6 +53,13 @@ interface UiStoreState {
   setSoundEnabled: (enabled: boolean) => void;
   setAnimationsEnabled: (enabled: boolean) => void;
   setCompactMode: (compact: boolean) => void;
+  setLoading: (isLoading: boolean, message?: string | null) => void;
+  addToast: (toast: Omit<ToastMessage, 'id'>) => void;
+  removeToast: (id: string) => void;
+  clearToasts: () => void;
+  setDevConsoleOpen: (open: boolean) => void;
+  closeDevtools: () => void;
+  openDevtools: () => void;
   reset: () => void;
 }
 
@@ -59,11 +82,15 @@ const initialState = {
   soundEnabled: true,
   animationsEnabled: true,
   compactMode: false,
+  isAppLoading: false,
+  appLoadingMessage: null as string | null,
+  toasts: [] as ToastMessage[],
+  devConsoleOpen: false,
 };
 
-const storeResult = createBoundStore<UiStoreState>((set, get) =>
+export const useUiStore = create<UiStoreState>()(
   persist(
-    {
+    (set, get) => ({
       ...initialState,
 
       setTheme: theme => {
@@ -132,10 +159,59 @@ const storeResult = createBoundStore<UiStoreState>((set, get) =>
         set({ compactMode: compact });
       },
 
+      setLoading: (isLoading, message = null) => {
+        set({
+          isAppLoading: isLoading,
+          appLoadingMessage: message,
+        });
+      },
+
+      addToast: toast => {
+        const id = `toast-${Date.now()}-${Math.random()}`;
+        const newToast: ToastMessage = {
+          ...toast,
+          id,
+        };
+        set(state => ({
+          toasts: [...state.toasts, newToast],
+        }));
+
+        if (toast.duration) {
+          setTimeout(() => {
+            set(state => ({
+              toasts: state.toasts.filter(t => t.id !== id),
+            }));
+          }, toast.duration);
+        }
+      },
+
+      removeToast: id => {
+        set(state => ({
+          toasts: state.toasts.filter(t => t.id !== id),
+        }));
+      },
+
+      clearToasts: () => {
+        set({ toasts: [] });
+      },
+
+      setDevConsoleOpen: open => {
+        if (get().devConsoleOpen === open) return;
+        set({ devConsoleOpen: open });
+      },
+
+      closeDevtools: () => {
+        set({ devConsoleOpen: false });
+      },
+
+      openDevtools: () => {
+        set({ devConsoleOpen: true });
+      },
+
       reset: () => {
         set(initialState);
       },
-    },
+    }),
     {
       name: 'eclipse-ui-store',
       storage: createJSONStorage(getPersistentStorage),
@@ -147,13 +223,13 @@ const storeResult = createBoundStore<UiStoreState>((set, get) =>
         soundEnabled: state.soundEnabled,
         animationsEnabled: state.animationsEnabled,
         compactMode: state.compactMode,
+        devConsoleOpen: state.devConsoleOpen,
       }),
     }
   )
 );
 
-export const useUiStore = storeResult.useStore;
-export const uiStore = storeResult.store;
+export const useUIStore = useUiStore;
 
 export const usePanelVisibility = (panel: keyof PanelVisibility) => {
   return useUiStore(state => state.panelVisibility[panel]);
