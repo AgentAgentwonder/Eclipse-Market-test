@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function P2PMarketplacePage() {
   return (
@@ -16,10 +16,12 @@ export default function P2PMarketplacePage() {
         </CardHeader>
         <CardContent>
           <div className="h-96 bg-muted/10 rounded flex items-center justify-center border border-border">
-            <p className="text-muted-foreground">P2P marketplace interface will be integrated here</p>
+            <p className="text-muted-foreground">
+              P2P marketplace interface will be integrated here
+            </p>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

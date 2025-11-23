@@ -67,7 +67,7 @@ describe('PhantomConnect', () => {
     mockUseWalletStore.mockReturnValue(mockStoreState);
     mockUseWallet.mockReturnValue(mockAdapterState);
     mockUseConnection.mockReturnValue(mockConnection);
-    
+
     // Mock console methods to avoid noise in tests
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -80,7 +80,7 @@ describe('PhantomConnect', () => {
 
   it('should render connect button when disconnected', () => {
     render(<PhantomConnect />);
-    
+
     expect(screen.getByText('Connect Wallet')).toBeInTheDocument();
   });
 
@@ -100,16 +100,19 @@ describe('PhantomConnect', () => {
     render(<PhantomConnect />);
 
     // Wait for any potential useEffect runs
-    await waitFor(() => {
-      // setStatus should only be called once for initial status
-      expect(statusCallCount).toBeLessThanOrEqual(2);
-    }, { timeout: 1000 });
+    await waitFor(
+      () => {
+        // setStatus should only be called once for initial status
+        expect(statusCallCount).toBeLessThanOrEqual(2);
+      },
+      { timeout: 1000 }
+    );
   });
 
   it('should only call setPublicKey when the key actually changes', async () => {
     const setPublicKey = vi.fn();
     const mockPublicKey = { toBase58: () => 'test-public-key' };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'test-public-key', // Same as adapter
@@ -139,7 +142,7 @@ describe('PhantomConnect', () => {
   it('should call setPublicKey when the key changes', async () => {
     const setPublicKey = vi.fn();
     const mockPublicKey = { toBase58: () => 'new-public-key' };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'old-public-key', // Different from adapter
@@ -169,7 +172,7 @@ describe('PhantomConnect', () => {
   it('should only update balance when it changes', async () => {
     const setBalance = vi.fn();
     const mockPublicKey = { toBase58: () => 'test-public-key' };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'test-public-key',
@@ -196,7 +199,7 @@ describe('PhantomConnect', () => {
   it('should update balance when it changes', async () => {
     const setBalance = vi.fn();
     const mockPublicKey = { toBase58: () => 'test-public-key' };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'test-public-key',
@@ -228,7 +231,7 @@ describe('PhantomConnect', () => {
       network: 'devnet',
       connected: true,
     };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'test-public-key',
@@ -254,7 +257,7 @@ describe('PhantomConnect', () => {
 
   it('should display connected state when wallet is connected', () => {
     const mockPublicKey = { toBase58: () => 'test-very-long-public-key-address' };
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       publicKey: 'test-very-long-public-key-address',
@@ -278,7 +281,7 @@ describe('PhantomConnect', () => {
   it('should handle connection errors gracefully', async () => {
     const setError = vi.fn();
     const setStatus = vi.fn();
-    
+
     mockUseWalletStore.mockReturnValue({
       ...mockStoreState,
       setError,

@@ -19,7 +19,7 @@ describe('Wallet Store Setters', () => {
 
   it('should not update state when setting the same status', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial status
     act(() => {
       result.current.setStatus('connected');
@@ -39,7 +39,7 @@ describe('Wallet Store Setters', () => {
 
   it('should update state when setting a different status', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial status
     act(() => {
       result.current.setStatus('connected');
@@ -56,7 +56,7 @@ describe('Wallet Store Setters', () => {
 
   it('should not update state when setting the same publicKey', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial public key
     act(() => {
       result.current.setPublicKey('test-key-123');
@@ -76,7 +76,7 @@ describe('Wallet Store Setters', () => {
 
   it('should update state when setting a different publicKey', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial public key
     act(() => {
       result.current.setPublicKey('test-key-123');
@@ -93,7 +93,7 @@ describe('Wallet Store Setters', () => {
 
   it('should not update state when setting the same balance', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial balance
     act(() => {
       result.current.setBalance(1.5);
@@ -113,7 +113,7 @@ describe('Wallet Store Setters', () => {
 
   it('should update state when setting a different balance', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial balance
     act(() => {
       result.current.setBalance(1.5);
@@ -130,7 +130,7 @@ describe('Wallet Store Setters', () => {
 
   it('should not update state when setting the same error', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial error
     act(() => {
       result.current.setError('test error');
@@ -150,7 +150,7 @@ describe('Wallet Store Setters', () => {
 
   it('should update state when setting a different error', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial error
     act(() => {
       result.current.setError('test error');
@@ -172,7 +172,7 @@ describe('Wallet Store Setters', () => {
       network: 'devnet',
       connected: true,
     };
-    
+
     // Set initial session
     act(() => {
       result.current.setSession(session);
@@ -202,7 +202,7 @@ describe('Wallet Store Setters', () => {
       network: 'mainnet',
       connected: true,
     };
-    
+
     // Set initial session
     act(() => {
       result.current.setSession(session1);
@@ -220,7 +220,7 @@ describe('Wallet Store Setters', () => {
   it('should not update state when setting the same lastConnected', () => {
     const { result } = renderHook(() => useWalletStore());
     const timestamp = '2024-01-01T00:00:00.000Z';
-    
+
     // Set initial timestamp
     act(() => {
       result.current.setLastConnected(timestamp);
@@ -242,7 +242,7 @@ describe('Wallet Store Setters', () => {
     const { result } = renderHook(() => useWalletStore());
     const timestamp1 = '2024-01-01T00:00:00.000Z';
     const timestamp2 = '2024-01-02T00:00:00.000Z';
-    
+
     // Set initial timestamp
     act(() => {
       result.current.setLastConnected(timestamp1);
@@ -259,7 +259,7 @@ describe('Wallet Store Setters', () => {
 
   it('should not update state when setting the same attemptedAutoConnect', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial value
     act(() => {
       result.current.setAttemptedAutoConnect(true);
@@ -279,7 +279,7 @@ describe('Wallet Store Setters', () => {
 
   it('should update state when setting a different attemptedAutoConnect', () => {
     const { result } = renderHook(() => useWalletStore());
-    
+
     // Set initial value
     act(() => {
       result.current.setAttemptedAutoConnect(true);

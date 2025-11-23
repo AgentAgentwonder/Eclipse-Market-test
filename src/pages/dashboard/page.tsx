@@ -1,7 +1,7 @@
-"use client"
-import PortfolioOverview from "@/components/dashboard/portfolio-overview"
-import RecentTrades from "@/components/dashboard/recent-trades"
-import NewCoins from "@/components/dashboard/new-coins"
+'use client';
+import PortfolioOverview from '@/components/dashboard/portfolio-overview';
+import RecentTrades from '@/components/dashboard/recent-trades';
+import NewCoins from '@/components/dashboard/new-coins';
 
 export default function DashboardPage() {
   return (
@@ -28,5 +28,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

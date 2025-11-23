@@ -99,7 +99,9 @@ test.describe('AI Assistant', () => {
       const chatInput = page.getByPlaceholder(/Ask me anything/i);
       if (await chatInput.isVisible()) {
         await chatInput.fill('Test message');
-        const sendButton = page.getByRole('button').filter({ has: page.locator('svg[class*="lucide-send"]') });
+        const sendButton = page
+          .getByRole('button')
+          .filter({ has: page.locator('svg[class*="lucide-send"]') });
         if (await sendButton.isVisible()) {
           await sendButton.click();
           await page.waitForTimeout(2000);
@@ -148,7 +150,9 @@ test.describe('AI Assistant Feedback', () => {
       const chatInput = page.getByPlaceholder(/Ask me anything/i);
       if (await chatInput.isVisible()) {
         await chatInput.fill('Hello');
-        const sendButton = page.getByRole('button').filter({ has: page.locator('svg[class*="lucide-send"]') });
+        const sendButton = page
+          .getByRole('button')
+          .filter({ has: page.locator('svg[class*="lucide-send"]') });
         if (await sendButton.isVisible()) {
           await sendButton.click();
           await page.waitForTimeout(2000);

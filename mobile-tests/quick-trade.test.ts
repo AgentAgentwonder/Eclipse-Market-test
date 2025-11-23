@@ -31,19 +31,19 @@ describe('Quick Trade', () => {
     it('should execute buy trade with biometric', async () => {
       await element(by.id('symbol-selector')).tap();
       await element(by.text('SOL')).tap();
-      
+
       await element(by.id('amount-input')).clearText();
       await element(by.id('amount-input')).typeText('100');
-      
+
       await element(by.id('buy-button')).tap();
-      
+
       // Confirm trade details
       await detoxExpect(element(by.id('trade-confirmation'))).toBeVisible();
       await element(by.id('confirm-trade')).tap();
-      
+
       // Biometric authentication
       await device.matchBiometric();
-      
+
       // Wait for success
       await waitFor(element(by.id('trade-success')))
         .toBeVisible()
@@ -53,18 +53,18 @@ describe('Quick Trade', () => {
     it('should execute sell trade with biometric', async () => {
       await element(by.id('symbol-selector')).tap();
       await element(by.text('SOL')).tap();
-      
+
       await element(by.id('amount-input')).clearText();
       await element(by.id('amount-input')).typeText('50');
-      
+
       await element(by.id('sell-button')).tap();
-      
+
       // Confirm trade
       await element(by.id('confirm-trade')).tap();
-      
+
       // Biometric authentication
       await device.matchBiometric();
-      
+
       // Wait for success
       await waitFor(element(by.id('trade-success')))
         .toBeVisible()
@@ -74,16 +74,16 @@ describe('Quick Trade', () => {
     it('should cancel trade on biometric failure', async () => {
       await element(by.id('symbol-selector')).tap();
       await element(by.text('USDC')).tap();
-      
+
       await element(by.id('amount-input')).clearText();
       await element(by.id('amount-input')).typeText('200');
-      
+
       await element(by.id('buy-button')).tap();
       await element(by.id('confirm-trade')).tap();
-      
+
       // Fail biometric
       await device.unmatchBiometric();
-      
+
       // Should show error
       await detoxExpect(element(by.id('trade-error'))).toBeVisible();
     });
@@ -91,13 +91,13 @@ describe('Quick Trade', () => {
     it('should respect trade amount limits', async () => {
       await element(by.id('symbol-selector')).tap();
       await element(by.text('SOL')).tap();
-      
+
       // Try to exceed limit
       await element(by.id('amount-input')).clearText();
       await element(by.id('amount-input')).typeText('100000');
-      
+
       await element(by.id('buy-button')).tap();
-      
+
       // Should show limit error
       await detoxExpect(element(by.id('amount-limit-error'))).toBeVisible();
     });
@@ -107,7 +107,7 @@ describe('Quick Trade', () => {
     it('should display safety rules', async () => {
       await element(by.id('settings-tab')).tap();
       await element(by.id('safety-settings')).tap();
-      
+
       await detoxExpect(element(by.id('safety-rules-list'))).toBeVisible();
       await detoxExpect(element(by.text(/Max notional value/i))).toBeVisible();
       await detoxExpect(element(by.text(/Max order size/i))).toBeVisible();
@@ -116,7 +116,7 @@ describe('Quick Trade', () => {
     it('should require biometric for all trades', async () => {
       await element(by.id('quick-trade-tab')).tap();
       await element(by.id('buy-button')).tap();
-      
+
       // Should always prompt for biometric
       await detoxExpect(element(by.id('biometric-prompt'))).toBeVisible();
     });
@@ -125,9 +125,9 @@ describe('Quick Trade', () => {
   describe('Trade History', () => {
     it('should show executed trades in history', async () => {
       await element(by.id('history-tab')).tap();
-      
+
       await detoxExpect(element(by.id('trade-history-list'))).toBeVisible();
-      
+
       // Should have at least one trade from previous tests
       const firstTrade = element(by.id('trade-item-0'));
       await detoxExpect(firstTrade).toBeVisible();
@@ -136,7 +136,7 @@ describe('Quick Trade', () => {
     it('should display trade details', async () => {
       await element(by.id('history-tab')).tap();
       await element(by.id('trade-item-0')).tap();
-      
+
       await detoxExpect(element(by.id('trade-details'))).toBeVisible();
       await detoxExpect(element(by.id('trade-symbol'))).toBeVisible();
       await detoxExpect(element(by.id('trade-amount'))).toBeVisible();

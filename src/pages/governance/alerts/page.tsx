@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Bell, X } from "lucide-react"
+import { Card, CardContent } from '@/components/ui/card';
+import { Bell, X } from 'lucide-react';
 
 export default function AlertsPage() {
   const alerts = [
-    { id: 1, type: "Price Alert", asset: "BTC", condition: "Price > $50,000", status: "Active" },
-    { id: 2, type: "Volume Alert", asset: "ETH", condition: "Volume > 1M USD", status: "Active" },
-  ]
+    { id: 1, type: 'Price Alert', asset: 'BTC', condition: 'Price > $50,000', status: 'Active' },
+    { id: 2, type: 'Volume Alert', asset: 'ETH', condition: 'Volume > 1M USD', status: 'Active' },
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -17,7 +17,7 @@ export default function AlertsPage() {
       </div>
 
       <div className="space-y-3">
-        {alerts.map((alert) => (
+        {alerts.map(alert => (
           <Card key={alert.id} className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -39,5 +39,5 @@ export default function AlertsPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

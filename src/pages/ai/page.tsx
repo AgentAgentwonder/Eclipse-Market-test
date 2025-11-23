@@ -1,15 +1,17 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Brain, AlertTriangle, MessageCircle } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Brain, AlertTriangle, MessageCircle } from 'lucide-react';
 
 export default function AIAnalysisPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">AI Analysis</h1>
-        <p className="text-muted-foreground mt-1">AI-powered insights, predictions, and risk assessment</p>
+        <p className="text-muted-foreground mt-1">
+          AI-powered insights, predictions, and risk assessment
+        </p>
       </div>
 
       <Tabs defaultValue="predictions" className="w-full">
@@ -65,5 +67,5 @@ export default function AIAnalysisPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

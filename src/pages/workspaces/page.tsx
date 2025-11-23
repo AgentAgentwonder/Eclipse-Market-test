@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Users } from "lucide-react"
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, Users } from 'lucide-react';
 
 export default function WorkspacesPage() {
   const workspaces = [
-    { id: 1, name: "Personal Trading", members: 1, role: "Owner" },
-    { id: 2, name: "Team Operations", members: 5, role: "Admin" },
-  ]
+    { id: 1, name: 'Personal Trading', members: 1, role: 'Owner' },
+    { id: 2, name: 'Team Operations', members: 5, role: 'Admin' },
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -23,7 +23,7 @@ export default function WorkspacesPage() {
       </div>
 
       <div className="grid gap-4">
-        {workspaces.map((workspace) => (
+        {workspaces.map(workspace => (
           <Card key={workspace.id} className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -31,7 +31,7 @@ export default function WorkspacesPage() {
                   <p className="font-semibold text-foreground">{workspace.name}</p>
                   <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                     <Users className="w-4 h-4" />
-                    {workspace.members} member{workspace.members > 1 ? "s" : ""} • {workspace.role}
+                    {workspace.members} member{workspace.members > 1 ? 's' : ''} • {workspace.role}
                   </p>
                 </div>
                 <button className="px-3 py-1.5 border border-border text-foreground rounded hover:bg-muted/20 transition-colors text-sm">
@@ -43,5 +43,5 @@ export default function WorkspacesPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

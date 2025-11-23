@@ -1,27 +1,32 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Send } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Send } from 'lucide-react';
+import { useState } from 'react';
 
 export default function AIAssistantPage() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([
-    { role: "assistant", content: "Hello! I'm your Eclipse Market Trading AI Assistant. How can I help you today?" },
-  ])
-  const [input, setInput] = useState("")
+    {
+      role: 'assistant',
+      content: "Hello! I'm your Eclipse Market Trading AI Assistant. How can I help you today?",
+    },
+  ]);
+  const [input, setInput] = useState('');
 
   const handleSend = () => {
     if (input.trim()) {
-      setMessages([...messages, { role: "user", content: input }])
-      setInput("")
+      setMessages([...messages, { role: 'user', content: input }]);
+      setInput('');
     }
-  }
+  };
 
   return (
     <div className="p-6 space-y-6 fade-in">
       <div>
         <h1 className="text-3xl font-bold text-foreground">AI Assistant</h1>
-        <p className="text-muted-foreground mt-1">Chat with our AI for trading insights and advice</p>
+        <p className="text-muted-foreground mt-1">
+          Chat with our AI for trading insights and advice
+        </p>
       </div>
 
       <Card className="bg-card border-border h-[600px] flex flex-col">
@@ -30,10 +35,15 @@ export default function AIAssistantPage() {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto space-y-4 mb-4">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              key={i}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
               <div
                 className={`max-w-xs px-4 py-2 rounded-lg ${
-                  msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                  msg.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground'
                 }`}
               >
                 {msg.content}
@@ -45,8 +55,8 @@ export default function AIAssistantPage() {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            onChange={e => setInput(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && handleSend()}
             placeholder="Type your message..."
             className="flex-1 bg-input rounded px-3 py-2 text-foreground placeholder:text-muted-foreground"
           />
@@ -59,5 +69,5 @@ export default function AIAssistantPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

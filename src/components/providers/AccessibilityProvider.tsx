@@ -17,7 +17,9 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     []
   );
 
-  const { fontScale, highContrastMode, reducedMotion } = useAccessibilityStore(useShallow(selector));
+  const { fontScale, highContrastMode, reducedMotion } = useAccessibilityStore(
+    useShallow(selector)
+  );
 
   useEffect(() => {
     const root = document.documentElement;

@@ -1,26 +1,32 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { BookOpen, Play } from "lucide-react"
+import { Card, CardContent } from '@/components/ui/card';
+import { BookOpen, Play } from 'lucide-react';
 
 export default function LearningPage() {
   const resources = [
     {
       id: 1,
-      title: "Getting Started with Spot Trading",
-      type: "Tutorial",
-      duration: "5 min",
+      title: 'Getting Started with Spot Trading',
+      type: 'Tutorial',
+      duration: '5 min',
       icon: BookOpen,
     },
     {
       id: 2,
-      title: "Understanding Futures Trading",
-      type: "Video",
-      duration: "12 min",
+      title: 'Understanding Futures Trading',
+      type: 'Video',
+      duration: '12 min',
       icon: Play,
     },
-    { id: 3, title: "Risk Management Strategies", type: "Guide", duration: "8 min", icon: BookOpen },
-  ]
+    {
+      id: 3,
+      title: 'Risk Management Strategies',
+      type: 'Guide',
+      duration: '8 min',
+      icon: BookOpen,
+    },
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -30,8 +36,8 @@ export default function LearningPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {resources.map((resource) => {
-          const Icon = resource.icon
+        {resources.map(resource => {
+          const Icon = resource.icon;
           return (
             <Card
               key={resource.id}
@@ -48,9 +54,9 @@ export default function LearningPage() {
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

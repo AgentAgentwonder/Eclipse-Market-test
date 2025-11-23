@@ -18,9 +18,9 @@ vi.mock('../src/hooks/useWebSocketStream', () => ({
   useStreamStatus: vi.fn(() => []),
 }));
 
-const createWrapper = () => ({ children }: { children: React.ReactNode }) => (
-  <StreamProvider>{children}</StreamProvider>
-);
+const createWrapper =
+  () =>
+  ({ children }: { children: React.ReactNode }) => <StreamProvider>{children}</StreamProvider>;
 
 const getInvokeCallCount = (method: string) =>
   (invoke as any).mock.calls.filter((call: any) => call[0] === method).length;
@@ -48,13 +48,10 @@ describe('usePriceStream - Stabilization', () => {
   });
 
   it('should not resubscribe when symbols array reference changes but content is same', async () => {
-    const { rerender } = renderHook(
-      ({ symbols }) => usePriceStream(symbols),
-      {
-        wrapper: createWrapper(),
-        initialProps: { symbols: ['BTC', 'ETH'] },
-      }
-    );
+    const { rerender } = renderHook(({ symbols }) => usePriceStream(symbols), {
+      wrapper: createWrapper(),
+      initialProps: { symbols: ['BTC', 'ETH'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_price_stream', {
@@ -96,13 +93,10 @@ describe('usePriceStream - Stabilization', () => {
   });
 
   it('should handle unordered symbols as equivalent', async () => {
-    const { rerender } = renderHook(
-      ({ symbols }) => usePriceStream(symbols),
-      {
-        wrapper: createWrapper(),
-        initialProps: { symbols: ['BTC', 'ETH', 'SOL'] },
-      }
-    );
+    const { rerender } = renderHook(({ symbols }) => usePriceStream(symbols), {
+      wrapper: createWrapper(),
+      initialProps: { symbols: ['BTC', 'ETH', 'SOL'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_price_stream', {
@@ -140,13 +134,10 @@ describe('usePriceStream - Stabilization', () => {
   });
 
   it('should resubscribe when symbols actually change', async () => {
-    const { rerender } = renderHook(
-      ({ symbols }) => usePriceStream(symbols),
-      {
-        wrapper: createWrapper(),
-        initialProps: { symbols: ['BTC'] },
-      }
-    );
+    const { rerender } = renderHook(({ symbols }) => usePriceStream(symbols), {
+      wrapper: createWrapper(),
+      initialProps: { symbols: ['BTC'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_price_stream', {
@@ -179,13 +170,10 @@ describe('useWalletStream - Stabilization', () => {
   });
 
   it('should not resubscribe when addresses array reference changes but content is same', async () => {
-    const { rerender } = renderHook(
-      ({ addresses }) => useWalletStream(addresses),
-      {
-        wrapper: createWrapper(),
-        initialProps: { addresses: ['addr1', 'addr2'] },
-      }
-    );
+    const { rerender } = renderHook(({ addresses }) => useWalletStream(addresses), {
+      wrapper: createWrapper(),
+      initialProps: { addresses: ['addr1', 'addr2'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_wallet_stream', {
@@ -224,13 +212,10 @@ describe('useWalletStream - Stabilization', () => {
   });
 
   it('should handle unordered addresses as equivalent', async () => {
-    const { rerender } = renderHook(
-      ({ addresses }) => useWalletStream(addresses),
-      {
-        wrapper: createWrapper(),
-        initialProps: { addresses: ['addr1', 'addr2', 'addr3'] },
-      }
-    );
+    const { rerender } = renderHook(({ addresses }) => useWalletStream(addresses), {
+      wrapper: createWrapper(),
+      initialProps: { addresses: ['addr1', 'addr2', 'addr3'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_wallet_stream', {
@@ -268,13 +253,10 @@ describe('useWalletStream - Stabilization', () => {
   });
 
   it('should resubscribe when addresses actually change', async () => {
-    const { rerender } = renderHook(
-      ({ addresses }) => useWalletStream(addresses),
-      {
-        wrapper: createWrapper(),
-        initialProps: { addresses: ['addr1'] },
-      }
-    );
+    const { rerender } = renderHook(({ addresses }) => useWalletStream(addresses), {
+      wrapper: createWrapper(),
+      initialProps: { addresses: ['addr1'] },
+    });
 
     await waitFor(() => {
       expect(invoke).toHaveBeenCalledWith('subscribe_wallet_stream', {

@@ -28,7 +28,7 @@ test.describe('Animation Accessibility', () => {
     await expect(root).toHaveClass(/reduce-motion/);
 
     // Check CSS variable
-    const motionDuration = await root.evaluate(el => 
+    const motionDuration = await root.evaluate(el =>
       getComputedStyle(el).getPropertyValue('--motion-duration')
     );
     expect(motionDuration).toContain('0.01ms');
@@ -37,15 +37,18 @@ test.describe('Animation Accessibility', () => {
   test('should toggle animations via accessibility settings', async ({ page }) => {
     // Navigate to settings
     await page.click('[aria-label*="Settings"], button:has-text("Settings")');
-    
+
     // Wait for settings page to load
     await page.waitForSelector('text=Accessibility', { timeout: 5000 });
-    
+
     // Click accessibility section
     await page.click('text=Accessibility');
 
     // Toggle reduced motion
-    const reducedMotionToggle = page.locator('text=Reduced Motion').locator('..').locator('input[type="checkbox"], button');
+    const reducedMotionToggle = page
+      .locator('text=Reduced Motion')
+      .locator('..')
+      .locator('input[type="checkbox"], button');
     await reducedMotionToggle.click();
 
     // Check if the setting was applied
@@ -61,7 +64,7 @@ test.describe('Animation Accessibility', () => {
     // Look for loading indicator (may appear briefly or during data fetching)
     // Check if EclipseLoader component structure exists or can be rendered
     const hasLoader = await page.locator('[role="status"][aria-label="Loading"]').count();
-    
+
     // The loader should either be present or have been present during initial load
     // For this test, we just verify the page loaded successfully
     expect(hasLoader).toBeGreaterThanOrEqual(0);
@@ -73,18 +76,14 @@ test.describe('Animation Accessibility', () => {
 
     // Get initial position of a parallax element
     const parallaxElement = page.locator('.constellation-stars, svg').first();
-    const initialTransform = await parallaxElement.evaluate(el => 
-      getComputedStyle(el).transform
-    );
+    const initialTransform = await parallaxElement.evaluate(el => getComputedStyle(el).transform);
 
     // Scroll down
     await page.evaluate(() => window.scrollBy(0, 500));
     await page.waitForTimeout(100);
 
     // Get new position
-    const newTransform = await parallaxElement.evaluate(el => 
-      getComputedStyle(el).transform
-    );
+    const newTransform = await parallaxElement.evaluate(el => getComputedStyle(el).transform);
 
     // In reduced motion mode, transforms might not change
     // In normal mode, they should change
@@ -115,7 +114,7 @@ test.describe('Animation Accessibility', () => {
 
     // Look for any progress bars
     const progressBars = await page.locator('[role="progressbar"]').count();
-    
+
     // Verify progress bars have proper ARIA attributes when present
     if (progressBars > 0) {
       const firstProgress = page.locator('[role="progressbar"]').first();
@@ -130,7 +129,7 @@ test.describe('Animation Accessibility', () => {
     await page.waitForSelector('.bg-slate-800\\/50', { timeout: 5000 });
 
     const card = page.locator('.bg-slate-800\\/50').first();
-    
+
     // Get initial transform
     const initialTransform = await card.evaluate(el => getComputedStyle(el).transform);
 
@@ -150,7 +149,7 @@ test.describe('Animation Accessibility', () => {
     // Moon phase indicator might be on specific pages or components
     // Check if it exists anywhere in the app
     const moonPhase = await page.locator('[aria-label*="Moon phase"]').count();
-    
+
     // It may not always be visible, so we just check it's properly structured if present
     if (moonPhase > 0) {
       const indicator = page.locator('[aria-label*="Moon phase"]').first();
@@ -163,7 +162,7 @@ test.describe('Animation Accessibility', () => {
 
     // Check for status indicators
     const statusElements = await page.locator('[role="status"]').count();
-    
+
     if (statusElements > 0) {
       const firstStatus = page.locator('[role="status"]').first();
       const ariaLabel = await firstStatus.getAttribute('aria-label');
@@ -179,7 +178,7 @@ test.describe('Animation Accessibility', () => {
     await page.waitForSelector('text=Dashboard, text=Trending Coins', { timeout: 5000 });
     await page.evaluate(() => window.scrollBy(0, 500));
     await page.waitForTimeout(500);
-    
+
     await page.evaluate(() => performance.mark('end'));
 
     // Measure performance

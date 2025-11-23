@@ -1,13 +1,15 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function SentimentPage() {
   return (
     <div className="p-6 space-y-6 fade-in">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Market Sentiment</h1>
-        <p className="text-muted-foreground mt-1">Overall market sentiment and social media trends</p>
+        <p className="text-muted-foreground mt-1">
+          Overall market sentiment and social media trends
+        </p>
       </div>
 
       <Card className="bg-card border-border">
@@ -21,5 +23,5 @@ export default function SentimentPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

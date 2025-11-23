@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mic } from 'lucide-react';
 
 export default function VoicePage() {
   return (
@@ -33,5 +33,5 @@ export default function VoicePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

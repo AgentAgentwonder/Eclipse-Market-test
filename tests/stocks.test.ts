@@ -25,7 +25,7 @@ describe('Stock Intelligence Types', () => {
     const mockMover = {
       symbol: 'NVDA',
       name: 'NVIDIA Corporation',
-      price: 495.30,
+      price: 495.3,
       change: 12.85,
       percentChange: 2.66,
       volume: 45300000,
@@ -53,7 +53,7 @@ describe('Stock Intelligence Types', () => {
       name: 'ARM Holdings',
       ipoDate: '2024-09-15',
       offerPrice: 51.0,
-      currentPrice: 68.50,
+      currentPrice: 68.5,
       percentChange: 34.31,
       sharesOffered: 95500000,
       marketCap: 70000000000,

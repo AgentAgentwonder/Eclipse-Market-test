@@ -3,6 +3,9 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AccessibilityProvider } from '@/components/providers/AccessibilityProvider';
 import ClientLayout from '@/layouts/ClientLayout';
 import { APIProvider } from '@/lib/api-context';
+import { AppErrorBoundary } from '@/components';
+import { ToastContainer } from '@/components';
+import { useDevConsoleAutoSetup } from '@/hooks';
 import AIAssistantPage from '@/pages/ai/assistant/page';
 import AIPage from '@/pages/ai/page';
 import AIPredictionsPage from '@/pages/ai/predictions/page';
@@ -77,22 +80,33 @@ const ROUTES: RouteConfig[] = [
 ];
 
 function App() {
+  // Set up dev console keyboard shortcuts automatically
+  useDevConsoleAutoSetup();
+
   return (
-    <APIProvider>
-      <AccessibilityProvider>
-        <HashRouter>
-          <ClientLayout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              {ROUTES.map(({ path, Component }) => (
-                <Route key={path} path={path} element={<Component />} />
-              ))}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </ClientLayout>
-        </HashRouter>
-      </AccessibilityProvider>
-    </APIProvider>
+    <AppErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('Global error caught:', error, errorInfo);
+        // In production, you might want to send this to an error reporting service
+      }}
+    >
+      <APIProvider>
+        <AccessibilityProvider>
+          <HashRouter>
+            <ClientLayout>
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                {ROUTES.map(({ path, Component }) => (
+                  <Route key={path} path={path} element={<Component />} />
+                ))}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </ClientLayout>
+          </HashRouter>
+          <ToastContainer />
+        </AccessibilityProvider>
+      </APIProvider>
+    </AppErrorBoundary>
   );
 }
 

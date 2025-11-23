@@ -1,15 +1,17 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Vote, Mic, Bell } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Vote, Mic, Bell } from 'lucide-react';
 
 export default function GovernancePage() {
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Governance & Alerts</h1>
-        <p className="text-muted-foreground mt-1">Vote on proposals, manage alerts, and voice controls</p>
+        <p className="text-muted-foreground mt-1">
+          Vote on proposals, manage alerts, and voice controls
+        </p>
       </div>
 
       <Tabs defaultValue="alerts" className="w-full">
@@ -65,5 +67,5 @@ export default function GovernancePage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

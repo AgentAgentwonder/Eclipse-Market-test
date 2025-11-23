@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  usePaperTradingStore,
-  PaperTrade,
-} from '../src/store/paperTradingStore';
+import { usePaperTradingStore, PaperTrade } from '../src/store/paperTradingStore';
 import { useTradingSettingsStore } from '../src/store/tradingSettingsStore';
 import { useAutoTradingStore } from '../src/store/autoTradingStore';
 

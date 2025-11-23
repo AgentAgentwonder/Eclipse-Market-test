@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import { Card } from "@/components/ui/card"
+import { Card } from '@/components/ui/card';
 
 export default function PortfolioPage() {
   const holdings = [
-    { symbol: "BTC", amount: 2.5, value: "$247,500", change: "+5.2%" },
-    { symbol: "ETH", amount: 15.2, value: "$52,500", change: "+3.1%" },
-    { symbol: "SOL", amount: 450, value: "$105,300", change: "+12.5%" },
-  ]
+    { symbol: 'BTC', amount: 2.5, value: '$247,500', change: '+5.2%' },
+    { symbol: 'ETH', amount: 15.2, value: '$52,500', change: '+3.1%' },
+    { symbol: 'SOL', amount: 450, value: '$105,300', change: '+12.5%' },
+  ];
 
   return (
     <div className="p-6 space-y-6">
@@ -30,13 +30,16 @@ export default function PortfolioPage() {
                 </tr>
               </thead>
               <tbody>
-                {holdings.map((holding) => (
-                  <tr key={holding.symbol} className="border-b border-border hover:bg-muted/5 transition-colors">
+                {holdings.map(holding => (
+                  <tr
+                    key={holding.symbol}
+                    className="border-b border-border hover:bg-muted/5 transition-colors"
+                  >
                     <td className="py-3 text-foreground font-medium">{holding.symbol}</td>
                     <td className="text-right text-foreground">{holding.amount}</td>
                     <td className="text-right text-foreground">{holding.value}</td>
                     <td
-                      className={`text-right font-medium ${holding.change.includes("+") ? "text-accent" : "text-destructive"}`}
+                      className={`text-right font-medium ${holding.change.includes('+') ? 'text-accent' : 'text-destructive'}`}
                     >
                       {holding.change}
                     </td>
@@ -48,5 +51,5 @@ export default function PortfolioPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }
