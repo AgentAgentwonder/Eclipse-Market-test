@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useUIStore } from '../store/uiStore';
 
@@ -8,7 +8,11 @@ import { useUIStore } from '../store/uiStore';
  */
 export function useDevConsole() {
   const { devConsoleOpen, setDevConsoleOpen } = useUIStore();
-  const [appWindow] = React.useState(() => getCurrentWindow());
+  const [appWindow, setAppWindow] = useState<any>(null);
+
+  useEffect(() => {
+    getCurrentWindow().then(setAppWindow);
+  }, []);
 
   const toggleDevConsole = useCallback(async () => {
     // Only allow in development builds
@@ -16,6 +20,8 @@ export function useDevConsole() {
       console.warn('Dev console is only available in development builds');
       return;
     }
+
+    if (!appWindow) return;
 
     try {
       if (devConsoleOpen) {
@@ -38,6 +44,8 @@ export function useDevConsole() {
       return;
     }
 
+    if (!appWindow) return;
+
     try {
       if (!devConsoleOpen) {
         await appWindow.openDevtools();
@@ -52,6 +60,8 @@ export function useDevConsole() {
     if (process.env.NODE_ENV !== 'development') {
       return;
     }
+
+    if (!appWindow) return;
 
     try {
       if (devConsoleOpen) {
