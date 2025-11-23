@@ -1,13 +1,34 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function HistoryPage() {
   const trades = [
-    { type: "Buy", asset: "BTC", amount: 0.5, price: "$43,200", date: "2024-01-15", status: "Completed" },
-    { type: "Sell", asset: "ETH", amount: 5, price: "$3,450", date: "2024-01-14", status: "Completed" },
-    { type: "Buy", asset: "SOL", amount: 100, price: "$234", date: "2024-01-13", status: "Completed" },
-  ]
+    {
+      type: 'Buy',
+      asset: 'BTC',
+      amount: 0.5,
+      price: '$43,200',
+      date: '2024-01-15',
+      status: 'Completed',
+    },
+    {
+      type: 'Sell',
+      asset: 'ETH',
+      amount: 5,
+      price: '$3,450',
+      date: '2024-01-14',
+      status: 'Completed',
+    },
+    {
+      type: 'Buy',
+      asset: 'SOL',
+      amount: 100,
+      price: '$234',
+      date: '2024-01-13',
+      status: 'Completed',
+    },
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -37,7 +58,7 @@ export default function HistoryPage() {
                 {trades.map((trade, i) => (
                   <tr key={i} className="border-b border-border hover:bg-muted/5 transition-colors">
                     <td
-                      className={`py-3 px-2 font-medium ${trade.type === "Buy" ? "text-accent" : "text-destructive"}`}
+                      className={`py-3 px-2 font-medium ${trade.type === 'Buy' ? 'text-accent' : 'text-destructive'}`}
                     >
                       {trade.type}
                     </td>
@@ -54,5 +75,5 @@ export default function HistoryPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

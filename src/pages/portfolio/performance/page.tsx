@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function PerformancePage() {
   return (
@@ -42,5 +42,5 @@ export default function PerformancePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -48,7 +48,8 @@ export interface ThemeStoreState {
   listThemes: () => ThemeDefinition[];
 }
 
-const createCustomThemeId = () => `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+const createCustomThemeId = () =>
+  `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 const BUILTIN_THEMES: ThemeDefinition[] = [
   {
@@ -243,7 +244,8 @@ export const useThemeStore = create<ThemeStoreState>()(
             return null;
           }
 
-          const id: string = parsed.id && typeof parsed.id === 'string' ? String(parsed.id) : createCustomThemeId();
+          const id: string =
+            parsed.id && typeof parsed.id === 'string' ? String(parsed.id) : createCustomThemeId();
           const theme: ThemeDefinition = {
             id: id.startsWith('custom-') ? id : createCustomThemeId(),
             name: parsed.name || 'Imported Theme',

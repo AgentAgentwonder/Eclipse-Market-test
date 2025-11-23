@@ -224,7 +224,9 @@ describe('Tutorial Auto-Start Guard Logic', () => {
         // Should not find the skipped tutorial
         const nextAfterSkip = findNextTutorial(availableTutorials, result.current.progress);
         if (nextAfterSkip) {
-          expect((nextAfterSkip as { id: string }).id).not.toBe((nextTutorial as { id: string }).id);
+          expect((nextAfterSkip as { id: string }).id).not.toBe(
+            (nextTutorial as { id: string }).id
+          );
         }
       }
     }

@@ -1,23 +1,23 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ThumbsUp, ThumbsDown } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 export default function ProposalsPage() {
   const proposals = [
     {
       id: 1,
-      title: "Increase Protocol Fee",
-      description: "Raise platform fee from 0.1% to 0.15%",
+      title: 'Increase Protocol Fee',
+      description: 'Raise platform fee from 0.1% to 0.15%',
       votes: { yes: 7500, no: 2500 },
     },
     {
       id: 2,
-      title: "Add New Trading Pair",
-      description: "List XRP/USD trading pair",
+      title: 'Add New Trading Pair',
+      description: 'List XRP/USD trading pair',
       votes: { yes: 9200, no: 800 },
     },
-  ]
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -27,7 +27,7 @@ export default function ProposalsPage() {
       </div>
 
       <div className="space-y-4">
-        {proposals.map((proposal) => (
+        {proposals.map(proposal => (
           <Card key={proposal.id} className="bg-card border-border">
             <CardHeader>
               <CardTitle className="text-lg">{proposal.title}</CardTitle>
@@ -64,5 +64,5 @@ export default function ProposalsPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

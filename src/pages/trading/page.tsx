@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Card } from "@/components/ui/card"
+import { Card } from '@/components/ui/card';
 
 export default function TradingPage() {
   return (
@@ -51,5 +51,5 @@ export default function TradingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

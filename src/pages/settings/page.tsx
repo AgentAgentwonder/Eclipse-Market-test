@@ -1,132 +1,136 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { useAPIKeys } from "@/lib/api-context"
-import { Wallet, Lock, Eye, EyeOff, Check, X, TrendingUp, Plus, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useAPIKeys } from '@/lib/api-context';
+import { Wallet, Lock, Eye, EyeOff, Check, X, TrendingUp, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function SettingsPage() {
-  const { apiKeys, setAPIKey, clearAPIKeys } = useAPIKeys()
-  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({})
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [walletAddress, setWalletAddress] = useState("")
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [paperTradingInput, setPaperTradingInput] = useState(apiKeys?.paperTradingBalance?.toString() || "10000")
-  const [newBuyInAmount, setNewBuyInAmount] = useState("")
-  const [buyInAmounts, setBuyInAmounts] = useState<number[]>(apiKeys?.buyInAmounts || [10, 25, 50, 100])
+  const { apiKeys, setAPIKey, clearAPIKeys } = useAPIKeys();
+  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [paperTradingInput, setPaperTradingInput] = useState(
+    apiKeys?.paperTradingBalance?.toString() || '10000'
+  );
+  const [newBuyInAmount, setNewBuyInAmount] = useState('');
+  const [buyInAmounts, setBuyInAmounts] = useState<number[]>(
+    apiKeys?.buyInAmounts || [10, 25, 50, 100]
+  );
 
   const togglePasswordVisibility = (field: string) => {
-    setShowPasswords((prev) => ({
+    setShowPasswords(prev => ({
       ...prev,
       [field]: !prev[field],
-    }))
-  }
+    }));
+  };
 
   const handleConnectPhantom = async () => {
     try {
-      const response = await (window as any).solana?.connect()
+      const response = await (window as any).solana?.connect();
       if (response?.publicKey) {
-        setWalletAddress(response.publicKey.toString())
-        setWalletConnected(true)
-        setSaveSuccess(true)
-        setTimeout(() => setSaveSuccess(false), 3000)
+        setWalletAddress(response.publicKey.toString());
+        setWalletConnected(true);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
       }
     } catch (error) {
-      console.error("Failed to connect Phantom wallet:", error)
-      alert("Please install Phantom wallet or check if it's enabled")
+      console.error('Failed to connect Phantom wallet:', error);
+      alert("Please install Phantom wallet or check if it's enabled");
     }
-  }
+  };
 
   const handleDisconnectPhantom = async () => {
     try {
-      await (window as any).solana?.disconnect()
-      setWalletConnected(false)
-      setWalletAddress("")
+      await (window as any).solana?.disconnect();
+      setWalletConnected(false);
+      setWalletAddress('');
     } catch (error) {
-      console.error("Failed to disconnect Phantom wallet:", error)
+      console.error('Failed to disconnect Phantom wallet:', error);
     }
-  }
+  };
 
   const handleSaveAPIKeys = () => {
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const handleClearAPIKeys = () => {
-    if (window.confirm("Are you sure you want to clear all API keys? This cannot be undone.")) {
-      clearAPIKeys()
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+    if (window.confirm('Are you sure you want to clear all API keys? This cannot be undone.')) {
+      clearAPIKeys();
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     }
-  }
+  };
 
   const handlePaperTradingToggle = () => {
-    setAPIKey("paperTradingEnabled", !apiKeys?.paperTradingEnabled)
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    setAPIKey('paperTradingEnabled', !apiKeys?.paperTradingEnabled);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const handlePaperTradingBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setPaperTradingInput(value)
-  }
+    const value = e.target.value;
+    setPaperTradingInput(value);
+  };
 
   const handleSavePaperTradingBalance = () => {
-    const balance = Number.parseFloat(paperTradingInput)
+    const balance = Number.parseFloat(paperTradingInput);
     if (isNaN(balance) || balance < 0) {
-      alert("Please enter a valid amount")
-      return
+      alert('Please enter a valid amount');
+      return;
     }
-    setAPIKey("paperTradingBalance", balance)
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    setAPIKey('paperTradingBalance', balance);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const handleResetPaperTrading = () => {
-    if (window.confirm("Reset paper trading balance to $10,000?")) {
-      setAPIKey("paperTradingBalance", 10000)
-      setPaperTradingInput("10000")
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+    if (window.confirm('Reset paper trading balance to $10,000?')) {
+      setAPIKey('paperTradingBalance', 10000);
+      setPaperTradingInput('10000');
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     }
-  }
+  };
 
   const handleAddBuyInAmount = () => {
-    const amount = Number.parseFloat(newBuyInAmount)
+    const amount = Number.parseFloat(newBuyInAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid amount")
-      return
+      alert('Please enter a valid amount');
+      return;
     }
     if (buyInAmounts.includes(amount)) {
-      alert("This amount already exists")
-      return
+      alert('This amount already exists');
+      return;
     }
-    const updated = [...buyInAmounts, amount].sort((a, b) => a - b)
-    setBuyInAmounts(updated)
-    setNewBuyInAmount("")
-    setAPIKey("buyInAmounts", updated)
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    const updated = [...buyInAmounts, amount].sort((a, b) => a - b);
+    setBuyInAmounts(updated);
+    setNewBuyInAmount('');
+    setAPIKey('buyInAmounts', updated);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const handleRemoveBuyInAmount = (amount: number) => {
-    const updated = buyInAmounts.filter((a) => a !== amount)
-    setBuyInAmounts(updated)
-    setAPIKey("buyInAmounts", updated)
+    const updated = buyInAmounts.filter(a => a !== amount);
+    setBuyInAmounts(updated);
+    setAPIKey('buyInAmounts', updated);
     if (apiKeys?.defaultBuyInAmount === amount) {
-      setAPIKey("defaultBuyInAmount", updated[0] || 50)
+      setAPIKey('defaultBuyInAmount', updated[0] || 50);
     }
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const handleSetDefaultBuyIn = (amount: number) => {
-    setAPIKey("defaultBuyInAmount", amount)
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
+    setAPIKey('defaultBuyInAmount', amount);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -233,19 +237,25 @@ export default function SettingsPage() {
             <TrendingUp className="w-5 h-5 text-accent" />
             Buy-In Preferences
           </CardTitle>
-          <CardDescription>Customize your quick buy-in amounts when jumping into new coins</CardDescription>
+          <CardDescription>
+            Customize your quick buy-in amounts when jumping into new coins
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Add new buy-in amount */}
           <div>
-            <label className="text-sm font-medium text-foreground block mb-2">Add Quick Buy-In Amount</label>
+            <label className="text-sm font-medium text-foreground block mb-2">
+              Add Quick Buy-In Amount
+            </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
                 <input
                   type="number"
                   value={newBuyInAmount}
-                  onChange={(e) => setNewBuyInAmount(e.target.value)}
+                  onChange={e => setNewBuyInAmount(e.target.value)}
                   placeholder="Enter amount"
                   min="1"
                   step="5"
@@ -264,20 +274,22 @@ export default function SettingsPage() {
 
           {/* Display current buy-in amounts */}
           <div>
-            <label className="text-sm font-medium text-foreground block mb-3">Your Quick Buy-In Amounts</label>
+            <label className="text-sm font-medium text-foreground block mb-3">
+              Your Quick Buy-In Amounts
+            </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {buyInAmounts.length === 0 ? (
                 <p className="text-xs text-muted-foreground col-span-full">
                   No buy-in amounts configured. Add one to get started.
                 </p>
               ) : (
-                buyInAmounts.map((amount) => (
+                buyInAmounts.map(amount => (
                   <div
                     key={amount}
                     className={`flex items-center justify-between px-3 py-2 rounded border transition-colors ${
                       apiKeys?.defaultBuyInAmount === amount
-                        ? "bg-accent/20 border-accent"
-                        : "bg-muted/10 border-border hover:border-primary"
+                        ? 'bg-accent/20 border-accent'
+                        : 'bg-muted/10 border-border hover:border-primary'
                     }`}
                   >
                     <div className="flex items-center gap-2 flex-1">
@@ -308,9 +320,9 @@ export default function SettingsPage() {
           {/* Info */}
           <div className="bg-muted/10 border border-border rounded-lg p-3">
             <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">Buy-In Info:</span> These amounts appear as quick buttons
-              when viewing new coins in the Market Surveillance. Select a default amount that will be pre-selected when
-              jumping into coins.
+              <span className="font-semibold text-foreground">Buy-In Info:</span> These amounts
+              appear as quick buttons when viewing new coins in the Market Surveillance. Select a
+              default amount that will be pre-selected when jumping into coins.
             </p>
           </div>
         </CardContent>
@@ -331,29 +343,33 @@ export default function SettingsPage() {
               <p className="text-sm font-medium text-foreground">Paper Trading Mode</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {apiKeys?.paperTradingEnabled
-                  ? "Active - Trading with virtual funds"
-                  : "Disabled - Enable to start practicing"}
+                  ? 'Active - Trading with virtual funds'
+                  : 'Disabled - Enable to start practicing'}
               </p>
             </div>
             <button
               onClick={handlePaperTradingToggle}
               className={`px-4 py-2 rounded font-medium transition-colors ${
                 apiKeys?.paperTradingEnabled
-                  ? "bg-accent text-accent-foreground hover:opacity-90"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? 'bg-accent text-accent-foreground hover:opacity-90'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
-              {apiKeys?.paperTradingEnabled ? "Deactivate" : "Activate"}
+              {apiKeys?.paperTradingEnabled ? 'Deactivate' : 'Activate'}
             </button>
           </div>
 
           {apiKeys?.paperTradingEnabled && (
             <div className="space-y-4 pt-2">
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">Starting Balance</label>
+                <label className="text-sm font-medium text-foreground block mb-2">
+                  Starting Balance
+                </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                      $
+                    </span>
                     <input
                       type="number"
                       value={paperTradingInput}
@@ -377,10 +393,10 @@ export default function SettingsPage() {
                 <p className="text-sm font-medium text-foreground mb-1">Current Virtual Balance</p>
                 <p className="text-2xl font-bold text-accent">
                   $
-                  {apiKeys?.paperTradingBalance?.toLocaleString("en-US", {
+                  {apiKeys?.paperTradingBalance?.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }) || "10000"}
+                  }) || '10000'}
                 </p>
                 <button
                   onClick={handleResetPaperTrading}
@@ -392,8 +408,9 @@ export default function SettingsPage() {
 
               <div className="bg-muted/10 border border-border rounded-lg p-3">
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">Paper Trading Info:</span> Your virtual balance is
-                  used for simulating trades. This does not affect your real portfolio or wallet.
+                  <span className="font-semibold text-foreground">Paper Trading Info:</span> Your
+                  virtual balance is used for simulating trades. This does not affect your real
+                  portfolio or wallet.
                 </p>
               </div>
             </div>
@@ -409,7 +426,8 @@ export default function SettingsPage() {
             API Keys & Configuration
           </CardTitle>
           <CardDescription>
-            Add your own API keys instead of relying on .env file. These are stored locally in your browser.
+            Add your own API keys instead of relying on .env file. These are stored locally in your
+            browser.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -422,7 +440,7 @@ export default function SettingsPage() {
             <input
               type="text"
               value={apiKeys?.databaseUrl}
-              onChange={(e) => setAPIKey("databaseUrl", e.target.value)}
+              onChange={e => setAPIKey('databaseUrl', e.target.value)}
               placeholder="sqlite:./database.db"
               className="w-full bg-input rounded px-3 py-2 text-foreground mt-1 border border-border focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
             />
@@ -437,7 +455,7 @@ export default function SettingsPage() {
             <input
               type="text"
               value={apiKeys?.sentrySdn}
-              onChange={(e) => setAPIKey("sentrySdn", e.target.value)}
+              onChange={e => setAPIKey('sentrySdn', e.target.value)}
               placeholder="https://your-key@sentry.io/project-id"
               className="w-full bg-input rounded px-3 py-2 text-foreground mt-1 border border-border focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
             />
@@ -447,17 +465,17 @@ export default function SettingsPage() {
           <div>
             <label className="text-sm font-medium text-foreground block mb-2">LLM Provider</label>
             <div className="grid grid-cols-2 gap-2">
-              {["claude", "gpt4"].map((provider) => (
+              {['claude', 'gpt4'].map(provider => (
                 <button
                   key={provider}
-                  onClick={() => setAPIKey("llmProvider", provider as "claude" | "gpt4")}
+                  onClick={() => setAPIKey('llmProvider', provider as 'claude' | 'gpt4')}
                   className={`py-2 px-3 rounded border transition-colors ${
                     apiKeys?.llmProvider === provider
-                      ? "bg-primary border-primary text-primary-foreground"
-                      : "bg-muted/10 border-border text-foreground hover:border-primary"
+                      ? 'bg-primary border-primary text-primary-foreground'
+                      : 'bg-muted/10 border-border text-foreground hover:border-primary'
                   }`}
                 >
-                  {provider === "claude" ? "Claude (Anthropic)" : "GPT-4 (OpenAI)"}
+                  {provider === 'claude' ? 'Claude (Anthropic)' : 'GPT-4 (OpenAI)'}
                 </button>
               ))}
             </div>
@@ -471,17 +489,21 @@ export default function SettingsPage() {
             </label>
             <div className="relative">
               <input
-                type={showPasswords["claude"] ? "text" : "password"}
+                type={showPasswords['claude'] ? 'text' : 'password'}
                 value={apiKeys?.claudeApiKey}
-                onChange={(e) => setAPIKey("claudeApiKey", e.target.value)}
+                onChange={e => setAPIKey('claudeApiKey', e.target.value)}
                 placeholder="sk-ant-..."
                 className="w-full bg-input rounded px-3 py-2 pr-10 text-foreground mt-1 border border-border focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
               />
               <button
-                onClick={() => togglePasswordVisibility("claude")}
+                onClick={() => togglePasswordVisibility('claude')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                {showPasswords["claude"] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPasswords['claude'] ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -494,17 +516,21 @@ export default function SettingsPage() {
             </label>
             <div className="relative">
               <input
-                type={showPasswords["openai"] ? "text" : "password"}
+                type={showPasswords['openai'] ? 'text' : 'password'}
                 value={apiKeys?.openaiApiKey}
-                onChange={(e) => setAPIKey("openaiApiKey", e.target.value)}
+                onChange={e => setAPIKey('openaiApiKey', e.target.value)}
                 placeholder="sk-proj-..."
                 className="w-full bg-input rounded px-3 py-2 pr-10 text-foreground mt-1 border border-border focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
               />
               <button
-                onClick={() => togglePasswordVisibility("openai")}
+                onClick={() => togglePasswordVisibility('openai')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                {showPasswords["openai"] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPasswords['openai'] ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -517,17 +543,21 @@ export default function SettingsPage() {
             </label>
             <div className="relative">
               <input
-                type={showPasswords["twitter"] ? "text" : "password"}
+                type={showPasswords['twitter'] ? 'text' : 'password'}
                 value={apiKeys?.twitterBearerToken}
-                onChange={(e) => setAPIKey("twitterBearerToken", e.target.value)}
+                onChange={e => setAPIKey('twitterBearerToken', e.target.value)}
                 placeholder="AAAA..."
                 className="w-full bg-input rounded px-3 py-2 pr-10 text-foreground mt-1 border border-border focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
               />
               <button
-                onClick={() => togglePasswordVisibility("twitter")}
+                onClick={() => togglePasswordVisibility('twitter')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                {showPasswords["twitter"] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPasswords['twitter'] ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -553,8 +583,9 @@ export default function SettingsPage() {
           {/* Security Notice */}
           <div className="bg-muted/10 border border-border rounded-lg p-3">
             <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">Security Note:</span> Your API keys are stored locally in
-              your browser's localStorage. They are never sent to our servers. Clear your browser data to remove them.
+              <span className="font-semibold text-foreground">Security Note:</span> Your API keys
+              are stored locally in your browser's localStorage. They are never sent to our servers.
+              Clear your browser data to remove them.
             </p>
           </div>
         </CardContent>
@@ -571,18 +602,20 @@ export default function SettingsPage() {
             <label className="text-sm font-medium text-foreground block mb-3">Select Theme</label>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { id: "eclipse", label: "Eclipse", desc: "Deep purple and gold" },
-                { id: "midnight", label: "Midnight", desc: "Navy and cyan" },
-                { id: "cyber", label: "Cyber", desc: "Electric pink and green" },
-                { id: "lunar", label: "Lunar", desc: "Silver and blue" },
-              ].map((themeOption) => (
+                { id: 'eclipse', label: 'Eclipse', desc: 'Deep purple and gold' },
+                { id: 'midnight', label: 'Midnight', desc: 'Navy and cyan' },
+                { id: 'cyber', label: 'Cyber', desc: 'Electric pink and green' },
+                { id: 'lunar', label: 'Lunar', desc: 'Silver and blue' },
+              ].map(themeOption => (
                 <button
                   key={themeOption.id}
-                  onClick={() => setAPIKey("theme", themeOption.id as "eclipse" | "midnight" | "cyber" | "lunar")}
+                  onClick={() =>
+                    setAPIKey('theme', themeOption.id as 'eclipse' | 'midnight' | 'cyber' | 'lunar')
+                  }
                   className={`p-4 rounded border-2 transition-all text-left ${
                     apiKeys?.theme === themeOption.id
-                      ? "border-accent bg-accent/10"
-                      : "border-border hover:border-primary"
+                      ? 'border-accent bg-accent/10'
+                      : 'border-border hover:border-primary'
                   }`}
                 >
                   <p className="text-sm font-semibold text-foreground">{themeOption.label}</p>
@@ -594,8 +627,8 @@ export default function SettingsPage() {
 
           <div className="bg-muted/10 border border-border rounded-lg p-3">
             <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">Theme Note:</span> Changes apply immediately across the
-              entire app. Your theme preference is saved locally.
+              <span className="font-semibold text-foreground">Theme Note:</span> Changes apply
+              immediately across the entire app. Your theme preference is saved locally.
             </p>
           </div>
         </CardContent>
@@ -623,5 +656,5 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

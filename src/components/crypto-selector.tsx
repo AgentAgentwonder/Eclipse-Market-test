@@ -1,28 +1,29 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { useAPIKeys } from "@/lib/api-context"
+import { useState } from 'react';
+import { useAPIKeys } from '@/lib/api-context';
 
 // Phantom wallet supported cryptocurrencies with mock data
 const PHANTOM_CRYPTOS = [
-  { symbol: "SOL", name: "Solana", balance: 45.5, usdValue: 12340.55 },
-  { symbol: "USDC", name: "USD Coin", balance: 5000, usdValue: 5000 },
-  { symbol: "USDT", name: "Tether", balance: 3200, usdValue: 3200 },
-  { symbol: "ORCA", name: "Orca", balance: 850, usdValue: 2550.75 },
-  { symbol: "RAY", name: "Raydium", balance: 420, usdValue: 1680.32 },
-  { symbol: "COPE", name: "Cope", balance: 500, usdValue: 125.5 },
-]
+  { symbol: 'SOL', name: 'Solana', balance: 45.5, usdValue: 12340.55 },
+  { symbol: 'USDC', name: 'USD Coin', balance: 5000, usdValue: 5000 },
+  { symbol: 'USDT', name: 'Tether', balance: 3200, usdValue: 3200 },
+  { symbol: 'ORCA', name: 'Orca', balance: 850, usdValue: 2550.75 },
+  { symbol: 'RAY', name: 'Raydium', balance: 420, usdValue: 1680.32 },
+  { symbol: 'COPE', name: 'Cope', balance: 500, usdValue: 125.5 },
+];
 
 export default function CryptoSelector() {
-  const { apiKeys, setAPIKey } = useAPIKeys()
-  const [isOpen, setIsOpen] = useState(false)
+  const { apiKeys, setAPIKey } = useAPIKeys();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const selectedCrypto = PHANTOM_CRYPTOS.find((c) => c.symbol === apiKeys.selectedCrypto) || PHANTOM_CRYPTOS[0]
+  const selectedCrypto =
+    PHANTOM_CRYPTOS.find(c => c.symbol === apiKeys.selectedCrypto) || PHANTOM_CRYPTOS[0];
 
   const handleSelect = (symbol: string) => {
-    setAPIKey("selectedCrypto", symbol)
-    setIsOpen(false)
-  }
+    setAPIKey('selectedCrypto', symbol);
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -33,7 +34,7 @@ export default function CryptoSelector() {
         <div>
           <div className="font-semibold text-foreground">{selectedCrypto.symbol}</div>
           <div className="text-xs text-muted-foreground">
-            ${selectedCrypto.usdValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+            ${selectedCrypto.usdValue.toLocaleString('en-US', { maximumFractionDigits: 2 })}
           </div>
         </div>
       </button>
@@ -44,12 +45,12 @@ export default function CryptoSelector() {
             <h3 className="font-semibold text-foreground text-sm">Select Cryptocurrency</h3>
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {PHANTOM_CRYPTOS.map((crypto) => (
+            {PHANTOM_CRYPTOS.map(crypto => (
               <button
                 key={crypto.symbol}
                 onClick={() => handleSelect(crypto.symbol)}
                 className={`w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors border-b border-border/50 last:border-b-0 ${
-                  crypto.symbol === apiKeys.selectedCrypto ? "bg-accent/10" : ""
+                  crypto.symbol === apiKeys.selectedCrypto ? 'bg-accent/10' : ''
                 }`}
               >
                 <div className="flex justify-between items-start">
@@ -58,9 +59,11 @@ export default function CryptoSelector() {
                     <div className="text-xs text-muted-foreground">{crypto.name}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-foreground">{crypto.balance.toLocaleString()}</div>
+                    <div className="font-medium text-foreground">
+                      {crypto.balance.toLocaleString()}
+                    </div>
                     <div className="text-xs text-accent">
-                      ${crypto.usdValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                      ${crypto.usdValue.toLocaleString('en-US', { maximumFractionDigits: 2 })}
                     </div>
                   </div>
                 </div>
@@ -70,5 +73,5 @@ export default function CryptoSelector() {
         </div>
       )}
     </div>
-  )
+  );
 }

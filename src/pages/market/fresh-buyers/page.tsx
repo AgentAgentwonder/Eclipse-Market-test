@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function FreshBuyersPage() {
   return (
@@ -21,5 +21,5 @@ export default function FreshBuyersPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

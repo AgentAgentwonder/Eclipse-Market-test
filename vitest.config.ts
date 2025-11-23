@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -18,7 +18,7 @@ export default defineConfig({
     exclude: [
       'node_modules/**',
       'tests/accessibility.test.ts',
-      'tests/drawings.test.ts', 
+      'tests/drawings.test.ts',
       'tests/tutorial-autostart.test.ts',
       'tests/tutorial-store.test.ts',
       'tests/v0-trading.test.ts',
@@ -33,4 +33,4 @@ export default defineConfig({
       reporter: ['text', 'html'],
     },
   },
-})
+});

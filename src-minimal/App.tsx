@@ -22,7 +22,7 @@ function MinimalApp() {
         addLog('Testing Tauri API...');
         const { invoke } = await import('@tauri-apps/api/core');
         addLog('Tauri invoke imported successfully');
-        
+
         // Test a simple command that should exist
         const result = await invoke('biometric_get_status');
         addLog(`Tauri command result: ${JSON.stringify(result)}`);
@@ -40,7 +40,7 @@ function MinimalApp() {
         const { useThemeStore } = await import('./src/store/themeStore');
         const theme = useThemeStore.getState();
         addLog(`Theme store loaded: ${theme.currentTheme.name}`);
-        
+
         const { useAccessibilityStore } = await import('./src/store/accessibilityStore');
         const accessibility = useAccessibilityStore.getState();
         addLog(`Accessibility store loaded: fontScale=${accessibility.fontScale}`);
@@ -65,35 +65,67 @@ function MinimalApp() {
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace', backgroundColor: '#1a1a1a', color: '#fff', minHeight: '100vh' }}>
+    <div
+      style={{
+        padding: '20px',
+        fontFamily: 'monospace',
+        backgroundColor: '#1a1a1a',
+        color: '#fff',
+        minHeight: '100vh',
+      }}
+    >
       <h1>Eclipse Market Pro - Minimal Test App</h1>
       <p>This is a minimal version to isolate startup issues.</p>
-      
-      <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#2a2a2a', borderRadius: '5px' }}>
+
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '10px',
+          backgroundColor: '#2a2a2a',
+          borderRadius: '5px',
+        }}
+      >
         <h3>Startup Logs:</h3>
         <div style={{ maxHeight: '300px', overflow: 'auto', fontSize: '12px' }}>
           {logs.map((log, index) => (
-            <div key={index} style={{ marginBottom: '5px' }}>{log}</div>
+            <div key={index} style={{ marginBottom: '5px' }}>
+              {log}
+            </div>
           ))}
         </div>
       </div>
 
       <div style={{ marginTop: '20px' }}>
-        <button 
+        <button
           onClick={() => window.location.reload()}
-          style={{ padding: '10px 20px', marginRight: '10px', backgroundColor: '#007acc', color: 'white', border: 'none', borderRadius: '5px' }}
+          style={{
+            padding: '10px 20px',
+            marginRight: '10px',
+            backgroundColor: '#007acc',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+          }}
         >
           Reload
         </button>
-        <button 
+        <button
           onClick={() => {
-            import('./src/App').then(() => {
-              addLog('Full App module loaded successfully');
-            }).catch(error => {
-              addLog(`Failed to load full App: ${error}`);
-            });
+            import('./src/App')
+              .then(() => {
+                addLog('Full App module loaded successfully');
+              })
+              .catch(error => {
+                addLog(`Failed to load full App: ${error}`);
+              });
           }}
-          style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px' }}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+          }}
         >
           Test Full App Import
         </button>

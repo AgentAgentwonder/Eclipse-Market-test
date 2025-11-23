@@ -1,23 +1,23 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import CryptoSelector from "./crypto-selector"
+import { useState } from 'react';
+import CryptoSelector from './crypto-selector';
 
 interface TopNavProps {
-  onToggleSidebar: () => void
-  sidebarOpen: boolean
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
 }
 
 export default function TopNav({ onToggleSidebar, sidebarOpen }: TopNavProps) {
-  const [isSpinning, setIsSpinning] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false);
 
   const handleLogoClick = () => {
-    setIsSpinning(true)
+    setIsSpinning(true);
     setTimeout(() => {
-      onToggleSidebar()
-      setIsSpinning(false)
-    }, 300)
-  }
+      onToggleSidebar();
+      setIsSpinning(false);
+    }, 300);
+  };
 
   return (
     <div className="h-16 bg-card border-b border-border flex items-center px-6 gap-4">
@@ -28,7 +28,7 @@ export default function TopNav({ onToggleSidebar, sidebarOpen }: TopNavProps) {
       >
         <div
           className={`w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center ${
-            isSpinning ? "eclipse-spin" : ""
+            isSpinning ? 'eclipse-spin' : ''
           }`}
         >
           <span className="text-xs font-bold text-primary-foreground">E</span>
@@ -42,5 +42,5 @@ export default function TopNav({ onToggleSidebar, sidebarOpen }: TopNavProps) {
         <CryptoSelector />
       </div>
     </div>
-  )
+  );
 }

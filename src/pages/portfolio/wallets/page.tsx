@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Copy, ExternalLink } from "lucide-react"
+import { Card, CardContent } from '@/components/ui/card';
+import { Copy, ExternalLink } from 'lucide-react';
 
 export default function WalletsPage() {
   const wallets = [
-    { type: "Phantom", address: "7Kj9...q4M2", network: "Solana", balance: "$4,850.00" },
-    { type: "MetaMask", address: "0x8a2...b3c", network: "Ethereum", balance: "$12,450.00" },
-  ]
+    { type: 'Phantom', address: '7Kj9...q4M2', network: 'Solana', balance: '$4,850.00' },
+    { type: 'MetaMask', address: '0x8a2...b3c', network: 'Ethereum', balance: '$12,450.00' },
+  ];
 
   return (
     <div className="p-6 space-y-6 fade-in">
@@ -43,5 +43,5 @@ export default function WalletsPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

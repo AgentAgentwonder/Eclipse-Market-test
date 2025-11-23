@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Card } from "@/components/ui/card"
+import { Card } from '@/components/ui/card';
 
 export default function PortfolioOverview() {
   return (
@@ -37,5 +37,5 @@ export default function PortfolioOverview() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

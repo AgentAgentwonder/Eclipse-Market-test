@@ -1,20 +1,20 @@
-"use client"
+'use client';
 
-import { useNavigate, useParams } from "react-router-dom"
-import { useState, useEffect } from "react"
-import { useAPIKeys } from "@/lib/api-context"
-import { Card } from "@/components/ui/card"
-import { ArrowLeft } from "lucide-react"
-import CandlestickChart from "@/components/candlestick-chart"
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useAPIKeys } from '@/lib/api-context';
+import { Card } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
+import CandlestickChart from '@/components/candlestick-chart';
 
 interface CoinData {
-  symbol: string
-  name: string
-  price: number
-  marketCap: number
-  holders: number
-  totalFees: number
-  change24h: number
+  symbol: string;
+  name: string;
+  price: number;
+  marketCap: number;
+  holders: number;
+  totalFees: number;
+  change24h: number;
 }
 
 // Mock coin data
@@ -26,53 +26,56 @@ const getCoinData = (symbol: string): CoinData => ({
   holders: 125000,
   totalFees: 15000,
   change24h: 12.5,
-})
+});
 
 export default function CoinDetailPage() {
-  const params = useParams<{ symbol?: string }>()
-  const navigate = useNavigate()
-  const { apiKeys } = useAPIKeys()
-  const coinSymbol = (params.symbol ?? "SOL").toUpperCase()
+  const params = useParams<{ symbol?: string }>();
+  const navigate = useNavigate();
+  const { apiKeys } = useAPIKeys();
+  const coinSymbol = (params.symbol ?? 'SOL').toUpperCase();
 
-  const [coin, setCoin] = useState<CoinData | null>(null)
-  const [buyAmount, setBuyAmount] = useState<string>("")
-  const [mounted, setMounted] = useState(false)
+  const [coin, setCoin] = useState<CoinData | null>(null);
+  const [buyAmount, setBuyAmount] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-    setCoin(getCoinData(coinSymbol))
-  }, [coinSymbol])
+    setMounted(true);
+    setCoin(getCoinData(coinSymbol));
+  }, [coinSymbol]);
 
   if (!mounted || !coin) {
-    return <div className="p-8 text-center text-muted-foreground">Loading coin...</div>
+    return <div className="p-8 text-center text-muted-foreground">Loading coin...</div>;
   }
 
   const handleQuickBuy = (amount: number) => {
-    console.log("[v0] Quick buy:", amount, "of", coinSymbol)
+    console.log('[v0] Quick buy:', amount, 'of', coinSymbol);
     // Integrate with your trading logic here
-  }
+  };
 
   const handleQuickSell = () => {
-    console.log("[v0] Quick sell all of", coinSymbol)
+    console.log('[v0] Quick sell all of', coinSymbol);
     // Integrate with your trading logic here
-  }
+  };
 
   const handleCustomBuy = () => {
-    const amount = Number.parseFloat(buyAmount)
+    const amount = Number.parseFloat(buyAmount);
     if (!isNaN(amount) && amount > 0) {
-      console.log("[v0] Custom buy:", amount, "of", coinSymbol)
+      console.log('[v0] Custom buy:', amount, 'of', coinSymbol);
       // Integrate with your trading logic here
-      setBuyAmount("")
+      setBuyAmount('');
     }
-  }
+  };
 
-  const buyInAmounts = apiKeys.buyInAmounts || [10, 25, 50, 100]
+  const buyInAmounts = apiKeys.buyInAmounts || [10, 25, 50, 100];
 
   return (
     <div className="p-4 h-screen overflow-hidden flex flex-col space-y-4 fade-in">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted rounded transition-colors">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-muted rounded transition-colors"
+        >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div>
@@ -95,11 +98,15 @@ export default function CoinDetailPage() {
             <div className="grid grid-cols-4 gap-4">
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Holders</div>
-                <div className="text-2xl font-bold text-foreground">{(coin.holders / 1000).toFixed(0)}k</div>
+                <div className="text-2xl font-bold text-foreground">
+                  {(coin.holders / 1000).toFixed(0)}k
+                </div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Market Cap</div>
-                <div className="text-2xl font-bold text-accent">${(coin.marketCap / 1000000).toFixed(1)}M</div>
+                <div className="text-2xl font-bold text-accent">
+                  ${(coin.marketCap / 1000000).toFixed(1)}M
+                </div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Price</div>
@@ -107,8 +114,10 @@ export default function CoinDetailPage() {
               </div>
               <div>
                 <div className={`text-sm text-muted-foreground mb-1`}>24h Change</div>
-                <div className={`text-2xl font-bold ${coin.change24h >= 0 ? "text-accent" : "text-red-500"}`}>
-                  {coin.change24h >= 0 ? "+" : ""}
+                <div
+                  className={`text-2xl font-bold ${coin.change24h >= 0 ? 'text-accent' : 'text-red-500'}`}
+                >
+                  {coin.change24h >= 0 ? '+' : ''}
                   {coin.change24h}%
                 </div>
               </div>
@@ -136,7 +145,7 @@ export default function CoinDetailPage() {
           <div>
             <div className="text-xs font-semibold text-muted-foreground mb-2">Quick Buy ($)</div>
             <div className="space-y-2">
-              {buyInAmounts.map((amount) => (
+              {buyInAmounts.map(amount => (
                 <button
                   key={amount}
                   onClick={() => handleQuickBuy(amount)}
@@ -150,12 +159,14 @@ export default function CoinDetailPage() {
 
           {/* Custom Buy Amount */}
           <div className="pt-2 border-t border-border">
-            <label className="text-xs font-semibold text-muted-foreground block mb-2">Custom Amount ($)</label>
+            <label className="text-xs font-semibold text-muted-foreground block mb-2">
+              Custom Amount ($)
+            </label>
             <div className="flex gap-1">
               <input
                 type="number"
                 value={buyAmount}
-                onChange={(e) => setBuyAmount(e.target.value)}
+                onChange={e => setBuyAmount(e.target.value)}
                 placeholder="Enter amount"
                 className="flex-1 px-3 py-2 bg-background border border-border rounded text-xs text-foreground"
               />
@@ -178,12 +189,14 @@ export default function CoinDetailPage() {
             <div className="space-y-1">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Fees</span>
-                <span className="text-foreground font-medium">${(coin.totalFees / 1000).toFixed(1)}k</span>
+                <span className="text-foreground font-medium">
+                  ${(coin.totalFees / 1000).toFixed(1)}k
+                </span>
               </div>
             </div>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
