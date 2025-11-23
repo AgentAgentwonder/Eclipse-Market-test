@@ -13,7 +13,6 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const { apiKeys } = useAPIKeys();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
   const themeSelector = useCallback(
     (state: ThemeStoreState) => ({
@@ -26,26 +25,14 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const { activeThemeId, setActiveTheme } = useThemeStore(useShallow(themeSelector));
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
     setActiveTheme(apiKeys?.theme ?? 'eclipse');
   }, [apiKeys?.theme, setActiveTheme]);
 
   useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
     const htmlElement = document.documentElement;
     htmlElement.setAttribute('data-theme', activeThemeId);
     htmlElement.classList.add('dark');
-  }, [activeThemeId, mounted]);
-
-  if (!mounted) {
-    return null;
-  }
+  }, [activeThemeId]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
