@@ -1,140 +1,167 @@
-import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { getPersistentStorage } from './storage';
+import { createBoundStore } from './createBoundStore';
 
-export interface ToastMessage {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  title: string;
-  message?: string;
-  duration?: number;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
+export type Theme = 'dark' | 'light' | 'auto';
+
+export interface PanelVisibility {
+  sidebar: boolean;
+  watchlist: boolean;
+  orderBook: boolean;
+  trades: boolean;
+  chat: boolean;
+  alerts: boolean;
 }
 
-export interface LoadingState {
-  id: string;
-  message?: string;
-  progress?: number;
+interface UiStoreState {
+  theme: Theme;
+  panelVisibility: PanelVisibility;
+  devConsoleVisible: boolean;
+  sidebarCollapsed: boolean;
+  commandPaletteOpen: boolean;
+  notificationsEnabled: boolean;
+  soundEnabled: boolean;
+  animationsEnabled: boolean;
+  compactMode: boolean;
+
+  // Actions
+  setTheme: (theme: Theme) => void;
+  setPanelVisibility: (panel: keyof PanelVisibility, visible: boolean) => void;
+  togglePanel: (panel: keyof PanelVisibility) => void;
+  setDevConsoleVisible: (visible: boolean) => void;
+  toggleDevConsole: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
+  setCommandPaletteOpen: (open: boolean) => void;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  setSoundEnabled: (enabled: boolean) => void;
+  setAnimationsEnabled: (enabled: boolean) => void;
+  setCompactMode: (compact: boolean) => void;
+  reset: () => void;
 }
 
-export interface UIStoreState {
-  // Global loading states
-  loadingStates: LoadingState[];
-  setLoading: (id: string, loading: boolean, message?: string, progress?: number) => void;
-  clearLoading: (id: string) => void;
-  clearAllLoading: () => void;
-  isLoading: (id?: string) => boolean;
+const defaultPanelVisibility: PanelVisibility = {
+  sidebar: true,
+  watchlist: true,
+  orderBook: true,
+  trades: true,
+  chat: false,
+  alerts: true,
+};
 
-  // Toast notifications
-  toasts: ToastMessage[];
-  addToast: (toast: Omit<ToastMessage, 'id'>) => string;
-  removeToast: (id: string) => void;
-  clearToasts: () => void;
+const initialState = {
+  theme: 'dark' as Theme,
+  panelVisibility: defaultPanelVisibility,
+  devConsoleVisible: false,
+  sidebarCollapsed: false,
+  commandPaletteOpen: false,
+  notificationsEnabled: true,
+  soundEnabled: true,
+  animationsEnabled: true,
+  compactMode: false,
+};
 
-  // Error handling
-  globalError: Error | null;
-  setGlobalError: (error: Error | null) => void;
-  clearGlobalError: () => void;
-
-  // Dev console state
-  devConsoleOpen: boolean;
-  setDevConsoleOpen: (open: boolean) => void;
-
-  // App-wide loading overlay
-  isAppLoading: boolean;
-  appLoadingMessage?: string;
-  setAppLoading: (loading: boolean, message?: string) => void;
-}
-
-export const useUIStore = create<UIStoreState>()(
+const storeResult = createBoundStore<UiStoreState>((set, get) =>
   persist(
-    (set, get) => ({
-      // Loading states
-      loadingStates: [],
-      setLoading: (id, loading, message, progress) =>
-        set(state => {
-          const existingIndex = state.loadingStates.findIndex(s => s.id === id);
-          if (loading) {
-            const newState = { id, message, progress };
-            if (existingIndex >= 0) {
-              return {
-                loadingStates: state.loadingStates.map((s, i) =>
-                  i === existingIndex ? newState : s
-                ),
-              };
-            } else {
-              return {
-                loadingStates: [...state.loadingStates, newState],
-              };
-            }
-          } else {
-            return {
-              loadingStates: state.loadingStates.filter(s => s.id !== id),
-            };
-          }
-        }),
-      clearLoading: id =>
-        set(state => ({
-          loadingStates: state.loadingStates.filter(s => s.id !== id),
-        })),
-      clearAllLoading: () => set({ loadingStates: [] }),
-      isLoading: id => {
-        const states = get().loadingStates;
-        return id ? states.some(s => s.id === id) : states.length > 0;
+    {
+      ...initialState,
+
+      setTheme: theme => {
+        if (get().theme === theme) return;
+        set({ theme });
       },
 
-      // Toast notifications
-      toasts: [],
-      addToast: toast => {
-        const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        const newToast: ToastMessage = { ...toast, id };
+      setPanelVisibility: (panel, visible) => {
         set(state => ({
-          toasts: [...state.toasts, newToast],
+          panelVisibility: {
+            ...state.panelVisibility,
+            [panel]: visible,
+          },
         }));
-
-        // Auto-remove toast after duration (default 5 seconds)
-        const duration = toast.duration ?? 5000;
-        if (duration > 0) {
-          setTimeout(() => {
-            get().removeToast(id);
-          }, duration);
-        }
-
-        return id;
       },
-      removeToast: id =>
+
+      togglePanel: panel => {
         set(state => ({
-          toasts: state.toasts.filter(t => t.id !== id),
-        })),
-      clearToasts: () => set({ toasts: [] }),
+          panelVisibility: {
+            ...state.panelVisibility,
+            [panel]: !state.panelVisibility[panel],
+          },
+        }));
+      },
 
-      // Error handling
-      globalError: null,
-      setGlobalError: error => set({ globalError: error }),
-      clearGlobalError: () => set({ globalError: null }),
+      setDevConsoleVisible: visible => {
+        if (get().devConsoleVisible === visible) return;
+        set({ devConsoleVisible: visible });
+      },
 
-      // Dev console
-      devConsoleOpen: false,
-      setDevConsoleOpen: open => set({ devConsoleOpen: open }),
+      toggleDevConsole: () => {
+        set(state => ({ devConsoleVisible: !state.devConsoleVisible }));
+      },
 
-      // App loading overlay
-      isAppLoading: false,
-      appLoadingMessage: undefined,
-      setAppLoading: (loading, message) =>
-        set({
-          isAppLoading: loading,
-          appLoadingMessage: loading ? message : undefined,
-        }),
-    }),
+      setSidebarCollapsed: collapsed => {
+        if (get().sidebarCollapsed === collapsed) return;
+        set({ sidebarCollapsed: collapsed });
+      },
+
+      toggleSidebar: () => {
+        set(state => ({ sidebarCollapsed: !state.sidebarCollapsed }));
+      },
+
+      setCommandPaletteOpen: open => {
+        if (get().commandPaletteOpen === open) return;
+        set({ commandPaletteOpen: open });
+      },
+
+      setNotificationsEnabled: enabled => {
+        if (get().notificationsEnabled === enabled) return;
+        set({ notificationsEnabled: enabled });
+      },
+
+      setSoundEnabled: enabled => {
+        if (get().soundEnabled === enabled) return;
+        set({ soundEnabled: enabled });
+      },
+
+      setAnimationsEnabled: enabled => {
+        if (get().animationsEnabled === enabled) return;
+        set({ animationsEnabled: enabled });
+      },
+
+      setCompactMode: compact => {
+        if (get().compactMode === compact) return;
+        set({ compactMode: compact });
+      },
+
+      reset: () => {
+        set(initialState);
+      },
+    },
     {
       name: 'eclipse-ui-store',
       storage: createJSONStorage(getPersistentStorage),
       partialize: state => ({
-        devConsoleOpen: state.devConsoleOpen,
+        theme: state.theme,
+        panelVisibility: state.panelVisibility,
+        sidebarCollapsed: state.sidebarCollapsed,
+        notificationsEnabled: state.notificationsEnabled,
+        soundEnabled: state.soundEnabled,
+        animationsEnabled: state.animationsEnabled,
+        compactMode: state.compactMode,
       }),
     }
   )
 );
+
+export const useUiStore = storeResult.useStore;
+export const uiStore = storeResult.store;
+
+export const usePanelVisibility = (panel: keyof PanelVisibility) => {
+  return useUiStore(state => state.panelVisibility[panel]);
+};
+
+export const useDevConsole = () => {
+  return useUiStore(state => ({
+    visible: state.devConsoleVisible,
+    toggle: state.toggleDevConsole,
+  }));
+};
