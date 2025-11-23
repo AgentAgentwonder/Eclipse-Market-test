@@ -9,7 +9,7 @@ interface ToastProps {
 /**
  * Individual toast component
  */
-function Toast({ toast, onRemove }: ToastProps) {
+export function Toast({ toast, onRemove }: ToastProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
