@@ -4,7 +4,9 @@ export interface TokenBalance {
   name: string;
   balance: number;
   decimals: number;
+  uiAmount: number;
   usdValue: number;
+  price?: number;
   change24h: number;
   logoUri?: string;
   lastUpdated: string;

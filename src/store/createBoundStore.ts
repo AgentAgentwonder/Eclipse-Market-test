@@ -14,7 +14,9 @@ export type CreateStoreResult<T> = {
   subscribe: (listener: (state: T, prevState: T) => void) => () => void;
 };
 
-export function createBoundStore<T>(initializer: (set: any, get: any, api: any) => T): CreateStoreResult<T> {
+export function createBoundStore<T>(
+  initializer: (set: any, get: any, api: any) => T
+): CreateStoreResult<T> {
   const store = createZustandStore<T>(initializer);
 
   const useStore = (<U = T>(selector?: (state: T) => U) => {

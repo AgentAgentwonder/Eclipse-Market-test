@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       '@tauri-apps/api/tauri': path.resolve(__dirname, 'tests/mocks/tauri.ts'),
       '@tauri-apps/api/core': path.resolve(__dirname, 'tests/mocks/tauri.ts'),
       '@tauri-apps/api/event': path.resolve(__dirname, 'tests/mocks/tauri-event.ts'),

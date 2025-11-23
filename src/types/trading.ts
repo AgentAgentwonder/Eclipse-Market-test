@@ -1,6 +1,12 @@
 export type OrderType = 'market' | 'limit' | 'stoploss' | 'takeprofit' | 'trailingstop';
 export type OrderSide = 'buy' | 'sell';
-export type OrderStatus = 'pending' | 'partiallyfilled' | 'filled' | 'cancelled' | 'expired' | 'failed';
+export type OrderStatus =
+  | 'pending'
+  | 'partiallyfilled'
+  | 'filled'
+  | 'cancelled'
+  | 'expired'
+  | 'failed';
 
 export interface Order {
   id: string;

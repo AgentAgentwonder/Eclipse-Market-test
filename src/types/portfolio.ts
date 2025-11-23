@@ -50,6 +50,7 @@ export interface PortfolioAnalytics {
 export interface SectorAllocation {
   sector: string;
   allocation: number;
+  percentage: number;
   value: number;
   symbols: string[];
 }
@@ -66,6 +67,7 @@ export interface ConcentrationAlert {
 
 export interface Position {
   symbol: string;
+  amount: number;
   allocation: number;
   value: number;
   pnl?: number;
