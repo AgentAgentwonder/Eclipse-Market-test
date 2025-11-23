@@ -54,7 +54,7 @@ const storeWithMiddleware = (set: any, get: any, api: any) => ({
 
   initialize: async () => {
     if (get().isInitialized) return;
-    
+
     set({ isLoading: true, error: null });
     try {
       await invoke('trading_init');
@@ -93,14 +93,14 @@ const storeWithMiddleware = (set: any, get: any, api: any) => ({
 
     try {
       const order = await invoke<Order>('create_order', { request });
-      
+
       get().removeOptimisticOrder(optimisticOrder.id);
-      
+
       set(state => ({
         activeOrders: [...state.activeOrders, order],
         isLoading: false,
       }));
-      
+
       return order;
     } catch (error) {
       get().removeOptimisticOrder(optimisticOrder.id);
@@ -242,7 +242,7 @@ const storeWithMiddleware = (set: any, get: any, api: any) => ({
   handleOrderUpdate: (update: OrderUpdate) => {
     const state = get();
     const order = state.activeOrders.find(o => o.id === update.orderId);
-    
+
     if (!order) return;
 
     const updatedOrder: Order = {

@@ -22,6 +22,13 @@ export interface OptimizationAction {
   reason: string;
 }
 
+export interface OptimizationRecommendation {
+  action: string;
+  symbol: string;
+  amount?: number;
+  reason: string;
+}
+
 export interface PortfolioOptimization {
   id: string;
   timestamp: string;
@@ -31,6 +38,7 @@ export interface PortfolioOptimization {
   riskScore: number;
   reasoning: string[];
   actions: OptimizationAction[];
+  recommendations: OptimizationRecommendation[];
 }
 
 export interface PatternWarning {
@@ -41,6 +49,7 @@ export interface PatternWarning {
   tokens: string[];
   description: string;
   recommendation: string;
+  confidence: number;
 }
 
 export interface StreamingMetadata {

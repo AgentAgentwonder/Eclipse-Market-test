@@ -1,10 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import type {
-  Position,
-  PortfolioAnalytics,
-  SectorAllocation,
-  ConcentrationAlert,
-} from '../types';
+import type { Position, PortfolioAnalytics, SectorAllocation, ConcentrationAlert } from '../types';
 import { createBoundStore } from './createBoundStore';
 
 interface AnalyticsCache {
@@ -62,11 +57,7 @@ const storeResult = createBoundStore<PortfolioStoreState>((set, get) => ({
     const cached = get().analyticsCache[walletAddress];
     const now = Date.now();
 
-    if (
-      !forceRefresh &&
-      cached &&
-      now - new Date(cached.timestamp).getTime() < cached.ttl
-    ) {
+    if (!forceRefresh && cached && now - new Date(cached.timestamp).getTime() < cached.ttl) {
       return cached.data;
     }
 
