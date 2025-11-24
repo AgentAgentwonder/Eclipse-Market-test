@@ -207,3 +207,21 @@ pub async fn update_dev_settings(settings: DevSettings) -> Result<(), String> {
     tracing::info!("Updated dev settings: {:?}", settings);
     Ok(())
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TauriHealthStatus {
+    pub status: String,
+    pub timestamp: String,
+    pub version: String,
+    pub backend_initialized: bool,
+}
+
+#[tauri::command]
+pub async fn check_tauri_health() -> Result<TauriHealthStatus, String> {
+    Ok(TauriHealthStatus {
+        status: "healthy".to_string(),
+        timestamp: chrono::Utc::now().to_rfc3339(),
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        backend_initialized: true,
+    })
+}

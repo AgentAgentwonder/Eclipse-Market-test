@@ -8,6 +8,7 @@ import { AppErrorBoundary } from '@/components';
 import { ToastContainer } from '@/components';
 import { useDevConsoleAutoSetup } from '@/hooks';
 import { errorLogger } from '@/utils/errorLogger';
+import { checkTauriHealth, isTauriEnvironment } from '@/utils/tauriHealthCheck';
 import AIAssistantPage from '@/pages/ai/assistant/page';
 import AIPage from '@/pages/ai/page';
 import AIPredictionsPage from '@/pages/ai/predictions/page';
@@ -85,9 +86,39 @@ function App() {
   // Set up dev console keyboard shortcuts automatically
   useDevConsoleAutoSetup();
 
-  // Log app initialization
+  // Log app initialization and check Tauri health
   useEffect(() => {
     errorLogger.info('App component mounted and rendering', 'App.tsx');
+    
+    // Check if running in Tauri environment
+    if (isTauriEnvironment()) {
+      errorLogger.info('Running in Tauri environment', 'App.tsx');
+      
+      // Check Tauri backend health
+      checkTauriHealth().then(health => {
+        if (health) {
+          errorLogger.info(
+            `Tauri backend connected successfully (v${health.version})`,
+            'App.tsx',
+            { health }
+          );
+        } else {
+          errorLogger.warning(
+            'Tauri backend not responding - some features may be unavailable',
+            'App.tsx'
+          );
+        }
+      }).catch(error => {
+        errorLogger.error(
+          'Failed to check Tauri health',
+          'App.tsx',
+          error instanceof Error ? error : undefined
+        );
+      });
+    } else {
+      errorLogger.info('Running in browser environment (not Tauri)', 'App.tsx');
+    }
+    
     return () => {
       errorLogger.info('App component unmounting', 'App.tsx');
     };
