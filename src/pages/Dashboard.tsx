@@ -8,7 +8,6 @@ import { useWalletStore } from '@/store/walletStore';
 import { useTradingStore } from '@/store/tradingStore';
 import { usePortfolioStore } from '@/store/portfolioStore';
 import { useAiStore } from '@/store/aiStore';
-import { useShallow } from 'zustand/react/shallow';
 import { Wallet, TrendingUp, AlertCircle, Activity } from 'lucide-react';
 
 export default function Dashboard() {
@@ -28,7 +27,7 @@ export default function Dashboard() {
     fetchBalances,
     isLoading: walletLoading,
     error: walletError,
-  } = useWalletStore(walletSelector, useShallow);
+  } = useWalletStore(walletSelector);
 
   const tradingSelector = useCallback(
     (state: ReturnType<typeof useTradingStore.getState>) => ({
@@ -44,7 +43,7 @@ export default function Dashboard() {
     getActiveOrders,
     isLoading: tradingLoading,
     error: tradingError,
-  } = useTradingStore(tradingSelector, useShallow);
+  } = useTradingStore(tradingSelector);
 
   const portfolioSelector = useCallback(
     (state: ReturnType<typeof usePortfolioStore.getState>) => ({
@@ -64,7 +63,7 @@ export default function Dashboard() {
     fetchAnalytics,
     isLoading: portfolioLoading,
     error: portfolioError,
-  } = usePortfolioStore(portfolioSelector, useShallow);
+  } = usePortfolioStore(portfolioSelector);
 
   const aiSelector = useCallback(
     (state: ReturnType<typeof useAiStore.getState>) => ({
@@ -80,7 +79,7 @@ export default function Dashboard() {
     fetchPatternWarnings,
     isLoading: aiLoading,
     error: aiError,
-  } = useAiStore(aiSelector, useShallow);
+  } = useAiStore(aiSelector);
 
   useEffect(() => {
     if (activeAccount) {

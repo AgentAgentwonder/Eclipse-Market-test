@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect } from 'react';
 import { useAccessibilityStore, type AccessibilityState } from '@/store/accessibilityStore';
-import { useShallow } from 'zustand/react/shallow';
 import { errorLogger } from '@/utils/errorLogger';
 
 interface AccessibilityProviderProps {
@@ -19,7 +18,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
   );
 
   const { fontScale, highContrastMode, reducedMotion } = useAccessibilityStore(
-    useShallow(selector)
+    selector
   );
 
   useEffect(() => {

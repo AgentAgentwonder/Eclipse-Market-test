@@ -13,7 +13,6 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTradingStore } from '@/store/tradingStore';
 import { useWalletStore } from '@/store/walletStore';
-import { useShallow } from 'zustand/react/shallow';
 import { AlertCircle } from 'lucide-react';
 import type { CreateOrderRequest } from '@/types';
 
@@ -26,7 +25,7 @@ export function OrderForm() {
     }),
     []
   );
-  const { createOrder, isLoading, error } = useTradingStore(tradingSelector, useShallow);
+  const { createOrder, isLoading, error } = useTradingStore(tradingSelector);
 
   const walletSelector = useCallback(
     (state: ReturnType<typeof useWalletStore.getState>) => ({
@@ -34,7 +33,7 @@ export function OrderForm() {
     }),
     []
   );
-  const { activeAccount } = useWalletStore(walletSelector, useShallow);
+  const { activeAccount } = useWalletStore(walletSelector);
 
   const [orderType, setOrderType] = useState<'market' | 'limit' | 'stop_limit'>('market');
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
