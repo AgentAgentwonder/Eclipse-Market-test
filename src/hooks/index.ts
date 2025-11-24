@@ -10,5 +10,5 @@ export {
 export { useDevConsole, useDevConsoleShortcuts, useDevConsoleAutoSetup } from './useDevConsole';
 
 // Re-export existing hooks
-export { useMobile } from './use-mobile';
+export { useIsMobile as useMobile } from './use-mobile';
 export { useToast } from './use-toast';
