@@ -11,7 +11,7 @@ export function useDevConsole() {
   const [appWindow, setAppWindow] = useState<any>(null);
 
   useEffect(() => {
-    getCurrentWindow().then(setAppWindow);
+    setAppWindow(getCurrentWindow());
   }, []);
 
   const toggleDevConsole = useCallback(async () => {

@@ -6,7 +6,6 @@ import ClientLayout from '@/layouts/ClientLayout';
 import { APIProvider } from '@/lib/api-context';
 import { AppErrorBoundary } from '@/components';
 import { ToastContainer } from '@/components';
-import { useDevConsoleAutoSetup } from '@/hooks';
 import { errorLogger } from '@/utils/errorLogger';
 import { checkTauriHealth, isTauriEnvironment } from '@/utils/tauriHealthCheck';
 import AIAssistantPage from '@/pages/ai/assistant/page';
@@ -83,9 +82,6 @@ const ROUTES: RouteConfig[] = [
 ];
 
 function App() {
-  // Set up dev console keyboard shortcuts automatically
-  useDevConsoleAutoSetup();
-
   // Log app initialization and check Tauri health
   useEffect(() => {
     errorLogger.info('App component mounted and rendering', 'App.tsx');
