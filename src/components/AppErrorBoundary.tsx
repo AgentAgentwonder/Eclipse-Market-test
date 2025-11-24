@@ -1,4 +1,5 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { errorLogger } from '@/utils/errorLogger';
 import { useUIStore } from '../store/uiStore';
 
 interface Props {
@@ -38,6 +39,11 @@ export class AppErrorBoundary extends Component<Props, State> {
     this.setState({
       error,
       errorInfo,
+    });
+
+    // Log error using the centralized error logger
+    errorLogger.error(error.message, 'AppErrorBoundary', error, {
+      componentStack: errorInfo.componentStack,
     });
 
     // Call custom error handler if provided

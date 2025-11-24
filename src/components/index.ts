@@ -1,5 +1,6 @@
 // Re-export all components for easier importing
 export { AppErrorBoundary, withErrorBoundary } from './AppErrorBoundary';
+export { DevErrorDisplay } from './DevErrorDisplay';
 export {
   LoadingOverlay,
   Spinner,

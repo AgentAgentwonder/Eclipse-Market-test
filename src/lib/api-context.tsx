@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
+import { errorLogger } from '@/utils/errorLogger';
 
 interface APIKeys {
   databaseUrl: string;
@@ -46,13 +47,23 @@ export function APIProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
+    errorLogger.info('APIProvider: Loading API keys from localStorage', 'APIProvider');
     const stored = localStorage.getItem('eclipse_api_keys');
     if (stored) {
       try {
-        setApiKeys(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setApiKeys(parsed);
+        errorLogger.info('APIProvider: API keys loaded successfully', 'APIProvider');
       } catch (error) {
+        errorLogger.error(
+          'Failed to parse stored API keys',
+          'APIProvider',
+          error instanceof Error ? error : undefined
+        );
         console.error('Failed to load API keys:', error);
       }
+    } else {
+      errorLogger.info('APIProvider: No stored API keys found, using defaults', 'APIProvider');
     }
   }, []);
 
@@ -105,6 +116,7 @@ export function APIProvider({ children }: { children: React.ReactNode }) {
 export function useAPIKeys() {
   const context = useContext(APIContext);
   if (context === undefined) {
+    errorLogger.error('useAPIKeys must be used within an APIProvider', 'useAPIKeys Hook');
     throw new Error('useAPIKeys must be used within an APIProvider');
   }
   return context;
