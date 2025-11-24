@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { useEffect } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AccessibilityProvider } from '@/components/providers/AccessibilityProvider';
 import ClientLayout from '@/layouts/ClientLayout';
@@ -6,6 +7,7 @@ import { APIProvider } from '@/lib/api-context';
 import { AppErrorBoundary } from '@/components';
 import { ToastContainer } from '@/components';
 import { useDevConsoleAutoSetup } from '@/hooks';
+import { errorLogger } from '@/utils/errorLogger';
 import AIAssistantPage from '@/pages/ai/assistant/page';
 import AIPage from '@/pages/ai/page';
 import AIPredictionsPage from '@/pages/ai/predictions/page';
@@ -83,9 +85,20 @@ function App() {
   // Set up dev console keyboard shortcuts automatically
   useDevConsoleAutoSetup();
 
+  // Log app initialization
+  useEffect(() => {
+    errorLogger.info('App component mounted and rendering', 'App.tsx');
+    return () => {
+      errorLogger.info('App component unmounting', 'App.tsx');
+    };
+  }, []);
+
   return (
     <AppErrorBoundary
       onError={(error, errorInfo) => {
+        errorLogger.error('Unhandled error in App', 'App.tsx', error, {
+          componentStack: errorInfo.componentStack,
+        });
         console.error('Global error caught:', error, errorInfo);
         // In production, you might want to send this to an error reporting service
       }}

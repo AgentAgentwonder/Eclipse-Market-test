@@ -6,11 +6,6 @@
         "cmd": "git add ${file} && git commit -m 'Secure commit: ${fileBasename}' --verify"
       }
     ],
-    "exclude": [
-      "**/node_modules/**",
-      "**/target/**",
-      "*.env*",
-      "*.secret*"
-    ]
+    "exclude": ["**/node_modules/**", "**/target/**", "*.env*", "*.secret*"]
   }
 }

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useUIStore } from '../store/uiStore';
+import { errorLogger } from '@/utils/errorLogger';
 import type { ApiResponse, TauriError } from '../lib/tauri/types';
 
 // Generic options for the hook
@@ -71,6 +72,11 @@ export function useTauriCommand<T, A extends any[] = []>(
       }
 
       try {
+        errorLogger.info(`Executing command: ${loadingMessage || 'Operation'}`, 'useTauriCommand', {
+          loadingId,
+          args: JSON.stringify(args).substring(0, 100),
+        });
+
         const response = await commandFn(...args);
 
         if (!mountedRef.current) {
@@ -80,10 +86,20 @@ export function useTauriCommand<T, A extends any[] = []>(
         if (response.success) {
           setData(response.data);
           setError(null);
+          errorLogger.info(
+            `Command completed successfully: ${loadingMessage || 'Operation'}`,
+            'useTauriCommand'
+          );
           onSuccess?.(response.data);
         } else {
           setError(response.error || { message: 'Unknown error' });
           onError?.(response.error || { message: 'Unknown error' });
+          errorLogger.error(
+            `Command failed: ${response.error?.message || 'Unknown error'}`,
+            'useTauriCommand',
+            undefined,
+            { loadingId, error: response.error }
+          );
 
           // Show toast error if enabled
           if (showToastOnError && response.error) {
@@ -100,6 +116,13 @@ export function useTauriCommand<T, A extends any[] = []>(
         const errorObj: TauriError = {
           message: err instanceof Error ? err.message : 'Unexpected error occurred',
         };
+
+        errorLogger.error(
+          `Command execution error: ${errorObj.message}`,
+          'useTauriCommand',
+          err instanceof Error ? err : undefined,
+          { loadingId }
+        );
 
         if (mountedRef.current) {
           setError(errorObj);
