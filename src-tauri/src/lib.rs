@@ -2102,6 +2102,7 @@ pub fn run() {
             restart_service,
             get_dev_settings,
             update_dev_settings,
+            check_tauri_health,
             // P2P Marketplace & Escrow
             create_p2p_offer,
             get_p2p_offer,
