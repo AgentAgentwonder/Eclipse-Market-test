@@ -49,11 +49,9 @@ describe('ErrorLogger - Recursion Prevention', () => {
 
   it('should handle localStorage errors silently', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error');
-    const localStorageSetItemSpy = vi
-      .spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => {
-        throw new Error('localStorage is full');
-      });
+    const localStorageSetItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('localStorage is full');
+    });
 
     // This should not throw an error
     expect(() => {

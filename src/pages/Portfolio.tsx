@@ -7,6 +7,7 @@ import { Metric } from '@/components/ui/metric';
 import { usePortfolioStore } from '@/store/portfolioStore';
 import { useWalletStore } from '@/store/walletStore';
 import { useAiStore } from '@/store/aiStore';
+import { useShallow } from '@/store/createBoundStore';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { AlertCircle, TrendingUp, Sparkles } from 'lucide-react';
 
@@ -19,7 +20,7 @@ export default function Portfolio() {
     }),
     []
   );
-  const { activeAccount } = useWalletStore(walletSelector);
+  const { activeAccount } = useWalletStore(walletSelector, useShallow);
 
   const portfolioSelector = useCallback(
     (state: ReturnType<typeof usePortfolioStore.getState>) => ({
@@ -47,7 +48,7 @@ export default function Portfolio() {
     refreshPortfolio,
     isLoading,
     error,
-  } = usePortfolioStore(portfolioSelector);
+  } = usePortfolioStore(portfolioSelector, useShallow);
 
   const aiSelector = useCallback(
     (state: ReturnType<typeof useAiStore.getState>) => ({
@@ -56,7 +57,7 @@ export default function Portfolio() {
     }),
     []
   );
-  const { optimizePortfolio, isLoading: aiLoading } = useAiStore(aiSelector);
+  const { optimizePortfolio, isLoading: aiLoading } = useAiStore(aiSelector, useShallow);
 
   useEffect(() => {
     if (activeAccount) {
