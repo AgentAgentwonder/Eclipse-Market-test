@@ -65,7 +65,7 @@ try {
   if (root) {
     const storedLogs = localStorage.getItem('eclipse_error_logs');
     const previousErrors = storedLogs ? JSON.parse(storedLogs).slice(-5) : [];
-    
+
     root.innerHTML = `
       <div style="
         display: flex;
@@ -115,7 +115,9 @@ try {
             ">${error instanceof Error ? error.stack || 'No stack trace available' : String(error)}</pre>
           </div>
 
-          ${previousErrors.length > 0 ? `
+          ${
+            previousErrors.length > 0
+              ? `
           <details style="margin-bottom: 20px;">
             <summary style="
               cursor: pointer;
@@ -134,7 +136,9 @@ try {
               max-height: 200px;
               overflow-y: auto;
             ">
-              ${previousErrors.map((log) => `
+              ${previousErrors
+                .map(
+                  log => `
                 <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #333;">
                   <div style="color: #ffffff; font-size: 12px; font-weight: bold; margin-bottom: 4px;">
                     ${log.source}
@@ -146,10 +150,14 @@ try {
                     ${new Date(log.timestamp).toLocaleString()}
                   </div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
           </details>
-          ` : ''}
+          `
+              : ''
+          }
           
           <div style="
             display: flex;

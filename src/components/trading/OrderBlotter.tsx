@@ -20,9 +20,8 @@ export function OrderBlotter() {
     }),
     []
   );
-  const { activeOrders, optimisticOrders, cancelOrder, isLoading, error } = useTradingStore(
-    tradingSelector
-  );
+  const { activeOrders, optimisticOrders, cancelOrder, isLoading, error } =
+    useTradingStore(tradingSelector);
 
   const allOrders = useMemo(() => {
     const optimistic = Array.from(optimisticOrders.values());

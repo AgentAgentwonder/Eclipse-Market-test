@@ -43,7 +43,7 @@ class ErrorLogger {
       // Get existing logs from storage and merge with current logs
       const stored = localStorage.getItem(STORAGE_KEY);
       let allLogs: ErrorLog[] = [];
-      
+
       if (stored) {
         try {
           allLogs = JSON.parse(stored) as ErrorLog[];
@@ -51,16 +51,14 @@ class ErrorLogger {
           allLogs = [];
         }
       }
-      
+
       // Merge and deduplicate by timestamp
       const merged = [...allLogs, ...this.logs];
-      const unique = Array.from(
-        new Map(merged.map(log => [log.timestamp, log])).values()
-      );
-      
+      const unique = Array.from(new Map(merged.map(log => [log.timestamp, log])).values());
+
       // Keep only recent logs
       const recent = unique.slice(-MAX_STORED_LOGS);
-      
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));
     } catch (e) {
       // If localStorage fails, log to console but don't throw
