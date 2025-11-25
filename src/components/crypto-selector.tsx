@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAPIKeys } from '@/lib/api-context';
+import { useSettingsStore } from '@/store/settingsStore';
 
 // Phantom wallet supported cryptocurrencies with mock data
 const PHANTOM_CRYPTOS = [
@@ -14,14 +14,15 @@ const PHANTOM_CRYPTOS = [
 ];
 
 export default function CryptoSelector() {
-  const { apiKeys, setAPIKey } = useAPIKeys();
+  const selectedCrypto = useSettingsStore(state => state.selectedCrypto);
+  const setSelectedCrypto = useSettingsStore(state => state.setSelectedCrypto);
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedCrypto =
-    PHANTOM_CRYPTOS.find(c => c.symbol === apiKeys.selectedCrypto) || PHANTOM_CRYPTOS[0];
+  const selectedCryptoData =
+    PHANTOM_CRYPTOS.find(c => c.symbol === selectedCrypto) || PHANTOM_CRYPTOS[0];
 
   const handleSelect = (symbol: string) => {
-    setAPIKey('selectedCrypto', symbol);
+    setSelectedCrypto(symbol);
     setIsOpen(false);
   };
 
@@ -32,9 +33,9 @@ export default function CryptoSelector() {
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/20 transition-colors text-sm border border-border"
       >
         <div>
-          <div className="font-semibold text-foreground">{selectedCrypto.symbol}</div>
+          <div className="font-semibold text-foreground">{selectedCryptoData.symbol}</div>
           <div className="text-xs text-muted-foreground">
-            ${selectedCrypto.usdValue.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+            ${selectedCryptoData.usdValue.toLocaleString('en-US', { maximumFractionDigits: 2 })}
           </div>
         </div>
       </button>
@@ -50,7 +51,7 @@ export default function CryptoSelector() {
                 key={crypto.symbol}
                 onClick={() => handleSelect(crypto.symbol)}
                 className={`w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors border-b border-border/50 last:border-b-0 ${
-                  crypto.symbol === apiKeys.selectedCrypto ? 'bg-accent/10' : ''
+                  crypto.symbol === selectedCrypto ? 'bg-accent/10' : ''
                 }`}
               >
                 <div className="flex justify-between items-start">
