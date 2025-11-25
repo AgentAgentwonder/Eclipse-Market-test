@@ -10,15 +10,20 @@ export function FailsafeErrorOverlay() {
   const [errors, setErrors] = useState<ErrorLog[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAllLogs, setShowAllLogs] = useState(false);
+  const [lastLogCount, setLastLogCount] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const logs = errorLogger.getLogs();
-      setErrors(logs);
-    }, 100);
+      // Only update state if the number of logs has changed
+      if (logs.length !== lastLogCount) {
+        setErrors(logs);
+        setLastLogCount(logs.length);
+      }
+    }, 500); // Increased interval from 100ms to 500ms to reduce polling frequency
 
     return () => clearInterval(interval);
-  }, []);
+  }, [lastLogCount]);
 
   const errorCount = errors.filter(log => log.type === 'error').length;
   const warningCount = errors.filter(log => log.type === 'warning').length;
