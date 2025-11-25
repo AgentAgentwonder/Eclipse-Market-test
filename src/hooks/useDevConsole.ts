@@ -7,7 +7,14 @@ import { useUIStore } from '../store/uiStore';
  * Only works in development builds (when __DEV__ is true)
  */
 export function useDevConsole() {
-  const { devConsoleOpen, setDevConsoleOpen } = useUIStore();
+  const uiSelector = useCallback(
+    (state: ReturnType<typeof useUIStore.getState>) => ({
+      devConsoleOpen: state.devConsoleOpen,
+      setDevConsoleOpen: state.setDevConsoleOpen,
+    }),
+    []
+  );
+  const { devConsoleOpen, setDevConsoleOpen } = useUIStore(uiSelector);
   const [appWindow, setAppWindow] = useState<any>(null);
 
   useEffect(() => {

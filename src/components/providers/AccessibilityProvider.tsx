@@ -17,9 +17,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     []
   );
 
-  const { fontScale, highContrastMode, reducedMotion } = useAccessibilityStore(
-    selector
-  );
+  const { fontScale, highContrastMode, reducedMotion } = useAccessibilityStore(selector);
 
   useEffect(() => {
     errorLogger.info('AccessibilityProvider: Initializing', 'AccessibilityProvider');

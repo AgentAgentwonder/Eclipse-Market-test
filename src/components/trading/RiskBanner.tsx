@@ -13,9 +13,7 @@ export function RiskBanner() {
     }),
     []
   );
-  const { patternWarnings, fetchPatternWarnings, dismissPatternWarning } = useAiStore(
-    aiSelector
-  );
+  const { patternWarnings, fetchPatternWarnings, dismissPatternWarning } = useAiStore(aiSelector);
 
   useEffect(() => {
     fetchPatternWarnings();
