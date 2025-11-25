@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAPIKeys } from '@/lib/api-context';
+import { useSettingsStore } from '@/store/settingsStore';
 import { Card } from '@/components/ui/card';
 
 interface Coin {
@@ -69,7 +69,11 @@ const generateMockCoins = (): Coin[] => [
 ];
 
 export default function NewCoins() {
-  const { apiKeys, setAPIKey } = useAPIKeys();
+  const minMarketCap = useSettingsStore(state => state.minMarketCap);
+  const buyInAmounts = useSettingsStore(state => state.buyInAmounts);
+  const updateSetting = useSettingsStore(state => state.updateSetting);
+  const addBuyInPreset = useSettingsStore(state => state.addBuyInPreset);
+  
   const [coins, setCoins] = useState<Coin[]>([]);
   const [sortBy, setSortBy] = useState<'marketCap' | 'price' | 'holders' | 'athMarketCap' | 'age'>(
     'marketCap'
@@ -103,7 +107,7 @@ export default function NewCoins() {
   };
 
   const sortedCoins = [...coins]
-    .filter(coin => coin.marketCap >= apiKeys.minMarketCap)
+    .filter(coin => coin.marketCap >= minMarketCap)
     .sort((a, b) => {
       let aVal, bVal;
       switch (sortBy) {

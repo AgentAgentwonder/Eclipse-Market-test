@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import Sidebar from '@/components/sidebar';
 import TopNav from '@/components/top-nav';
-import { useAPIKeys } from '@/lib/api-context';
+import { useSettingsStore } from '@/store/settingsStore';
 import { useThemeStore, type ThemeStoreState } from '@/store/themeStore';
 import { useShallow } from '@/store/createBoundStore';
 
@@ -11,7 +11,6 @@ interface ClientLayoutProps {
 }
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
-  const { apiKeys } = useAPIKeys();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const themeSelector = useCallback(
@@ -23,11 +22,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   );
 
   const { activeThemeId, setActiveTheme } = useThemeStore(themeSelector, useShallow);
+  const settingsTheme = useSettingsStore(state => state.theme);
 
   useEffect(() => {
-    setActiveTheme(apiKeys?.theme ?? 'eclipse');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKeys?.theme]);
+    setActiveTheme(settingsTheme);
+  }, [settingsTheme, setActiveTheme]);
 
   useEffect(() => {
     const htmlElement = document.documentElement;
