@@ -5,6 +5,7 @@ import TopNav from '@/components/top-nav';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useThemeStore, type ThemeStoreState } from '@/store/themeStore';
 import { useShallow } from '@/store/createBoundStore';
+import { useTradingEventBridge } from '@/hooks/useTradingEventBridge';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -12,6 +13,9 @@ interface ClientLayoutProps {
 
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Mount trading event bridge once at app root
+  useTradingEventBridge();
 
   const themeSelector = useCallback(
     (state: ThemeStoreState) => ({

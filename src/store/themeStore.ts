@@ -183,76 +183,23 @@ const storeResult = createBoundStoreWithMiddleware<ThemeStoreState>()(
   subscribeWithSelector(
     persist(
       (set, get) => ({
-      activeThemeId: BUILTIN_THEMES[0].id,
-      currentTheme: BUILTIN_THEMES[0],
-      customThemes: [],
-      setActiveTheme: id =>
-        set(state => {
-          const nextTheme = findThemeById(id, state.customThemes) ?? BUILTIN_THEMES[0];
-          return {
-            activeThemeId: nextTheme.id,
-            currentTheme: nextTheme,
-          };
-        }),
-      createCustomTheme: (name, colors) => {
-        const theme: ThemeDefinition = {
-          id: createCustomThemeId(),
-          name,
-          type: 'custom',
-          colors: { ...colors },
-        };
-
-        set(state => ({
-          customThemes: [...state.customThemes, theme],
-          activeThemeId: theme.id,
-          currentTheme: theme,
-        }));
-
-        return theme;
-      },
-      updateCustomTheme: (id, colors) =>
-        set(state => ({
-          customThemes: state.customThemes.map(theme =>
-            theme.id === id ? { ...theme, colors: { ...theme.colors, ...colors } } : theme
-          ),
-          currentTheme:
-            state.currentTheme.id === id
-              ? { ...state.currentTheme, colors: { ...state.currentTheme.colors, ...colors } }
-              : state.currentTheme,
-        })),
-      deleteCustomTheme: id =>
-        set(state => {
-          const nextCustomThemes = state.customThemes.filter(theme => theme.id !== id);
-          const isActiveTheme = state.activeThemeId === id;
-          if (!isActiveTheme) {
-            return { customThemes: nextCustomThemes };
-          }
-
-          const fallbackTheme = nextCustomThemes[0] ?? BUILTIN_THEMES[0];
-          return {
-            customThemes: nextCustomThemes,
-            activeThemeId: fallbackTheme.id,
-            currentTheme: fallbackTheme,
-          };
-        }),
-      exportTheme: id => {
-        const theme = findThemeById(id, get().customThemes) ?? get().currentTheme;
-        return JSON.stringify({ id: theme.id, name: theme.name, colors: theme.colors }, null, 2);
-      },
-      importTheme: payload => {
-        try {
-          const parsed = JSON.parse(payload);
-          if (!parsed?.colors) {
-            return null;
-          }
-
-          const id: string =
-            parsed.id && typeof parsed.id === 'string' ? String(parsed.id) : createCustomThemeId();
+        activeThemeId: BUILTIN_THEMES[0].id,
+        currentTheme: BUILTIN_THEMES[0],
+        customThemes: [],
+        setActiveTheme: id =>
+          set(state => {
+            const nextTheme = findThemeById(id, state.customThemes) ?? BUILTIN_THEMES[0];
+            return {
+              activeThemeId: nextTheme.id,
+              currentTheme: nextTheme,
+            };
+          }),
+        createCustomTheme: (name, colors) => {
           const theme: ThemeDefinition = {
-            id: id.startsWith('custom-') ? id : createCustomThemeId(),
-            name: parsed.name || 'Imported Theme',
+            id: createCustomThemeId(),
+            name,
             type: 'custom',
-            colors: { ...parsed.colors },
+            colors: { ...colors },
           };
 
           set(state => ({
@@ -262,12 +209,67 @@ const storeResult = createBoundStoreWithMiddleware<ThemeStoreState>()(
           }));
 
           return theme;
-        } catch (error) {
-          console.error('[themeStore] Failed to import theme', error);
-          return null;
-        }
-      },
-      listThemes: () => BUILTIN_THEMES.concat(get().customThemes),
+        },
+        updateCustomTheme: (id, colors) =>
+          set(state => ({
+            customThemes: state.customThemes.map(theme =>
+              theme.id === id ? { ...theme, colors: { ...theme.colors, ...colors } } : theme
+            ),
+            currentTheme:
+              state.currentTheme.id === id
+                ? { ...state.currentTheme, colors: { ...state.currentTheme.colors, ...colors } }
+                : state.currentTheme,
+          })),
+        deleteCustomTheme: id =>
+          set(state => {
+            const nextCustomThemes = state.customThemes.filter(theme => theme.id !== id);
+            const isActiveTheme = state.activeThemeId === id;
+            if (!isActiveTheme) {
+              return { customThemes: nextCustomThemes };
+            }
+
+            const fallbackTheme = nextCustomThemes[0] ?? BUILTIN_THEMES[0];
+            return {
+              customThemes: nextCustomThemes,
+              activeThemeId: fallbackTheme.id,
+              currentTheme: fallbackTheme,
+            };
+          }),
+        exportTheme: id => {
+          const theme = findThemeById(id, get().customThemes) ?? get().currentTheme;
+          return JSON.stringify({ id: theme.id, name: theme.name, colors: theme.colors }, null, 2);
+        },
+        importTheme: payload => {
+          try {
+            const parsed = JSON.parse(payload);
+            if (!parsed?.colors) {
+              return null;
+            }
+
+            const id: string =
+              parsed.id && typeof parsed.id === 'string'
+                ? String(parsed.id)
+                : createCustomThemeId();
+            const theme: ThemeDefinition = {
+              id: id.startsWith('custom-') ? id : createCustomThemeId(),
+              name: parsed.name || 'Imported Theme',
+              type: 'custom',
+              colors: { ...parsed.colors },
+            };
+
+            set(state => ({
+              customThemes: [...state.customThemes, theme],
+              activeThemeId: theme.id,
+              currentTheme: theme,
+            }));
+
+            return theme;
+          } catch (error) {
+            console.error('[themeStore] Failed to import theme', error);
+            return null;
+          }
+        },
+        listThemes: () => BUILTIN_THEMES.concat(get().customThemes),
       }),
       {
         name: 'eclipse-theme-store',

@@ -40,7 +40,7 @@ export default function SettingsPage() {
   );
 
   const settings = useSettingsStore(settingsSelector, useShallow);
-  
+
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [paperTradingInput, setPaperTradingInput] = useState(
@@ -215,7 +215,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">Connected Wallet</p>
-                  <p className="text-xs text-muted-foreground font-mono mt-1">{settings.phantomWallet.address}</p>
+                  <p className="text-xs text-muted-foreground font-mono mt-1">
+                    {settings.phantomWallet.address}
+                  </p>
                 </div>
                 <div className="px-3 py-1 bg-accent/20 text-accent rounded text-xs font-medium flex items-center gap-1">
                   <Check className="w-3 h-3" />

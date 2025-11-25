@@ -28,10 +28,7 @@ export interface SettingsState {
   phantomWallet: PhantomWalletState;
 
   // Actions
-  updateSetting: <K extends keyof SettingsState>(
-    key: K,
-    value: SettingsState[K]
-  ) => void;
+  updateSetting: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
   togglePaperTrading: () => void;
   setPaperTradingBalance: (balance: number) => void;
   resetPaperTradingBalance: () => void;
@@ -43,7 +40,10 @@ export interface SettingsState {
   setSelectedCrypto: (crypto: string) => void;
   connectPhantom: (address: string) => void;
   disconnectPhantom: () => void;
-  updateAPIKey: (key: 'databaseUrl' | 'sentrySdn' | 'claudeApiKey' | 'openaiApiKey' | 'twitterBearerToken', value: string) => void;
+  updateAPIKey: (
+    key: 'databaseUrl' | 'sentrySdn' | 'claudeApiKey' | 'openaiApiKey' | 'twitterBearerToken',
+    value: string
+  ) => void;
   clearAllSettings: () => void;
   reset: () => void;
 }

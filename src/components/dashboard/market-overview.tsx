@@ -92,9 +92,9 @@ export default function MarketOverview() {
     }),
     []
   );
-  
+
   const settings = useSettingsStore(settingsSelector, useShallow);
-  
+
   const [coins, setCoins] = useState<Coin[]>([]);
   const [selectedBuyin, setSelectedBuyin] = useState<{ [key: string]: number }>({});
   const [sortBy, setSortBy] = useState<'marketCap' | 'price' | 'holders' | 'athMarketCap' | 'age'>(
@@ -174,7 +174,9 @@ export default function MarketOverview() {
   };
 
   const handleRemoveBuyIn = (amount: number) => {
-    const current = Array.isArray(settings.buyInAmounts) ? settings.buyInAmounts : [10, 25, 50, 100];
+    const current = Array.isArray(settings.buyInAmounts)
+      ? settings.buyInAmounts
+      : [10, 25, 50, 100];
     const updated = current.filter(a => a !== amount);
     settings.updateSetting('buyInAmounts', updated);
   };

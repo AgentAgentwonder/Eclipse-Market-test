@@ -61,6 +61,7 @@ interface WalletStoreState {
   startSendWorkflow: (input: SendTransactionInput) => void;
   updateSendWorkflow: (workflow: Partial<SendWorkflow>) => void;
   completeSendWorkflow: () => void;
+  handleTransactionUpdate: (signature: string, walletAddress?: string) => Promise<void>;
   setError: (error: string | null) => void;
   reset: () => void;
 }
@@ -260,6 +261,19 @@ const storeResult = createBoundStore<WalletStoreState>((set, get) => ({
 
   completeSendWorkflow: () => {
     set({ sendWorkflow: null });
+  },
+
+  handleTransactionUpdate: async (signature: string, walletAddress?: string) => {
+    console.log('[WalletStore] Transaction update received:', signature);
+    const targetAddress = walletAddress || get().activeAccount?.publicKey;
+    if (targetAddress) {
+      try {
+        await get().fetchBalances(targetAddress, true);
+        console.log('[WalletStore] Balances refreshed for:', targetAddress);
+      } catch (error) {
+        console.error('[WalletStore] Failed to refresh balances:', error);
+      }
+    }
   },
 
   setError: error => {

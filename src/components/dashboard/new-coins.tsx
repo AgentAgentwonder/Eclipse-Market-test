@@ -73,7 +73,7 @@ export default function NewCoins() {
   const buyInAmounts = useSettingsStore(state => state.buyInAmounts);
   const updateSetting = useSettingsStore(state => state.updateSetting);
   const addBuyInPreset = useSettingsStore(state => state.addBuyInPreset);
-  
+
   const [coins, setCoins] = useState<Coin[]>([]);
   const [sortBy, setSortBy] = useState<'marketCap' | 'price' | 'holders' | 'athMarketCap' | 'age'>(
     'marketCap'

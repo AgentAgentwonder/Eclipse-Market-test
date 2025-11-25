@@ -26,6 +26,13 @@ export interface ToastMessage {
   };
 }
 
+export interface EventBridgeStatus {
+  isConnected: boolean;
+  lastError: string | null;
+  lastEventTime: number | null;
+  eventsReceived: number;
+}
+
 interface UiStoreState {
   theme: Theme;
   panelVisibility: PanelVisibility;
@@ -40,6 +47,7 @@ interface UiStoreState {
   appLoadingMessage: string | null;
   toasts: ToastMessage[];
   devConsoleOpen: boolean;
+  eventBridgeStatus: EventBridgeStatus;
 
   // Actions
   setTheme: (theme: Theme) => void;
@@ -61,6 +69,8 @@ interface UiStoreState {
   setDevConsoleOpen: (open: boolean) => void;
   closeDevtools: () => void;
   openDevtools: () => void;
+  updateEventBridgeStatus: (status: Partial<EventBridgeStatus>) => void;
+  recordEventReceived: () => void;
   reset: () => void;
 }
 
@@ -87,6 +97,12 @@ const initialState = {
   appLoadingMessage: null as string | null,
   toasts: [] as ToastMessage[],
   devConsoleOpen: false,
+  eventBridgeStatus: {
+    isConnected: false,
+    lastError: null,
+    lastEventTime: null,
+    eventsReceived: 0,
+  } as EventBridgeStatus,
 };
 
 const storeResult = createBoundStoreWithMiddleware<UiStoreState>()(
@@ -210,6 +226,27 @@ const storeResult = createBoundStoreWithMiddleware<UiStoreState>()(
           set({ devConsoleOpen: true });
         },
 
+        updateEventBridgeStatus: status => {
+          set(state => ({
+            eventBridgeStatus: {
+              ...state.eventBridgeStatus,
+              ...status,
+            },
+          }));
+        },
+
+        recordEventReceived: () => {
+          set(state => ({
+            eventBridgeStatus: {
+              ...state.eventBridgeStatus,
+              lastEventTime: Date.now(),
+              eventsReceived: state.eventBridgeStatus.eventsReceived + 1,
+              isConnected: true,
+              lastError: null,
+            },
+          }));
+        },
+
         reset: () => {
           set(initialState);
         },
@@ -254,4 +291,8 @@ export const useTheme = () => {
 
 export const useToasts = () => {
   return useUiStore(state => state.toasts);
+};
+
+export const useEventBridgeStatus = () => {
+  return useUiStore(state => state.eventBridgeStatus);
 };
