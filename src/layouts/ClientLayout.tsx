@@ -4,6 +4,7 @@ import Sidebar from '@/components/sidebar';
 import TopNav from '@/components/top-nav';
 import { useAPIKeys } from '@/lib/api-context';
 import { useThemeStore, type ThemeStoreState } from '@/store/themeStore';
+import { useShallow } from '@/store/createBoundStore';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -21,7 +22,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     []
   );
 
-  const { activeThemeId, setActiveTheme } = useThemeStore(themeSelector);
+  const { activeThemeId, setActiveTheme } = useThemeStore(themeSelector, useShallow);
 
   useEffect(() => {
     setActiveTheme(apiKeys?.theme ?? 'eclipse');

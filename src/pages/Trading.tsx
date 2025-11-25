@@ -4,6 +4,7 @@ import { OrderForm } from '@/components/trading/OrderForm';
 import { OrderBlotter } from '@/components/trading/OrderBlotter';
 import { RiskBanner } from '@/components/trading/RiskBanner';
 import { useTradingStore } from '@/store/tradingStore';
+import { useShallow } from '@/store/createBoundStore';
 import { AlertCircle } from 'lucide-react';
 
 export default function Trading() {
@@ -15,7 +16,7 @@ export default function Trading() {
     }),
     []
   );
-  const { isInitialized, initialize, error } = useTradingStore(tradingSelector);
+  const { isInitialized, initialize, error } = useTradingStore(tradingSelector, useShallow);
 
   useEffect(() => {
     if (!isInitialized) {

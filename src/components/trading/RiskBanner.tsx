@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAiStore } from '@/store/aiStore';
+import { useShallow } from '@/store/createBoundStore';
 import { AlertTriangle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -13,7 +14,10 @@ export function RiskBanner() {
     }),
     []
   );
-  const { patternWarnings, fetchPatternWarnings, dismissPatternWarning } = useAiStore(aiSelector);
+  const { patternWarnings, fetchPatternWarnings, dismissPatternWarning } = useAiStore(
+    aiSelector,
+    useShallow
+  );
 
   useEffect(() => {
     fetchPatternWarnings();
