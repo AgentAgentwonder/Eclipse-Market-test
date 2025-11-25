@@ -17,8 +17,7 @@ export function RiskBanner() {
 
   useEffect(() => {
     fetchPatternWarnings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchPatternWarnings]);
 
   const handleDismiss = useCallback(
     async (warningId: string) => {
