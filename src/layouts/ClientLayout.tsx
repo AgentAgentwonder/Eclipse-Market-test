@@ -26,7 +26,8 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   useEffect(() => {
     setActiveTheme(apiKeys?.theme ?? 'eclipse');
-  }, [apiKeys?.theme, setActiveTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKeys?.theme]);
 
   useEffect(() => {
     const htmlElement = document.documentElement;
