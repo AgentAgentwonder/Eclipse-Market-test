@@ -78,3 +78,33 @@ export interface QuickTradeRequest {
   walletAddress: string;
   useMax: boolean;
 }
+
+export interface OrderTriggeredEvent {
+  orderId: string;
+  orderType: OrderType;
+  symbol: string;
+  side: OrderSide;
+  triggerPrice: number;
+  amount: number;
+}
+
+export interface TransactionUpdate {
+  signature: string;
+  slot: number;
+  timestamp: number;
+  typ?: string;
+  amount?: number;
+  symbol?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface CopyTradeExecutionEvent {
+  configId: string;
+  name: string;
+  sourceWallet: string;
+  amount: number;
+  symbol: string;
+  status: string;
+  txSignature?: string;
+}

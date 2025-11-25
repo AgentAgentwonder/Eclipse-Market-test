@@ -43,7 +43,10 @@ export function createBoundStore<T>(
   // Wrap initializer with subscribeWithSelector middleware
   const store = createZustandStore<T>()(subscribeWithSelector(initializer));
 
-  const useStore: any = <U = T>(selector?: (state: T) => U, equalityFn?: (a: U, b: U) => boolean) => {
+  const useStore: any = <U = T>(
+    selector?: (state: T) => U,
+    equalityFn?: (a: U, b: U) => boolean
+  ) => {
     return useZustandStore(store, selector as any, equalityFn as any);
   };
 
@@ -92,7 +95,10 @@ export function createBoundStoreWithMiddleware<T>() {
   return (creator: any): CreateStoreResult<T> => {
     const store = createZustandStore<T>()(creator);
 
-    const useStore: any = <U = T>(selector?: (state: T) => U, equalityFn?: (a: U, b: U) => boolean) => {
+    const useStore: any = <U = T>(
+      selector?: (state: T) => U,
+      equalityFn?: (a: U, b: U) => boolean
+    ) => {
       return useZustandStore(store, selector as any, equalityFn as any);
     };
 
