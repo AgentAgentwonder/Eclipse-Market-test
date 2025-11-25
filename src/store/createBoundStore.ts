@@ -1,7 +1,7 @@
 import { createStore as createZustandStore, useStore as useZustandStore } from 'zustand';
 import type { StoreApi } from 'zustand';
 
-export { shallow as useShallow } from 'zustand/react/shallow';
+export { useShallow } from 'zustand/react/shallow';
 
 export type CreateStoreResult<T> = {
   store: StoreApi<T>;
