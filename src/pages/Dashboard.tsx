@@ -88,8 +88,7 @@ export default function Dashboard() {
       fetchAnalytics(activeAccount.publicKey);
     }
     fetchPatternWarnings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeAccount?.publicKey]);
+  }, [activeAccount, fetchBalances, getActiveOrders, fetchAnalytics, fetchPatternWarnings]);
 
   const accountBalances = useMemo(() => {
     if (!activeAccount) return [];

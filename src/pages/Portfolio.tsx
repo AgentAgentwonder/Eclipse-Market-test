@@ -63,8 +63,7 @@ export default function Portfolio() {
       refreshPortfolio(activeAccount.publicKey);
       fetchSectorAllocations(activeAccount.publicKey);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeAccount?.publicKey]);
+  }, [activeAccount, refreshPortfolio, fetchSectorAllocations]);
 
   const handleOptimize = useCallback(async () => {
     if (!activeAccount || positions.length === 0) return;

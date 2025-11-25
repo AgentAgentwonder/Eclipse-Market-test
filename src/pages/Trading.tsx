@@ -21,8 +21,7 @@ export default function Trading() {
     if (!isInitialized) {
       initialize();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialized]);
+  }, [isInitialized, initialize]);
 
   return (
     <div className="p-6 space-y-6 fade-in">
